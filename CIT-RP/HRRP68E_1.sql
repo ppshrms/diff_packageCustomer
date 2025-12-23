@@ -57,7 +57,7 @@
         param_msg_error := get_error_msg_php('HR2010',global_v_lang,'TEMPLOY1');
         return;
       end;
-      v_flgSecur := secur_main.secur2(b_index_codselect, global_v_coduser,global_v_zminlvl, global_v_zwrklvl, global_v_zupdsal);
+      v_flgSecur := secur_main.secur2(b_index_codselect, global_v_coduser,global_v_zminlvl, global_v_zwrklvl, global_v_zupdsal, global_v_numlvlsalst, global_v_numlvlsalen);
       if not v_flgSecur then
         param_msg_error := get_error_msg_php('HR3007',global_v_lang);
         return;
@@ -350,9 +350,6 @@
     obj_row   := json_object_t();
     obj_data  := json_object_t();
     v_condition := p_code;
-    
-
-
     if p_code is not null then
       v_stmt := 'select distinct codempid,codpos,codcomp,dteempdb,dteempmt,jobgrade '||
                 'from V_RP_EMP '||
@@ -367,9 +364,6 @@
                 'and (' || v_condition||') '||
                 'and V_RP_EMP.codcomp like '''||b_index_codcomp||'%'||'''';
     end if;
-    
-    
-
     for r1 in c1 loop
       v_flgsecur := secur_main.secur2(r1.codempid, global_v_coduser, global_v_zminlvl, global_v_zwrklvl, global_v_zupdsal, global_v_numlvlsalst, global_v_numlvlsalen);
       if v_flgsecur then
@@ -400,7 +394,6 @@
         v_count := v_count + 1;
       end if;
     end loop;
-
     if v_stmt is not null then
       begin
         v_cursor_id  := dbms_sql.open_cursor;
@@ -412,8 +405,6 @@
         dbms_sql.define_column(v_cursor_id, 5, v_dteempmt);
         dbms_sql.define_column(v_cursor_id, 6, v_jobgrade,100);
 
-
-    
         v_fetch := dbms_sql.execute(v_cursor_id);
         while dbms_sql.fetch_rows(v_cursor_id) > 0 loop
           dbms_sql.column_value(v_cursor_id, 1, v_codempid);
@@ -461,9 +452,6 @@
           end if;
         end loop;
         dbms_sql.close_cursor(v_cursor_id);
-        
-
-
       exception when others then
         param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
         if dbms_sql.is_open(v_cursor_id) then
@@ -471,8 +459,6 @@
         end if;
       end;
     end if;
-    
-
     if param_msg_error is null then
       json_str_output := obj_row.to_clob;
     else
@@ -591,7 +577,6 @@
     if param_msg_error is null then
       v_syncond        := hcm_util.get_string_t(params_syncond, 'code');
       v_statement      := hcm_util.get_string_t(params_syncond, 'statement');
-      
 
       begin
         insert into ttalent (codcomp,dteeffec, staappr,statement,syncond,codcreate,coduser)
@@ -727,5 +712,6 @@
 	end send_mail;
 
 end hrrp68e;
+
 
 /

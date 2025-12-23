@@ -101,7 +101,7 @@
         -- and trunc(dtereq)   = b_index_dtereq -- softberry || 15/11/2023 || #10142
          and dtereq   = nvl(b_index_dtereq,dtereq)
        order by dtereq asc;
-         
+
     -->> issue4448#10143 28/11/2023
     cursor c3 is
       select nvl(qtyreqyr,0)qtyreqyr ,
@@ -118,7 +118,7 @@
  begin
 
     obj_row := json_object_t();
-    
+
     if b_index_codcomp = '' or b_index_codcomp is null then
       v_chksecu := '1';
       for i in c1 loop
@@ -154,7 +154,7 @@
           obj_data.put('numlevel',i.numlevel);
           obj_data.put('codcompp',v_codcompp);
           -->> user25 Date : 02/09/2021 1. RP Module #3840
-  
+
           for k in c2 loop
             obj_data.put('addp',k.qtyreqyr);
             obj_data.put('promp',k.qtypromote);
@@ -169,7 +169,7 @@
           obj_row.put(to_char(v_rcnt-1),obj_data);
         end loop;
       end if; --v_flgdata
-      
+
       if v_flgdata = 'N' then
         param_msg_error := get_error_msg_php('HR2055', global_v_lang, 'thisorg');
         json_str_output := get_response_message(null, param_msg_error, global_v_lang);
@@ -201,7 +201,7 @@
         obj_data.put('requestby',get_temploy_name(j.codemprq,global_v_lang));
       end loop;
       obj_row.put(to_char(v_rcnt-1),obj_data);
-      
+
       if v_flgdata = 'N' then
         param_msg_error := get_error_msg_php('HR2055', global_v_lang, 'tbudget');
         json_str_output := get_response_message(null, param_msg_error, global_v_lang);
@@ -446,5 +446,6 @@
   -----
 
 end;
+
 
 /

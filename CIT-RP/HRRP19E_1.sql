@@ -2709,7 +2709,7 @@
       exception when no_data_found then
         v_grade := null;
       end;
-      
+
       if nvl(v_grade,0) < nvl(i.grade,0) then
         v_gap := 'N';
         exit;
@@ -2719,5 +2719,6 @@
   end check_gap;
   -->>User37 #4561 #4559 #4552 1. RP Module 16/12/2021 
 end hrrp19e;
+
 
 /

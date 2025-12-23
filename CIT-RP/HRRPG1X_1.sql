@@ -154,6 +154,7 @@
                                          and rownum    <= 1 )))
                         order by '||b_index_col_grp ;
     end if;
+
     v_cursor := dbms_sql.open_cursor;
     dbms_sql.parse(v_cursor,v_statment,dbms_sql.native);
     dbms_sql.define_column(v_cursor,1,v_col_grp,1000);
@@ -531,7 +532,7 @@
 
     for r1 in c1 loop
       get_data_box(b_index_dteyear, r1.codcompy, r1.codcompy, r1.codgroup, v_amountemp, v_percntemp);
-      
+
       obj_box := json_object_t();
       obj_box.put('codgroup', nvl(r1.codgroup,''));
       obj_box.put('namgroupt', nvl(r1.namgroupt,''));
@@ -556,7 +557,7 @@
     param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
     json_str_output := get_response_message('400',param_msg_error,global_v_lang);
   end;
-  
+
   procedure get_data_box(v_year in varchar2, v_codcomp in varchar2, v_codcompy in tninebox.codcompy%type, v_codgroup in tninebox.codgroup%type,
                          v_amountemp out varchar2, v_percntemp out varchar2) as
     v_empall number := 0;
@@ -608,5 +609,6 @@
   end;
 
 end;
+
 
 /
