@@ -72,7 +72,7 @@
       end;
     end if;
 
-    tbonparh_rec.flgcal := 'N' ;
+
     obj_data := json_object_t();
     obj_data.put('coderror', '200');
     obj_data.put('isCopy', p_isCopy);
@@ -101,7 +101,7 @@
     else
       obj_data.put('msgerror', '');
     end if;
-    --obj_data.put('msgerror', '');
+
     json_str_output := obj_data.to_clob;
   exception when others then
     param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
@@ -668,7 +668,7 @@
     initial_value(json_str_input);
 
     begin
-      select 'N' into v_flgcal
+      select flgcal into v_flgcal
         from tbonparh
        where codcomp = b_index_codcomp
          and dteyreap = b_index_dteyreap
@@ -677,7 +677,6 @@
     exception when no_data_found then
       v_flgcal  :=  null;
     end;
-    v_flgcal     := 'N' ;
     if v_flgcal = 'Y' then
       param_msg_error   := get_error_msg_php('HR1507', global_v_lang);
     end if;
@@ -720,5 +719,6 @@
   end;
   --
 end hrap51e;
+
 
 /

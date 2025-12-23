@@ -22,7 +22,7 @@
     b_index_dteyear    := hcm_util.get_string_t(json_obj,'p_year');
     b_index_numtime    := hcm_util.get_string_t(json_obj,'p_numseq');
 
-    --Group รายละเอียด
+    --Group ??????????
     b_index_v_grp1     := get_label_name('HRAPSJX', global_v_lang, '60');
     b_index_v_grp2     := get_label_name('HRAPSJX', global_v_lang, '70');
     b_index_v_grp3     := get_label_name('HRAPSJX', global_v_lang, '80');
@@ -476,8 +476,8 @@
   begin
     v_numseq := 1;
     param_msg_error := null;
-    v_item1  := get_label_name('HRAPSJX', global_v_lang, '90'); --'% พนักงาน'
-    v_item31 := get_label_name('HRAPSJX', global_v_lang, '110'); --'เปรียบเทียบ Performance Grade ของพนักงานในแต่ละปี'
+    v_item1  := get_label_name('HRAPSJX', global_v_lang, '90'); --'% ???????'
+    v_item31 := get_label_name('HRAPSJX', global_v_lang, '110'); --'??????????? Performance Grade ???????????????????'
 
     for i in c1 loop
         v_flgdata := 'Y';
@@ -487,13 +487,13 @@
         ---------- Group1
             v_item7  := i.jobgrade;
             v_item8  := get_tcodec_name('TCODJOBG', i.jobgrade, global_v_lang);
---            v_item9  := get_label_name('HRAPSJX', global_v_lang, '90'); --'% พนักงาน';
-        ----------แกน x
+--            v_item9  := get_label_name('HRAPSJX', global_v_lang, '90'); --'% ???????';
+        ----------??? x
             v_item4  := j.grdap;
             v_item5  := j.grdap;
---            v_item6  := get_label_name('HRAPSJX', global_v_lang, '30'); --'ปี';
+--            v_item6  := get_label_name('HRAPSJX', global_v_lang, '30'); --'??';
 
-        ----------ค่าข้อมูล (จำนวนพนักงานทั้งหมด)
+        ----------????????? (???????????????????)
             v_cntemp1 := 0;  v_cntemp2:= 0;
             begin
                 select count(distinct codempid) into v_cntemp1

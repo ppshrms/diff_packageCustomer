@@ -83,7 +83,7 @@
     v_codcompy := hcm_util.get_codcomp_level(b_index_codcomp,1);
     v_descodcompy := v_codcompy ||' - '||get_tcompny_name(v_codcompy,global_v_lang);
     begin
-        select sum(amtbudg) into v_amtbudg       -- จำนวนเงินงบประมาณ
+        select sum(amtbudg) into v_amtbudg       -- ?????????????????
           from tbonparh
          where codcomp like v_codcompy||'%'
            and dteyreap = to_number(b_index_dteyear)
@@ -95,7 +95,7 @@
     end;
 /*
     begin
-      select sum(nvl(stddec(amtbon,codempid,v_chken),0))   -- จำนวนเงินโบนัสที่คำนวณได้
+      select sum(nvl(stddec(amtbon,codempid,v_chken),0))   -- ?????????????????????????
         into v_amtbon
         from tbonus
        where codcomp like v_codcompy||'%'
@@ -147,10 +147,10 @@
     v_qtyemp3       number;
 
     cursor c1 is
---      select codcomp, count(codempid)qtyemp2,             -- Adisak 26/04/2023 12:26 | fix case count codempid ต้องมีโบนัสสุทธิมากกว่า 0
+--      select codcomp, count(codempid)qtyemp2,             -- Adisak 26/04/2023 12:26 | fix case count codempid ??????????????????????? 0
       select codcomp, sum(case when nvl(stddec(amtnbon,codempid,v_chken),0) > 0 then 1 else 0 end) qtyemp2,
-             sum(nvl(stddec(amtsal,codempid,v_chken),0)) amtsal, -- เงินเดือนปัจจุบัน (บาท)
-             sum(nvl(stddec(amtbon,codempid,v_chken),0)) amtbon  -- จำนวนเงินโบนัสที่คำนวณได้
+             sum(nvl(stddec(amtsal,codempid,v_chken),0)) amtsal, -- ????????????????? (???)
+             sum(nvl(stddec(amtbon,codempid,v_chken),0)) amtbon  -- ?????????????????????????
         from tbonus
        where codcomp like b_index_codcomp||'%'
          and dteyreap = to_number(b_index_dteyear)
@@ -167,7 +167,7 @@
           v_flgdata := 'Y';
           v_qtyemp2 := nvl(i.qtyemp2, 0);
 
-          v_qtyemp1 := count_emp(i.codcomp,null);   -- หาคน
+          v_qtyemp1 := count_emp(i.codcomp,null);   -- ????
           v_qtyemp3 := v_qtyemp1 - v_qtyemp2;
           if v_qtyemp3 < 0 then
             v_qtyemp3 := null;
@@ -175,14 +175,14 @@
           v_rcnt := v_rcnt+1;
           obj_data := json_object_t();
           obj_data.put('coderror', '200');
-          obj_data.put('codcomp',i.codcomp); --หน่วยงาน
-          obj_data.put('desc_codcomp',get_tcenter_name(i.codcomp,global_v_lang)); --หน่วยงาน
+          obj_data.put('codcomp',i.codcomp); --????????
+          obj_data.put('desc_codcomp',get_tcenter_name(i.codcomp,global_v_lang)); --????????
 
           obj_data.put('qtyemp',v_qtyemp1);
           obj_data.put('qtybonus',v_qtyemp2);
           obj_data.put('qtynon',v_qtyemp3);
-          obj_data.put('salary',i.amtsal);     -- เงินเดือนปัจจุบัน (บาท)
-          obj_data.put('paybonus',i.amtbon);     -- จำนวนเงินโบนัสที่คำนวณได้
+          obj_data.put('salary',i.amtsal);     -- ????????????????? (???)
+          obj_data.put('paybonus',i.amtbon);     -- ?????????????????????????
           obj_row.put(to_char(v_rcnt-1),obj_data);
     end loop;
 
@@ -237,7 +237,7 @@
          and dteyreap = to_number(b_index_dteyear)
          and numtime = to_number(b_index_numtime)
          and codbon = nvl(b_index_codbon,codbon)
-         and nvl(stddec(amtnbon,codempid,v_chken),0) > 0 -- Adisak 26/04/2023 12:26 | เปลี่ยนจาก amtbon => amtnbon ตาม SWD ต้องเช็คจากโบนัสสุทธิมากกว่า 0
+         and nvl(stddec(amtnbon,codempid,v_chken),0) > 0 -- Adisak 26/04/2023 12:26 | ?????????? amtbon => amtnbon ??? SWD ???????????????????????????? 0
       order by a.codempid;
 
   begin
@@ -283,14 +283,14 @@
           obj_data.put('desc_codempid',get_temploy_name(i.codempid,global_v_lang));
           obj_data.put('desc_codpos',get_tpostn_name(i.codpos,global_v_lang));
           obj_data.put('jobgrade',i.jobgrade);
-          obj_data.put('qtywork',to_char(v_year)||':'||to_char(v_month));  -- อายุงาน
+          obj_data.put('qtywork',to_char(v_year)||':'||to_char(v_month));  -- ???????
           obj_data.put('grade',i.grade);
-          obj_data.put('detail',get_tlistval_name('INSTGRD',i.grade,global_v_lang));  --รายละเอียดเกรด
-          obj_data.put('salary',stddec(i.amtsal,i.codempid,v_chken));  -- เงินเดือนปัจจุบัน
-          obj_data.put('rate',i.qtybon);  -- อัตราการจ่าย
-          obj_data.put('increate',stddec(i.amtadjbo,i.codempid,v_chken));  -- จำนวนเงินที่ปรับ
-          obj_data.put('percent',i.pctdedbo);  -- % การหัก
-          obj_data.put('total',stddec(i.amtnbon,i.codempid,v_chken));  -- โบนัสสุทธิ
+          obj_data.put('detail',get_tlistval_name('INSTGRD',i.grade,global_v_lang));  --??????????????
+          obj_data.put('salary',stddec(i.amtsal,i.codempid,v_chken));  -- ?????????????????
+          obj_data.put('rate',i.qtybon);  -- ????????????
+          obj_data.put('increate',stddec(i.amtadjbo,i.codempid,v_chken));  -- ????????????????
+          obj_data.put('percent',i.pctdedbo);  -- % ??????
+          obj_data.put('total',stddec(i.amtnbon,i.codempid,v_chken));  -- ??????????
           obj_data.put('remark',i.remarkadj);
           obj_row.put(to_char(v_rcnt-1),obj_data);
       end if;
@@ -347,7 +347,7 @@
          and dteyreap = to_number(b_index_dteyear)
          and numtime = to_number(b_index_numtime)
          and codbon = nvl(b_index_codbon,codbon)
-         and nvl(stddec(amtnbon,codempid,v_chken),0) <= 0 -- Adisak 26/04/2023 12:26 | เปลี่ยนจาก amtbon => amtnbon ตาม SWD ต้องเช็คจากโบนัสสุทธิน้อยกว่าหรือเท่ากับ 0
+         and nvl(stddec(amtnbon,codempid,v_chken),0) <= 0 -- Adisak 26/04/2023 12:26 | ?????????? amtbon => amtnbon ??? SWD ???????????????????????????????????????? 0
       order by a.codempid;
 
   begin
@@ -384,11 +384,11 @@
           obj_data.put('desc_codpos',get_tpostn_name(i.codpos,global_v_lang));
           obj_data.put('jobgrade',i.jobgrade);
           obj_data.put('dtein',to_char(i.dteempmt,'dd/mm/yyyy'));
-          obj_data.put('score',v_qtytotnet);  --คะแนนที่ได้
+          obj_data.put('score',v_qtytotnet);  --???????????
           obj_data.put('grade',i.grade);
-          obj_data.put('detail',get_tlistval_name('INSTGRD',i.grade,global_v_lang));  --รายละเอียดเกรด
-          obj_data.put('discout',v_qtyta);  --คะแนนที่หัก
-          obj_data.put('discard',v_qtypuns);  --คะแนนที่หักผิดวินัย
+          obj_data.put('detail',get_tlistval_name('INSTGRD',i.grade,global_v_lang));  --??????????????
+          obj_data.put('discout',v_qtyta);  --???????????
+          obj_data.put('discard',v_qtypuns);  --???????????????????
           obj_data.put('remark',i.remarkadj);
           obj_row.put(to_char(v_rcnt-1),obj_data);
       end if;

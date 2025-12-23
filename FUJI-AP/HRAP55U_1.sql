@@ -684,7 +684,7 @@
                            and codbon = v_codbon
                            and codempid = v_codempid;
 
-                        ---ส่งเมลหาผู้ขออนุมัติ
+                        ---????????????????????
 --                        v_codform := 'HRAP55U';
 --                        begin
 --                            chk_flowmail.get_message_result(v_codform, global_v_lang, v_msg_to, v_templete_to);

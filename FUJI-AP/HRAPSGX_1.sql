@@ -317,7 +317,7 @@
             ----------Axis X level 1(from data row)
             v_item8  := get_label_name('HRAPSGX', global_v_lang, '60');
             ----------Axis Y Label
-            v_item9  := get_label_name('HRAPSGXC2', global_v_lang, '30'); --อัตราการจ่าย / % การขึ้นเงินเดือน
+            v_item9  := get_label_name('HRAPSGXC2', global_v_lang, '30'); --???????????? / % ????????????????
             v_item10 := to_char(nvl(v_avgbonrate,0),'fm9,999,990.00');
 
             v_item6 := get_label_name('HRAPSGX', global_v_lang, '40');

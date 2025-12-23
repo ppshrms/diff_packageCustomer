@@ -691,7 +691,7 @@
          -- and codpos = nvl(b_index_codpos,codpos)
          -- >> -- bk surachai | 20230310 | 
 
-         -- << -- add surachai | 20230310 | #9993 (คุยกับพี่บออลแล้วว่าให้ ปิด แล้วเพิ่ม where ให้เหมือนกับ hrap31e)
+         -- << -- add surachai | 20230310 | #9993 (??????????????????????? ??? ????????? where ???????????? hrap31e)
           and (codempid = nvl(b_index_codapman , codempid)
                 or (b_index_codcomp is not null and codcomp like b_index_codcomp||'%')
                 or (b_index_codaplvl is not null and codaplvl = nvl(b_index_codaplvl,codaplvl))

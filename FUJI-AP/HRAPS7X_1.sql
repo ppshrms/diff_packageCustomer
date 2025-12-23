@@ -168,7 +168,7 @@
                                                    0, 0,
                                                    0, 0,
                                                    0, 0,
-                                                   v_sumhur,v_sumday,v_summth);-- เอาเเค่ รายได้ตัวแรก
+                                                   v_sumhur,v_sumday,v_summth);-- ??????? ????????????
                                   if v_summth between v_amtsal_st(k) and v_amtsal_en(k) then
                                     v_emp := v_emp + 1;
                                   end if;
@@ -339,7 +339,7 @@
                              0, 0,
                              0, 0,
                              0, 0,
-                             v_sumhur,v_sumday,v_summth);-- เอาเเค่ รายได้ตัวแรก
+                             v_sumhur,v_sumday,v_summth);-- ??????? ????????????
           if v_summth between b_index_amtsal_st and b_index_amtsal_en then
               v_flgsecu := 'Y';
               v_rcnt := v_rcnt+1;

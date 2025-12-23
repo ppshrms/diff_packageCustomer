@@ -374,17 +374,17 @@ begin
         for i in c1 loop
             v_flgdata := 'Y';
             v_seq_grd := v_seq_grd+1;
-            ----------แกน X
+            ----------??? X
             v_item6  := null;
             v_item4  := v_seq_grd;
             v_item5  := i.codkpino;
             v_item31 := get_label_name('HRAPSKX3', global_v_lang, '10');
-            ----------แกน Y
+            ----------??? Y
             v_item7  := null;
             v_item8  := get_label_name('HRAPSKX3', global_v_lang, '30');
             v_item9  := get_label_name('HRAPSKX3', global_v_lang, '30');
---            v_item10 := i.mtrfinish;   ----------ค่าข้อมูล
-            v_item10 := i.qtyscor;   ----------ค่าข้อมูล
+--            v_item10 := i.mtrfinish;   ----------?????????
+            v_item10 := i.qtyscor;   ----------?????????
            ----------Insert ttemprpt
             begin
              insert into ttemprpt

@@ -120,7 +120,6 @@
         exception when others then
             v_count_tappemp := 0;
         end;
-        v_count_tappemp :=  0 ;
         --> [START] | 000554-bow.sarunya-dev | 4449#2264: add check tappemp | 01/08/2024
 
         --<< softberry || 9/08/2023 || #9449
@@ -135,7 +134,7 @@
         exception when others then
             v_count_tappfm := 0;
         end;
-        v_count_tappfm := 0;
+
         if v_count_tappfm > 0 or v_count_tappemp > 0 then -- 000554-bow.sarunya-dev | 4449#2264: add or v_count_tappemp > 0 | 01/08/2024
             obj_dataC.put('can_edit', false);
             v_flg_can_edit := v_flg_can_edit and false; -- softberry || 21/08/2023 || #9449
@@ -555,5 +554,6 @@
   end;
   --
 end hrap18e;
+
 
 /

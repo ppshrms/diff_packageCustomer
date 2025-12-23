@@ -24,7 +24,7 @@
     b_index_dteyear1   := hcm_util.get_string_t(json_obj,'p_year1');
     b_index_dteyear2   := hcm_util.get_string_t(json_obj,'p_year2');
     b_index_dteyear3   := hcm_util.get_string_t(json_obj,'p_year3');
-    b_index_typeof     := hcm_util.get_string_t(json_obj,'p_typeof');--G =  ตามประเมิน C = ตามเงื่อนไข
+    b_index_typeof     := hcm_util.get_string_t(json_obj,'p_typeof');--G =  ?????????? C = ???????????
 
     hcm_secur.get_global_secur(global_v_coduser,global_v_zminlvl,global_v_zwrklvl,global_v_numlvlsalst,global_v_numlvlsalen);
   end initial_value;
@@ -307,7 +307,7 @@
 
     if v_flgdata = 'Y' then
         param_msg_error := null;
-        v_item1  := get_label_name('HRAPSEXC3', global_v_lang, '30'); --'จ่ายตามนโยบาย'
+        v_item1  := get_label_name('HRAPSEXC3', global_v_lang, '30'); --'?????????????'
         v_item14 := '1';
         v_seq_grd := 0;
         for i in c1 loop
@@ -322,8 +322,8 @@
               for k in 1..v_seq_yre loop
                 v_cs := v_cs+1;
                 if  v_cs = v_cs1 then
-                  ----------ค่าข้อมูล
-                  if b_index_typeof = 'A' then --Grade ตามการประเมิน
+                  ----------?????????
+                  if b_index_typeof = 'A' then --Grade ?????????????
                         begin
                             select  ratebon
                               into  v_qty_policy
@@ -344,13 +344,13 @@
                           exception when no_data_found then
                                 v_qty_policy :=0;
                         end;
-                       ----------แกน X
-                        v_item6  := get_label_name('HRAPSEXC3', global_v_lang, '50'); --'เกรด';
+                       ----------??? X
+                        v_item6  := get_label_name('HRAPSEXC3', global_v_lang, '50'); --'????';
                         v_item4  := v_seq_grd;
                         v_item5  := i.grade_;
                       --v_itemXX  := get_tstdis_name(i.codcomp,v_dteyreap,i.grade,global_v_lang);
-                        v_item31 := get_label_name('HRAPSEXC3', global_v_lang, '10')||' '||get_label_name('HRAPSEXC3', global_v_lang, '50'); --'สรุปอัตราการจ่ายโบนัสแยกตาม'|| 'เกรด'
-                  else--Grade ตามเงื่อนไข
+                        v_item31 := get_label_name('HRAPSEXC3', global_v_lang, '10')||' '||get_label_name('HRAPSEXC3', global_v_lang, '50'); --'???????????????????????????'|| '????'
+                  else--Grade ???????????
                         begin
                             select ratebon,ratecond
                               into v_qty_policy, v_desc
@@ -374,18 +374,18 @@
                                 v_desc := '';
                         end;
                         --v_itemXX  := v_desc;
-                        ----------แกน X
+                        ----------??? X
 
                         v_item4  := v_seq_grd;
                         v_item5  := i.grade_;
-                        v_item6  := get_label_name('HRAPSEXC3', global_v_lang, '60'); --'เงื่อนไข';
-                        v_item31 := get_label_name('HRAPSEXC3', global_v_lang, '10')||' '||get_label_name('HRAPSEXC3', global_v_lang, '60'); --'สรุปอัตราการจ่ายโบนัสแยกตาม'||'เงื่อนไข'
+                        v_item6  := get_label_name('HRAPSEXC3', global_v_lang, '60'); --'????????';
+                        v_item31 := get_label_name('HRAPSEXC3', global_v_lang, '10')||' '||get_label_name('HRAPSEXC3', global_v_lang, '60'); --'???????????????????????????'||'????????'
                   end if;
-                  ----------แกน Y
+                  ----------??? Y
                   v_item7  := k;
                   -- v_item8  := j.dteyreap;
                   v_item8  := hcm_util.get_year_buddhist_era(j.dteyreap);--v_dteyreap;
-                  v_item9  := get_label_name('HRAPSEXC3', global_v_lang, '30'); --'จ่ายตามนโยบาย'
+                  v_item9  := get_label_name('HRAPSEXC3', global_v_lang, '30'); --'?????????????'
                   v_item10 := v_qty_policy;
                   ----------Insert ttemprpt
                   begin
@@ -519,7 +519,7 @@
 
     if v_flgdata = 'Y' then
         param_msg_error := null;
-        v_item1  := get_label_name('HRAPSEXC3', global_v_lang, '40'); --'อัตราการจ่ายตามจริง'
+        v_item1  := get_label_name('HRAPSEXC3', global_v_lang, '40'); --'???????????????????'
         v_item14 := '2';
 
     for i in c1 loop
@@ -534,8 +534,8 @@
               for k in 1..v_seq_yre loop
                 v_cs := v_cs+1;
                if  v_cs = v_cs1 then
-                          ---------ค่าข้อมูล--------------
-                        --แกน X
+                          ---------?????????--------------
+                        --??? X
 
                          begin
                             select nvl(sum(nvl(qtybon,0))/count(codempid),0)
@@ -556,13 +556,13 @@
                             exception when no_data_found then
                                 v_qty_actual :=0;
                         end;
-                        if b_index_typeof = 'A' then --Grade ตามการประเมิน
+                        if b_index_typeof = 'A' then --Grade ?????????????
                             v_item4  := v_seq_grd;
                             v_item5  := i.grade_;
                          --   v_item8  := get_tstdis_name(i.codcomp,v_dteyreap,i.grade,global_v_lang);
-                            v_item6  := get_label_name('HRAPSEXC3', global_v_lang, '50'); --'เกรด';
-                            v_item31 := get_label_name('HRAPSEXC3', global_v_lang, '10')||' '||get_label_name('HRAPSEXC3', global_v_lang, '50'); --'สรุปอัตราการจ่ายโบนัสแยกตาม'|| 'เกรด'
-                       else--Grade ตามเงื่อนไข
+                            v_item6  := get_label_name('HRAPSEXC3', global_v_lang, '50'); --'????';
+                            v_item31 := get_label_name('HRAPSEXC3', global_v_lang, '10')||' '||get_label_name('HRAPSEXC3', global_v_lang, '50'); --'???????????????????????????'|| '????'
+                       else--Grade ???????????
                            /*
                             begin
                                 select  ratecond
@@ -581,15 +581,15 @@
                             */
                             v_item4  := v_seq_grd;
                             v_item5  := i.grade_;
-                            v_item6  := get_label_name('HRAPSEXC3', global_v_lang, '60'); --'เงื่อนไข';
-                            v_item31 := get_label_name('HRAPSEXC3', global_v_lang, '10')||' '||get_label_name('HRAPSEXC3', global_v_lang, '60'); --'สรุปอัตราการจ่ายโบนัสแยกตาม'|| 'เงื่อนไข'
+                            v_item6  := get_label_name('HRAPSEXC3', global_v_lang, '60'); --'????????';
+                            v_item31 := get_label_name('HRAPSEXC3', global_v_lang, '10')||' '||get_label_name('HRAPSEXC3', global_v_lang, '60'); --'???????????????????????????'|| '????????'
 
                        end if;
-                        ---แกน Y
+                        ---??? Y
                         v_item7  := k;
                       --  v_item8  := j.dteyreap;--v_dteyreap;
                         v_item8  := hcm_util.get_year_buddhist_era(j.dteyreap);--v_dteyreap;
-                        v_item9 := get_label_name('HRAPSEXC3', global_v_lang, '40'); --'อัตราการจ่ายตามจริง'
+                        v_item9 := get_label_name('HRAPSEXC3', global_v_lang, '40'); --'???????????????????'
                         v_item10 := v_qty_actual;
             ----------Insert ttemprpt
                 begin
@@ -619,7 +619,7 @@
                             v_qty_policy out number,
                             v_qty_actual out number) as
   begin
-     if b_index_typeof = 'A' then --Grade ตามการประเมิน
+     if b_index_typeof = 'A' then --Grade ?????????????
            begin
               select ratebon
                 into v_qty_policy
@@ -640,7 +640,7 @@
               v_qty_policy :=0;
             end;
             v_desc := get_tstdis_name(b_index_codcomp,v_year,v_grade,global_v_lang);
-     else--Grade ตามเงื่อนไข
+     else--Grade ???????????
             begin
               select ratebon ,ratecond
                 into v_qty_policy, v_desc

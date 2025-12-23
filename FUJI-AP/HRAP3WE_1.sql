@@ -3,22 +3,7 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRAP3WE" is
-  procedure get_taplvl_where(p_codcomp_in in varchar2,p_codaplvl in varchar2,p_codcomp_out out varchar2,p_dteeffec out date) as
-    cursor c_taplvl is
-      select dteeffec,codcomp
-        from taplvl
-       where p_codcomp_in like codcomp||'%'
-         and codaplvl = p_codaplvl
-         and dteeffec <= v_global_dteapend
-      order by codcomp desc,dteeffec desc;
-  begin
-    for r_taplvl in c_taplvl loop
-      p_dteeffec := r_taplvl.dteeffec;
-      p_codcomp_out := r_taplvl.codcomp;
-      exit;
-    end loop;
-  end;
-  
+
   procedure initial_value(json_str in clob) is
     json_obj        json_object_t;
   begin
@@ -86,17 +71,12 @@
     v_flggrade          varchar2(2 char);
     v_desgrad           varchar2(1000 char);
     chkflggrade         varchar2(1000 char);    -- < apisit || 25/07/2023 || 4448 (#9722)
-    v_taplvl_codcomp     varchar2(1000 char);
-    v_dteapend        date ;
-   -- v_global_dteapend    date ;
-    v_taplvl_dteeffec     date ;
     v_max_dteadj        tappemp.dteadj%type := sysdate;
     v_max_codadj        tappemp.codadj%type := global_v_codempid;
-    t_taplvl                  taplvl%rowtype;
 
     cursor c1 is
       select codempid,codpos,qtyta,qtypuns,qtybeh3,qtycmp3,qtykpie3,qtytotnet,qtytot3,
-             grdap,grdadj,dteupd,coduser,codcreate,dteadj,codadj,codaplvl,codcomp,qtykpic,qtykpid
+             grdap,grdadj,dteupd,coduser,codcreate,dteadj,codadj
         from tappemp
        where dteyreap = p_dteyreap
          and numtime  = p_numtime
@@ -136,29 +116,6 @@
                 exception when others then
                   v_desgrad := NULL;
                 end;
-              
-                begin
-                    select dteapend
-                    into v_dteapend
-                    from tstdisd
-                    where codcomp = hcm_util.get_codcomp_level(r1.codcomp,1)
-                    and dteyreap = p_dteyreap
-                    and numtime = p_numtime
-                    and codaplvl = r1.codaplvl;
-                exception when no_data_found then
-                 v_dteapend := null;
-                end;
-
-                v_global_dteapend := v_dteapend;
-                get_taplvl_where(r1.codcomp,r1.codaplvl,v_taplvl_codcomp,v_taplvl_dteeffec);
-                    
-                select *
-                into t_taplvl
-                from taplvl
-                where codcomp = v_taplvl_codcomp
-                and codaplvl = r1.codaplvl
-                and dteeffec = v_taplvl_dteeffec;                       
-                       
                 obj_data := json_object_t();
                 obj_data.put('coderror','200');
                 obj_data.put('image',get_emp_img(r1.codempid));
@@ -166,19 +123,11 @@
                 obj_data.put('desc_codempid',get_temploy_name(r1.codempid,global_v_lang));
                 obj_data.put('codpos',r1.codpos);
                 obj_data.put('desc_codpos',get_tpostn_name(r1.codpos,global_v_lang));
-                
-                
                 obj_data.put('score1',(nvl(r1.qtyta,0)+nvl(r1.qtypuns,0)));
---                obj_data.put('score2',r1.qtybeh3);
---                obj_data.put('score3',r1.qtycmp3);
---                obj_data.put('score4',r1.qtykpie3);
-
-                obj_data.put('score2',round(  (nvl(r1.qtybeh3,0) * nvl(t_taplvl.pctbeh,0)) / 100,2)  );
-                obj_data.put('score3',round( (nvl(r1.qtycmp3,0) * nvl(t_taplvl.pctcmp,0)) /100,2)  );
-                obj_data.put('score4',round( ((nvl(r1.qtykpic,0) * nvl(t_taplvl.pctkpirt,0)) /100) +  ((nvl(r1.qtykpid,0) * nvl(t_taplvl.pctkpicp,0)) /100) + ((nvl(r1.qtykpie3,0) * nvl(t_taplvl.pctkpiem,0)) / 100),2));
-                
-
-                obj_data.put('total',r1.qtytotnet);
+                obj_data.put('score2',r1.qtybeh3);
+                obj_data.put('score3',r1.qtycmp3);
+                obj_data.put('score4',r1.qtykpie3);
+                obj_data.put('total',r1.qtytot3);
                 obj_data.put('gradeo',r1.grdap);
                 obj_data.put('graden',r1.grdadj);
                 obj_data.put('scorenew',(nvl(r1.qtytotnet,0))); -- < apisit || 25/07/2023 || 4448 (#9722) || obj_data.put('scorenew',r1.qtytotnet); >
@@ -922,5 +871,6 @@
   end;
 
 end hrap3we;
+
 
 /

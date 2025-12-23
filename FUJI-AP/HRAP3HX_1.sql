@@ -248,15 +248,15 @@
     v_level1        number;
     v_level2        number;
     v_level3        number;
-    v_Behavior      number;--พฤติกรรม
-    v_Competency    number;--ข้อมูลศักยภาพ (Competency)
+    v_Behavior      number;--????????
+    v_Competency    number;--????????????? (Competency)
     v_Kpi           number;--KPI
 
     cursor c1 is
       select codempid, codcomp, codpos, numlvl, codaplvl, dteyreap,
-             (nvl(qtyta,0) + nvl(qtypuns,0)) qtyta_puns,                   --เวลามาทำงาน + ผิดวินัย
-             (nvl(qtybeh,0) + nvl(qtybeh2,0) + nvl(qtybeh3,0)) Behavior,   --พฤติกรรม
-             (nvl(qtycmp,0) + nvl(qtycmp2,0) + nvl(qtycmp3,0)) Competency, --ข้อมูลศักยภาพ (Competency)
+             (nvl(qtyta,0) + nvl(qtypuns,0)) qtyta_puns,                   --??????????? + ????????
+             (nvl(qtybeh,0) + nvl(qtybeh2,0) + nvl(qtybeh3,0)) Behavior,   --????????
+             (nvl(qtycmp,0) + nvl(qtycmp2,0) + nvl(qtycmp3,0)) Competency, --????????????? (Competency)
              (nvl(qtykpie,0) + nvl(qtykpie2,0) + nvl(qtykpie3,0)) Kpi,     --KPI
              1 total, grdappr
         from tappemp
@@ -301,8 +301,8 @@
             end;
 
             begin
-              select decode(v_level , 1, nvl(qtybeh,0), 2, nvl(qtybeh2,0)  , 3, nvl(qtybeh3,0) , nvl(qtybeh,0) ) Behavior,   --พฤติกรรม
-                     decode(v_level , 1, nvl(qtycmp,0), 2, nvl(qtycmp2,0)  , 3, nvl(qtycmp3,0) , nvl(qtycmp,0) ) Competency, --ข้อมูลศักยภาพ (Competency)
+              select decode(v_level , 1, nvl(qtybeh,0), 2, nvl(qtybeh2,0)  , 3, nvl(qtybeh3,0) , nvl(qtybeh,0) ) Behavior,   --????????
+                     decode(v_level , 1, nvl(qtycmp,0), 2, nvl(qtycmp2,0)  , 3, nvl(qtycmp3,0) , nvl(qtycmp,0) ) Competency, --????????????? (Competency)
                      decode(v_level , 1, nvl(qtykpie,0), 2, nvl(qtykpie2,0)  , 3, nvl(qtykpie3,0) , nvl(qtykpie,0) ) Kpi     --KPI
                 into v_Behavior, v_Competency, v_Kpi
                 from tappemp
@@ -335,9 +335,9 @@
             obj_data.put('desc_group',get_tcodec_name('TCODAPLV',i.codaplvl,global_v_lang));
 
 --------------
-            obj_data.put('appemptamt',i.qtyta_puns);  --เวลามาทำงาน + ผิดวินัย
-            obj_data.put('intviewd',v_Behavior);      --พฤติกรรม
-            obj_data.put('appcmpc',v_Competency);  --ข้อมูลศักยภาพ (Competency)
+            obj_data.put('appemptamt',i.qtyta_puns);  --??????????? + ????????
+            obj_data.put('intviewd',v_Behavior);      --????????
+            obj_data.put('appcmpc',v_Competency);  --????????????? (Competency)
             obj_data.put('kpi',v_Kpi);
             obj_data.put('total',v_total);
             obj_data.put('grade',i.grdappr);
@@ -379,15 +379,15 @@
     v_level1        number;
     v_level2        number;
     v_level3        number;
-    v_Behavior      number;--พฤติกรรม
-    v_Competency    number;--ข้อมูลศักยภาพ (Competency)
+    v_Behavior      number;--????????
+    v_Competency    number;--????????????? (Competency)
     v_Kpi           number;--KPI
 
     cursor c1 is
       select codempid, codcomp, codpos, numlvl, codaplvl, codform,
-             (nvl(qtyta,0) + nvl(qtypuns,0)) qtyta_puns,                   --เวลามาทำงาน + ผิดวินัย
-             decode(v_level , 1, nvl(qtybeh,0), 2, nvl(qtybeh2,0)  , 3, nvl(qtybeh3,0) , nvl(qtybeh,0) ) Behavior,   --พฤติกรรม
-             decode(v_level , 1, nvl(qtycmp,0), 2, nvl(qtycmp2,0)  , 3, nvl(qtycmp3,0) , nvl(qtycmp,0) ) Competency, --ข้อมูลศักยภาพ (Competency)
+             (nvl(qtyta,0) + nvl(qtypuns,0)) qtyta_puns,                   --??????????? + ????????
+             decode(v_level , 1, nvl(qtybeh,0), 2, nvl(qtybeh2,0)  , 3, nvl(qtybeh3,0) , nvl(qtybeh,0) ) Behavior,   --????????
+             decode(v_level , 1, nvl(qtycmp,0), 2, nvl(qtycmp2,0)  , 3, nvl(qtycmp3,0) , nvl(qtycmp,0) ) Competency, --????????????? (Competency)
              decode(v_level , 1, nvl(qtykpie,0), 2, nvl(qtykpie2,0)  , 3, nvl(qtykpie3,0) , nvl(qtykpie,0) ) Kpi,     --KPI
              qtytot3,
              flgsal, pctdsal, flgbonus, pctdbon,
@@ -468,7 +468,7 @@
             p_codaplvl := i.codaplvl;
             p_codform  := i.codform;
 
---ประเมินผลตั้งแต่วันที่ (item5)
+--?????????????????????? (item5)
           begin
             select dteapstr, dteapend
               into v_dteapstr, v_dteapend
@@ -497,22 +497,22 @@
           p_dteapstr := v_dteapstr;
           p_dteapend := v_dteapend;
 
---บริษัท (item6)
+--?????? (item6)
           v_compny_name := v_codcompy ||' - '|| get_tcompny_name(v_codcompy, global_v_lang);
 
---รหัสพนักงาน (item7)
+--??????????? (item7)
           v_emp_name := i.codempid ||' - '|| get_temploy_name(i.codempid,global_v_lang);
 
---ชื่อพนักงาน (item8)
+--??????????? (item8)
           v_emp_name2 := get_temploy_name(i.codempid,global_v_lang);
 
---หน่วยงาน (item9)
+--???????? (item9)
           v_comp_name := get_tcenter_name(i.codcomp,global_v_lang);
 
---ตำแหน่ง (item10)
+--??????? (item10)
           v_pos_name := get_tpostn_name(i.codpos,global_v_lang);
 
---รหัสหัวหน้างาน (item11 - 12)
+--?????????????? (item11 - 12)
 
          if i.flgsal = 'Y' then
           v_flgsal  :=  get_label_name('HRAP3HX1', global_v_lang, '230');
@@ -528,18 +528,18 @@
 
           begin
             select codapman,   codposap
-              into v_codapman, v_codposap       --รหัสผู้ประเมิน, ตำแหน่งผู้ประเมิน
+              into v_codapman, v_codposap       --??????????????, ?????????????????
               from tappfm
              where dteyreap = b_index_dteyear
                and numtime  = b_index_numtime
                and codempid = i.codempid
-               and flgapman = '2'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+               and flgapman = '2'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                and numseq = (select max(numseq)
                                from tappfm
                               where dteyreap = b_index_dteyear
                                 and numtime  = b_index_numtime
                                 and codempid = i.codempid
-                                and flgapman = '2'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+                                and flgapman = '2'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                                 );
                 desc_codapman  := v_codapman ||' - '|| get_temploy_name(v_codapman,global_v_lang);
                 desc_codapman2 := get_temploy_name(v_codapman,global_v_lang);
@@ -555,21 +555,21 @@
               desc_codposap2 := null;
           end;
 
---รหัสผู้อนุมัติ (item13 - 14)
+--?????????????? (item13 - 14)
           begin
             select codapman,     codposap
-              into v_codapprman, v_codposappr     --รหัสผู้อนุมัติ, ตำแหน่งผู้อนุมัติ
+              into v_codapprman, v_codposappr     --??????????????, ?????????????????
               from tappfm
              where dteyreap = b_index_dteyear
                and numtime  = b_index_numtime
                and codempid = i.codempid
-               and flgapman = '3'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+               and flgapman = '3'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                and numseq = (select max(numseq)
                                from tappfm
                               where dteyreap = b_index_dteyear
                                 and numtime  = b_index_numtime
                                 and codempid = i.codempid
-                                and flgapman = '3'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+                                and flgapman = '3'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                                 );
                 desc_codapprman  := v_codapprman ||' - '|| get_temploy_name(v_codapprman,global_v_lang);
                 desc_codapprman2 := get_temploy_name(v_codapprman,global_v_lang);
@@ -584,7 +584,7 @@
               desc_codposappr2 := null;
           end;
 
---คะแนน(item15),เกรด(item16)
+--?????(item15),????(item16)
           v_qtytot3 := to_char(i.qtytot3 , 'fm999,999,990.00');
           v_grade := i.grdappr;
 
@@ -682,15 +682,15 @@
     v_level1        number;
     v_level2        number;
     v_level3        number;
-    v_Behavior      number;--พฤติกรรม
-    v_Competency    number;--ข้อมูลศักยภาพ (Competency)
+    v_Behavior      number;--????????
+    v_Competency    number;--????????????? (Competency)
     v_Kpi           number;--KPI
 
     cursor c1 is
       select codempid, codcomp, codpos, numlvl, codaplvl,
-             (nvl(qtyta,0) + nvl(qtypuns,0)) qtyta_puns,                   --เวลามาทำงาน + ผิดวินัย
-             (nvl(qtybeh,0) + nvl(qtybeh2,0) + nvl(qtybeh3,0)) Behavior,   --พฤติกรรม
-             (nvl(qtycmp,0) + nvl(qtycmp2,0) + nvl(qtycmp3,0)) Competency, --ข้อมูลศักยภาพ (Competency)
+             (nvl(qtyta,0) + nvl(qtypuns,0)) qtyta_puns,                   --??????????? + ????????
+             (nvl(qtybeh,0) + nvl(qtybeh2,0) + nvl(qtybeh3,0)) Behavior,   --????????
+             (nvl(qtycmp,0) + nvl(qtycmp2,0) + nvl(qtycmp3,0)) Competency, --????????????? (Competency)
              (nvl(qtykpie,0) + nvl(qtykpie2,0) + nvl(qtykpie3,0)) Kpi,     --KPI
              1 total, grdappr
         from tappemp
@@ -742,10 +742,10 @@
   begin
     obj_row := json_object_t();
 
---เวลามาทำงาน/ผิดวินัย
+--???????????/????????
 
 
-    --Weightเวลามาทำงาน , น.น. การผิดวินัย
+    --Weight??????????? , ?.?. ???????????
       get_taplvl_where(p_codempid, p_codcomp, p_codaplvl, nvl(p_dteapend , sysdate), v_codcomp_lvl,v_dteeffec_lvl);--User37 #7268 30/12/2021
 
       begin
@@ -765,13 +765,13 @@
           v_weigth1 := nvl(v_pctta,0) + nvl(v_pctpunsh,0);
           v_totwei_kpi := nvl(v_pctkpicp,0) + nvl(v_pctkpirt,0) + nvl(v_pctkpiem,0);
 /*
-pctta	  น.น. time attendance
-pctpunsh  น.น. การผิดวินัย
-pctbeh	  น.น. พฤติกรรม
-pctcmp	  น.น. ศักยภาพ (Competency)
-pctkpicp  น.น. kpi บริษัท
-pctkpirt  น.น. kpi routine (หน่วยงาน)
-pctkpiem  น.น. kpi เฉพาะบุคคล
+pctta	  ?.?. time attendance
+pctpunsh  ?.?. ???????????
+pctbeh	  ?.?. ????????
+pctcmp	  ?.?. ??????? (Competency)
+pctkpicp  ?.?. kpi ??????
+pctkpirt  ?.?. kpi routine (????????)
+pctkpiem  ?.?. kpi ??????????
 */
         exception when no_data_found then
           v_weigth1  := 0;
@@ -785,16 +785,16 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
           v_totwei_kpi := 0;
       end;
 
-    --คะแนนที่ได้(เวลามาทำงาน) , คะแนนผิดวินัยที่ได้
+    --???????????(???????????) , ???????????????????
       begin
-        select nvl(qtyta,0) , nvl(qtypuns,0),                   --เวลามาทำงาน + ผิดวินัย
-               nvl(qtybeh,0), nvl(qtybeh2,0), nvl(qtybeh3,0),   --พฤติกรรม
-               nvl(qtycmp,0), nvl(qtycmp2,0), nvl(qtycmp3,0),   --ข้อมูลศักยภาพ (Competency)
+        select nvl(qtyta,0) , nvl(qtypuns,0),                   --??????????? + ????????
+               nvl(qtybeh,0), nvl(qtybeh2,0), nvl(qtybeh3,0),   --????????
+               nvl(qtycmp,0), nvl(qtycmp2,0), nvl(qtycmp3,0),   --????????????? (Competency)
                nvl(qtykpie,0),nvl(qtykpie2,0),nvl(qtykpie3,0)   --KPI
                ,nvl(qtykpid,0),nvl(qtykpic,0)--User37 #7467 3. AP Module 11/01/2021
-          into v_qtyta , v_qtypuns,              --เวลามาทำงาน + ผิดวินัย
-               v_qtybeh, v_qtybeh2, v_qtybeh3,   --พฤติกรรม
-               v_qtycmp, v_qtycmp2, v_qtycmp3,   --ข้อมูลศักยภาพ (Competency)
+          into v_qtyta , v_qtypuns,              --??????????? + ????????
+               v_qtybeh, v_qtybeh2, v_qtybeh3,   --????????
+               v_qtycmp, v_qtycmp2, v_qtycmp3,   --????????????? (Competency)
                v_qtykpie,v_qtykpie2,v_qtykpie3   --KPI
                ,v_qtykpid,v_qtykpic--User37 #7467 3. AP Module 11/01/2021
 
@@ -811,7 +811,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
 ------------------------------------------
       v_flgdata := 'Y';
       v_flgsecu := 'Y';
----เวลามาทำงาน + ผิดวินัย (OK)
+---??????????? + ???????? (OK)
       if nvl(v_weigth1,0) > 0 then --User37 #7268 30/12/2021
       v_rcnt := v_rcnt+1;
       obj_data := json_object_t();
@@ -822,15 +822,15 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       obj_data.put('item3',b_index_numtime);
       obj_data.put('item4',p_codempid);
 
-      obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,191)); ---เวลามาทำงาน + ผิดวินัย
-      obj_data.put('item6',to_char(v_weigth1, 'fm999,999,990.00'));   --weigth เวลามาทำงาน + ผิดวินัย
+      obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,191)); ---??????????? + ????????
+      obj_data.put('item6',to_char(v_weigth1, 'fm999,999,990.00'));   --weigth ??????????? + ????????
       obj_data.put('item7',to_char((v_qtyta+v_qtypuns), 'fm999,999,990.00'));--User37 #7467 3. AP Module 11/01/2021 obj_data.put('item7',' ');
       obj_data.put('item8',' ');
       obj_data.put('item9',' ');
       obj_row.put(to_char(v_rcnt-1),obj_data);
       insert_ttemprpt(obj_data);
       end if;--User37 #7268 30/12/2021
---พฤติกรรม
+--????????
       if nvl(v_pctbeh,0) > 0 then --User37 #7268 30/12/2021
       v_rcnt := v_rcnt+1;
       obj_data := json_object_t();
@@ -841,17 +841,17 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       obj_data.put('item3',b_index_numtime);
       obj_data.put('item4',p_codempid);
 
-      obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,192)); ---พฤติกรรม
-      --พฤติกรรม
+      obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,192)); ---????????
+      --????????
       obj_data.put('item6',to_char(v_pctbeh, 'fm999,999,990.00'));   --WEIGHT
-      obj_data.put('item7',to_char(v_qtybeh, 'fm999,999,990.00'));   --คะแนนพนักงาน
-      obj_data.put('item8',to_char(v_qtybeh2, 'fm999,999,990.00'));  --คะแนนหัวหน้างาน
-      obj_data.put('item9',to_char(v_qtybeh3, 'fm999,999,990.00'));  --คะแนนผู้ประเมินสุดท้าย
+      obj_data.put('item7',to_char(v_qtybeh, 'fm999,999,990.00'));   --????????????
+      obj_data.put('item8',to_char(v_qtybeh2, 'fm999,999,990.00'));  --???????????????
+      obj_data.put('item9',to_char(v_qtybeh3, 'fm999,999,990.00'));  --??????????????????????
       obj_row.put(to_char(v_rcnt-1),obj_data);
       insert_ttemprpt(obj_data);
       end if;
 
---ศักยภาพ (Competency)
+--??????? (Competency)
       if nvl(v_pctcmp,0) > 0 then --User37 #7268 30/12/2021
       v_rcnt := v_rcnt+1;
       obj_data := json_object_t();
@@ -862,12 +862,12 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       obj_data.put('item3',b_index_numtime);
       obj_data.put('item4',p_codempid);
 
-      obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,193)); ---ศักยภาพ (Competency)
-      --ศักยภาพ (Competency)
+      obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,193)); ---??????? (Competency)
+      --??????? (Competency)
       obj_data.put('item6',to_char(v_pctcmp, 'fm999,999,990.00'));   --WEIGHT
-      obj_data.put('item7',to_char(v_qtycmp, 'fm999,999,990.00'));   --คะแนนพนักงาน
-      obj_data.put('item8',to_char(v_qtycmp2, 'fm999,999,990.00'));  --คะแนนหัวหน้างาน
-      obj_data.put('item9',to_char(v_qtycmp3, 'fm999,999,990.00'));  --คะแนนผู้ประเมินสุดท้าย
+      obj_data.put('item7',to_char(v_qtycmp, 'fm999,999,990.00'));   --????????????
+      obj_data.put('item8',to_char(v_qtycmp2, 'fm999,999,990.00'));  --???????????????
+      obj_data.put('item9',to_char(v_qtycmp3, 'fm999,999,990.00'));  --??????????????????????
       obj_row.put(to_char(v_rcnt-1),obj_data);
       insert_ttemprpt(obj_data);
       end if;
@@ -885,7 +885,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
 
       obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,194)); ---KPI
       --KPI
-      obj_data.put('item6',to_char(v_totwei_kpi, 'fm999,999,990.00'));   --WEIGHT KPI องค์กร
+      obj_data.put('item6',to_char(v_totwei_kpi, 'fm999,999,990.00'));   --WEIGHT KPI ??????
       obj_data.put('item7',' ');
       obj_data.put('item8',' ');
       obj_data.put('item9',' ');
@@ -893,7 +893,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       insert_ttemprpt(obj_data);
       end if;
 
---- KPI องค์กร
+--- KPI ??????
       if nvl(v_pctkpicp,0) > 0 then --User37 #7268 30/12/2021
       v_rcnt := v_rcnt+1;
       obj_data := json_object_t();
@@ -904,9 +904,9 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       obj_data.put('item3',b_index_numtime);
       obj_data.put('item4',p_codempid);
 
-      obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,195)); --- KPI องค์กร
-      --- KPI องค์กร
-      obj_data.put('item6',to_char(v_pctkpicp, 'fm999,999,990.00'));   --WEIGHT KPI องค์กร
+      obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,195)); --- KPI ??????
+      --- KPI ??????
+      obj_data.put('item6',to_char(v_pctkpicp, 'fm999,999,990.00'));   --WEIGHT KPI ??????
       obj_data.put('item7',to_char(v_qtykpic, 'fm999,999,990.00'));   --User37 #7467 3. AP Module 11/01/2021 obj_data.put('item7',' ');
       obj_data.put('item8',' ');
       obj_data.put('item9',' ');
@@ -914,7 +914,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       insert_ttemprpt(obj_data);
       end if;
 
---- KPI หน่วยงาน
+--- KPI ????????
       if nvl(v_pctkpirt,0) > 0 then --User37 #7268 30/12/2021
       v_rcnt := v_rcnt+1;
       obj_data := json_object_t();
@@ -925,9 +925,9 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       obj_data.put('item3',b_index_numtime);
       obj_data.put('item4',p_codempid);
 
-      obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,196)); --- KPI หน่วยงาน
-      --- KPI หน่วยงาน
-      obj_data.put('item6',to_char(v_pctkpirt, 'fm999,999,990.00'));   --WEIGHT KPI หน่วยงาน
+      obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,196)); --- KPI ????????
+      --- KPI ????????
+      obj_data.put('item6',to_char(v_pctkpirt, 'fm999,999,990.00'));   --WEIGHT KPI ????????
       obj_data.put('item7',to_char(v_qtykpid, 'fm999,999,990.00'));   --User37 #7467 3. AP Module 11/01/2021 obj_data.put('item7',' ');
       obj_data.put('item8',' ');
       obj_data.put('item9',' ');
@@ -935,7 +935,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       insert_ttemprpt(obj_data);
       end if;
 
---- KPI บุคคล
+--- KPI ?????
       if nvl(v_pctkpiem,0) > 0 then --User37 #7268 30/12/2021
       v_rcnt := v_rcnt+1;
       obj_data := json_object_t();
@@ -946,21 +946,21 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       obj_data.put('item3',b_index_numtime);
       obj_data.put('item4',p_codempid);
 
-      obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,197)); --- KPI บุคคล
-      --- KPI บุคคล
-      obj_data.put('item6',to_char(v_pctkpiem, 'fm999,999,990.00'));   --WEIGHT KPI บุคคล
-      obj_data.put('item7',to_char(v_qtykpie, 'fm999,999,990.00'));   --คะแนนพนักงาน
-      obj_data.put('item8',to_char(v_qtykpie2, 'fm999,999,990.00'));  --คะแนนหัวหน้างาน
-      obj_data.put('item9',to_char(v_qtykpie3, 'fm999,999,990.00'));  --คะแนนผู้ประเมินสุดท้าย
+      obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,197)); --- KPI ?????
+      --- KPI ?????
+      obj_data.put('item6',to_char(v_pctkpiem, 'fm999,999,990.00'));   --WEIGHT KPI ?????
+      obj_data.put('item7',to_char(v_qtykpie, 'fm999,999,990.00'));   --????????????
+      obj_data.put('item8',to_char(v_qtykpie2, 'fm999,999,990.00'));  --???????????????
+      obj_data.put('item9',to_char(v_qtykpie3, 'fm999,999,990.00'));  --??????????????????????
       obj_row.put(to_char(v_rcnt-1),obj_data);
       insert_ttemprpt(obj_data);
       end if;
 
 ---TOTAL
       v_totscor1 := nvl(v_weigth1,0) + nvl(v_pctbeh,0) + nvl(v_pctcmp,0) + nvl(v_totwei_kpi,0); --TOTAL WEIGHT
-      v_totscor2 := nvl(v_qtybeh,0) + nvl(v_qtycmp,0) + nvl(v_qtykpie,0); --TOTAL พนักงาน
-      v_totscor3 := nvl(v_qtybeh2,0) + nvl(v_qtycmp2,0) + nvl(v_qtykpie2,0); --TOTAL หัวหน้างาน
-      v_totscor4 := nvl(v_qtybeh3,0) + nvl(v_qtycmp3,0) + nvl(v_qtykpie3,0); --TOTAL ผู้ประเมินสุดท้าย
+      v_totscor2 := nvl(v_qtybeh,0) + nvl(v_qtycmp,0) + nvl(v_qtykpie,0); --TOTAL ???????
+      v_totscor3 := nvl(v_qtybeh2,0) + nvl(v_qtycmp2,0) + nvl(v_qtykpie2,0); --TOTAL ??????????
+      v_totscor4 := nvl(v_qtybeh3,0) + nvl(v_qtycmp3,0) + nvl(v_qtykpie3,0); --TOTAL ?????????????????
 
       if nvl(v_totscor1,0) > 0 or nvl(v_totscor2,0) > 0 or nvl(v_totscor3,0) > 0 or nvl(v_totscor4,0) > 0 then --TOTAL
           v_rcnt := v_rcnt+1;
@@ -975,9 +975,9 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
           obj_data.put('item5',get_label_name ('HRAP3HX1' , global_v_lang ,200)); --- TOTAL
           ---TOTAL WEIGHT
           obj_data.put('item6',to_char(v_totscor1, 'fm999,999,990.00'));  --TOTAL WEIGHT
-          obj_data.put('item7',to_char(v_totscor2, 'fm999,999,990.00'));  --TOTAL พนักงาน
-          obj_data.put('item8',to_char(v_totscor3, 'fm999,999,990.00'));  --TOTAL หัวหน้างาน
-          obj_data.put('item9',to_char(v_totscor4, 'fm999,999,990.00'));  --TOTAL ผู้ประเมินสุดท้าย
+          obj_data.put('item7',to_char(v_totscor2, 'fm999,999,990.00'));  --TOTAL ???????
+          obj_data.put('item8',to_char(v_totscor3, 'fm999,999,990.00'));  --TOTAL ??????????
+          obj_data.put('item9',to_char(v_totscor4, 'fm999,999,990.00'));  --TOTAL ?????????????????
           obj_row.put(to_char(v_rcnt-1),obj_data);
           insert_ttemprpt(obj_data);
       end if;
@@ -1019,15 +1019,15 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
     v_level1        number;
     v_level2        number;
     v_level3        number;
-    v_Behavior      number;--พฤติกรรม
-    v_Competency    number;--ข้อมูลศักยภาพ (Competency)
+    v_Behavior      number;--????????
+    v_Competency    number;--????????????? (Competency)
     v_Kpi           number;--KPI
 
     cursor c1 is
       select codempid, codcomp, codpos, numlvl, codaplvl,
-             (nvl(qtyta,0) + nvl(qtypuns,0)) qtyta_puns,                   --เวลามาทำงาน + ผิดวินัย
-             (nvl(qtybeh,0) + nvl(qtybeh2,0) + nvl(qtybeh3,0)) Behavior,   --พฤติกรรม
-             (nvl(qtycmp,0) + nvl(qtycmp2,0) + nvl(qtycmp3,0)) Competency, --ข้อมูลศักยภาพ (Competency)
+             (nvl(qtyta,0) + nvl(qtypuns,0)) qtyta_puns,                   --??????????? + ????????
+             (nvl(qtybeh,0) + nvl(qtybeh2,0) + nvl(qtybeh3,0)) Behavior,   --????????
+             (nvl(qtycmp,0) + nvl(qtycmp2,0) + nvl(qtycmp3,0)) Competency, --????????????? (Competency)
              (nvl(qtykpie,0) + nvl(qtykpie2,0) + nvl(qtykpie3,0)) Kpi,     --KPI
              1 total, grdappr
         from tappemp
@@ -1062,10 +1062,10 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
   begin
     obj_row := json_object_t();
 
---เวลามาทำงาน/ผิดวินัย
-    --คะแนนเต็ม
+--???????????/????????
+    --?????????
       begin
-    --คะแนนเต็ม Time Attendance, คะแนนเต็มการผิดวินัย  Misconduct
+    --????????? Time Attendance, ????????????????????  Misconduct
         select scorfta, scorfpunsh
           into v_scorfta, v_scorfpunsh
           from tattpreh
@@ -1081,7 +1081,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       end;
       v_totscor1 := nvl(v_scorfta,0) + nvl(v_scorfpunsh,0);
 ------------------------------------------
-    --คะแนนที่ถูกหัก(เวลามาทำงาน)
+    --??????????????(???????????)
       begin
         select sum(qtyscor) into v_qtyscor1
           from tappempta
@@ -1091,7 +1091,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
         exception when no_data_found then
           v_qtyscor1 := 0;
       end;
-    --คะแนนที่ถูกหัก(การทำผิดวินัย)
+    --??????????????(?????????????)
       begin
         select sum(qtyscor) into v_qtyscor2
           from tappempmt
@@ -1103,7 +1103,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       end;
       v_totscor2 := nvl(v_qtyscor1,0) + nvl(v_qtyscor2,0);
 ------------------------------------------
-    --คะแนนที่ได้(เวลามาทำงาน) , คะแนนผิดวินัยที่ได้
+    --???????????(???????????) , ???????????????????
       begin
         select sum(qtyta), sum(qtypuns) into v_qtyscor3, v_qtyscor4
           from tappemp
@@ -1116,7 +1116,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       end;
       v_totscor3 := nvl(v_qtyscor3,0) + nvl(v_qtyscor4,0);
 ------------------------------------------
-    --Weightเวลามาทำงาน , น.น. การผิดวินัย
+    --Weight??????????? , ?.?. ???????????
       get_taplvl_where(p_codempid, p_codcomp, p_codaplvl, nvl(p_dteapend , sysdate), v_codcomp_lvl,v_dteeffec_lvl);--User37 #7268 30/12/2021
       begin
         select pctta, pctpunsh into v_qtyscor5, v_qtyscor6
@@ -1145,9 +1145,9 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       obj_data.put('coderror', '200');
       obj_data.put('number',v_rcnt);
 
----คะแนนเต็มเวลามาทำงาน > 0
-        if v_scorfta > 0 then  --คะแนนเต็มเวลามาทำงาน > 0
-            v_qtyscor7 := v_qtyscor3 * v_qtyscor5;  --คะแนนที่ได้(เวลามาทำงาน) * Weightเวลามาทำงาน
+---???????????????????? > 0
+        if v_scorfta > 0 then  --???????????????????? > 0
+            v_qtyscor7 := v_qtyscor3 * v_qtyscor5;  --???????????(???????????) * Weight???????????
             v_totscor5 := nvl(v_totscor5,0) + nvl(v_qtyscor7,0);
 
             obj_data.put('number',v_rcnt);
@@ -1155,47 +1155,47 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
             obj_data.put('item2',b_index_dteyear + nvl(global_vyear,0));
             obj_data.put('item3',b_index_numtime);
             obj_data.put('item4',p_codempid);
-            obj_data.put('item5',get_label_name ('HRAP3HX2' , global_v_lang ,71)); --'เวลามาทำงาน'
-            obj_data.put('item6',to_char(v_scorfta, 'fm999,999,990.00'));   --คะแนนเต็มเวลามาทำงาน (Time Attendance)
-            obj_data.put('item7',to_char(v_qtyscor1, 'fm999,999,990.00'));   --คะแนนที่ถูกหัก(เวลามาทำงาน)
-            obj_data.put('item8',to_char(v_qtyscor3, 'fm999,999,990.00'));   --คะแนนที่ได้(เวลามาทำงาน)
-            obj_data.put('item9',to_char(v_qtyscor5, 'fm999,999,990.00'));   --Weightเวลามาทำงาน
-            obj_data.put('item10',to_char(v_qtyscor7, 'fm999,999,990.00'));  --สุทธิเวลามาทำงาน
+            obj_data.put('item5',get_label_name ('HRAP3HX2' , global_v_lang ,71)); --'???????????'
+            obj_data.put('item6',to_char(v_scorfta, 'fm999,999,990.00'));   --???????????????????? (Time Attendance)
+            obj_data.put('item7',to_char(v_qtyscor1, 'fm999,999,990.00'));   --??????????????(???????????)
+            obj_data.put('item8',to_char(v_qtyscor3, 'fm999,999,990.00'));   --???????????(???????????)
+            obj_data.put('item9',to_char(v_qtyscor5, 'fm999,999,990.00'));   --Weight???????????
+            obj_data.put('item10',to_char(v_qtyscor7, 'fm999,999,990.00'));  --????????????????
             obj_row.put(to_char(v_rcnt-1),obj_data);
             insert_ttemprpt(obj_data);
         end if;
 
----คะแนนเต็มการผิดวินัย > 0
-        if v_scorfpunsh > 0 then  --คะแนนเต็มการผิดวินัย > 0
+---???????????????????? > 0
+        if v_scorfpunsh > 0 then  --???????????????????? > 0
             v_rcnt := v_rcnt+1;
             obj_data := json_object_t();
             obj_data.put('coderror', '200');
 
             obj_data.put('number',v_rcnt);
-            v_qtyscor8 := v_qtyscor4 * v_qtyscor6;  --คะแนนผิดวินัยที่ได้ * น.น. การผิดวินัย
+            v_qtyscor8 := v_qtyscor4 * v_qtyscor6;  --??????????????????? * ?.?. ???????????
             v_totscor5 := nvl(v_totscor5,0) + nvl(v_qtyscor8,0);
             obj_data.put('number',v_rcnt);
             obj_data.put('item1','TABLE2');
             obj_data.put('item2',b_index_dteyear + nvl(global_vyear,0));
             obj_data.put('item3',b_index_numtime);
             obj_data.put('item4',p_codempid);
-            obj_data.put('item5',get_label_name ('HRAP3HX2' , global_v_lang ,72)); --'การทำผิดวินัย'
-            obj_data.put('item6',to_char(v_scorfpunsh, 'fm999,999,990.00'));   --คะแนนเต็มการผิดวินัย
-            obj_data.put('item7',to_char(v_qtyscor2, 'fm999,999,990.00'));   --คะแนนที่ถูกหัก(การทำผิดวินัย)
-            obj_data.put('item8',to_char(v_qtyscor4, 'fm999,999,990.00'));   --คะแนนผิดวินัยที่ได้
-            obj_data.put('item9',to_char(v_qtyscor6, 'fm999,999,990.00'));   --น.น. การผิดวินัย
-            obj_data.put('item10',to_char(v_qtyscor8, 'fm999,999,990.00'));  --สุทธิการผิดวินัย
+            obj_data.put('item5',get_label_name ('HRAP3HX2' , global_v_lang ,72)); --'?????????????'
+            obj_data.put('item6',to_char(v_scorfpunsh, 'fm999,999,990.00'));   --????????????????????
+            obj_data.put('item7',to_char(v_qtyscor2, 'fm999,999,990.00'));   --??????????????(?????????????)
+            obj_data.put('item8',to_char(v_qtyscor4, 'fm999,999,990.00'));   --???????????????????
+            obj_data.put('item9',to_char(v_qtyscor6, 'fm999,999,990.00'));   --?.?. ???????????
+            obj_data.put('item10',to_char(v_qtyscor8, 'fm999,999,990.00'));  --????????????????
             obj_row.put(to_char(v_rcnt-1),obj_data);
             insert_ttemprpt(obj_data);
         end if;
 
 ---TOTAL
-        if nvl(v_scorfta,0) > 0 or nvl(v_scorfpunsh,0) > 0 then --คะแนนเต็มเวลามาทำงาน > 0 ,คะแนนเต็มการผิดวินัย > 0
+        if nvl(v_scorfta,0) > 0 or nvl(v_scorfpunsh,0) > 0 then --???????????????????? > 0 ,???????????????????? > 0
             v_rcnt := v_rcnt+1;
             obj_data := json_object_t();
             obj_data.put('coderror', '200');
 
-            v_qtyscor8 := v_qtyscor4 * v_qtyscor6;  --คะแนนผิดวินัยที่ได้ * น.น. การผิดวินัย
+            v_qtyscor8 := v_qtyscor4 * v_qtyscor6;  --??????????????????? * ?.?. ???????????
             --User37 #7268 30/12/2021 v_totscor5 := nvl(v_totscor5,0) + nvl(v_qtyscor8,0);
             obj_data.put('number',v_rcnt);
             obj_data.put('item1','TABLE2');
@@ -1203,11 +1203,11 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
             obj_data.put('item3',b_index_numtime);
             obj_data.put('item4',p_codempid);
             obj_data.put('item5',get_label_name ('HRAP3HX2' , global_v_lang ,73)); --'TOTAL'
-            obj_data.put('item6',to_char(v_totscor1, 'fm999,999,990.00'));   --รวมคะแนนเต็ม
-            obj_data.put('item7',to_char(v_totscor2, 'fm999,999,990.00'));   --รวมคะแนนที่ถูกหัก
-            obj_data.put('item8',to_char(v_totscor3, 'fm999,999,990.00'));   --รวมคะแนนที่ได้
-            obj_data.put('item9',to_char(v_totscor4, 'fm999,999,990.00'));   --รวมน.น.
-            obj_data.put('item10',to_char(v_totscor5, 'fm999,999,990.00'));  --รวมสุทธิ
+            obj_data.put('item6',to_char(v_totscor1, 'fm999,999,990.00'));   --????????????
+            obj_data.put('item7',to_char(v_totscor2, 'fm999,999,990.00'));   --?????????????????
+            obj_data.put('item8',to_char(v_totscor3, 'fm999,999,990.00'));   --??????????????
+            obj_data.put('item9',to_char(v_totscor4, 'fm999,999,990.00'));   --????.?.
+            obj_data.put('item10',to_char(v_totscor5, 'fm999,999,990.00'));  --????????
             obj_row.put(to_char(v_rcnt-1),obj_data);
             insert_ttemprpt(obj_data);
         end if;
@@ -1250,8 +1250,8 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
     v_level1        number;
     v_level2        number;
     v_level3        number;
-    v_Behavior      number;--พฤติกรรม
-    v_Competency    number;--ข้อมูลศักยภาพ (Competency)
+    v_Behavior      number;--????????
+    v_Competency    number;--????????????? (Competency)
     v_Kpi           number;--KPI
 
     cursor c1 is
@@ -1269,7 +1269,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
     obj_row := json_object_t();
 
 
---เวลามาทำงาน/ผิดวินัย
+--???????????/????????
     for i in c1 loop
 ------------------------------------------
       v_flgdata := 'Y';
@@ -1285,8 +1285,8 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       obj_data.put('item2',b_index_dteyear + nvl(global_vyear,0));
       obj_data.put('item3',b_index_numtime);
       obj_data.put('item4',p_codempid);
---      obj_data.put('item5', i.codgrplv); --'กลุ่มการลา'
-      obj_data.put('item5', get_tlistval_name('GRPLEAVE',i.codgrplv,global_v_lang)); --'กลุ่มการลา'
+--      obj_data.put('item5', i.codgrplv); --'??????????'
+      obj_data.put('item5', get_tlistval_name('GRPLEAVE',i.codgrplv,global_v_lang)); --'??????????'
       obj_data.put('item6',to_char(i.qtyleav,'fm999,999,990'));
       obj_data.put('item7',to_char(i.qtyscor,'fm999,999,990.00'));
       obj_row.put(to_char(v_rcnt-1),obj_data);
@@ -1294,7 +1294,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
     end loop;
 
 ---TOTAL
-    if nvl(v_total1,0) > 0 or nvl(v_total2,0) > 0 then --จำนวนครั้ง > 0 ,คะแนนที่ถูกหัก > 0
+    if nvl(v_total1,0) > 0 or nvl(v_total2,0) > 0 then --?????????? > 0 ,?????????????? > 0
         v_rcnt := v_rcnt+1;
         obj_data := json_object_t();
         obj_data.put('coderror', '200');
@@ -1305,8 +1305,8 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
         obj_data.put('item4',p_codempid);
 
         obj_data.put('item5',get_label_name ('HRAP3HX2' , global_v_lang ,115)); --'TOTAL'
-        obj_data.put('item6',to_char(v_total1, 'fm999,999,990'));   --รวมจำนวนครั้ง
-        obj_data.put('item7',to_char(v_total2, 'fm999,999,990.00'));   --รวมคะแนนที่ถูกหัก
+        obj_data.put('item6',to_char(v_total1, 'fm999,999,990'));   --?????????????
+        obj_data.put('item7',to_char(v_total2, 'fm999,999,990.00'));   --?????????????????
         obj_row.put(to_char(v_rcnt-1),obj_data);
         insert_ttemprpt(obj_data);
     end if;
@@ -1347,8 +1347,8 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
     v_level1        number;
     v_level2        number;
     v_level3        number;
-    v_Behavior      number;--พฤติกรรม
-    v_Competency    number;--ข้อมูลศักยภาพ (Competency)
+    v_Behavior      number;--????????
+    v_Competency    number;--????????????? (Competency)
     v_Kpi           number;--KPI
 
     cursor c1 is
@@ -1364,7 +1364,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
 
   begin
     obj_row := json_object_t();
---เวลามาทำงาน/ผิดวินัย
+--???????????/????????
     for i in c1 loop
 ------------------------------------------
       v_flgdata := 'Y';
@@ -1381,7 +1381,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       obj_data.put('item3',b_index_numtime);
       obj_data.put('item4',p_codempid);
 ----
-      obj_data.put('item5', get_tcodec_name('TCODPUNH',i.codpunsh,global_v_lang)); --'รหัสการลงโทษ'
+      obj_data.put('item5', get_tcodec_name('TCODPUNH',i.codpunsh,global_v_lang)); --'????????????'
       obj_data.put('item6',to_char(i.qtypunsh,'fm999,999,990'));
       obj_data.put('item7',to_char(i.qtyscor,'fm999,999,990.00'));
       obj_row.put(to_char(v_rcnt-1),obj_data);
@@ -1389,7 +1389,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
     end loop;
 
 ---TOTAL
-    if nvl(v_total1,0) > 0 or nvl(v_total2,0) > 0 then --จำนวนครั้ง > 0 ,คะแนนที่ถูกหัก > 0
+    if nvl(v_total1,0) > 0 or nvl(v_total2,0) > 0 then --?????????? > 0 ,?????????????? > 0
         v_rcnt := v_rcnt+1;
         obj_data := json_object_t();
         obj_data.put('coderror', '200');
@@ -1399,8 +1399,8 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
         obj_data.put('item3',b_index_numtime);
         obj_data.put('item4',p_codempid);
         obj_data.put('item5',get_label_name ('HRAP3HX2' , global_v_lang ,153)); --'TOTAL'
-        obj_data.put('item6',to_char(v_total1, 'fm999,999,990'));   --รวมจำนวนครั้ง
-        obj_data.put('item7',to_char(v_total2, 'fm999,999,990.00'));   --รวมคะแนนที่ถูกหัก
+        obj_data.put('item6',to_char(v_total1, 'fm999,999,990'));   --?????????????
+        obj_data.put('item7',to_char(v_total2, 'fm999,999,990.00'));   --?????????????????
         obj_row.put(to_char(v_rcnt-1),obj_data);
         insert_ttemprpt(obj_data);
     end if;
@@ -1441,8 +1441,8 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
     v_level1        number;
     v_level2        number;
     v_level3        number;
-    v_Behavior      number;--พฤติกรรม
-    v_Competency    number;--ข้อมูลศักยภาพ (Competency)
+    v_Behavior      number;--????????
+    v_Competency    number;--????????????? (Competency)
     v_Kpi           number;--KPI
 
     v_maxseq3       number;--User37 #7268 30/12/2021
@@ -1466,7 +1466,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
 
 
 
---เวลามาทำงาน/ผิดวินัย
+--???????????/????????
     for i in c1 loop
 ------------------------------------------
       v_flgdata := 'Y';
@@ -1494,7 +1494,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
               v_qtyscorn := 0;
       end;*/
 
-      --3-ผู้ประเมินสุดท้าย
+      --3-?????????????????
       begin
         select numseq
           into v_maxseq3
@@ -1502,13 +1502,13 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
          where dteyreap = b_index_dteyear
            and numtime  = b_index_numtime
            and codempid = p_codempid
-           and flgapman = '3'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+           and flgapman = '3'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
            and numseq = (select max(numseq)
                            from tappfm
                           where dteyreap = b_index_dteyear
                             and numtime  = b_index_numtime
                             and codempid = p_codempid
-                            and flgapman = '3'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+                            and flgapman = '3'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                          );
       exception when no_data_found then
         v_maxseq3 := null;
@@ -1563,9 +1563,9 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
         obj_data.put('item4',p_codempid);
         obj_data.put('item5',' ');
         obj_data.put('item6',get_label_name ('HRAP3HX2' , global_v_lang ,153)); --'TOTAL'
-        obj_data.put('item7',to_char(v_total1, 'fm999,999,990.00'));   --รวมคะแนนที่ถูกหัก
-        obj_data.put('item8',to_char(v_total2, 'fm999,999,990.00'));   --รวมคะแนนที่ถูกหัก
-        obj_data.put('item9',to_char(v_total3, 'fm999,999,990.00'));   --รวมคะแนนที่ถูกหัก
+        obj_data.put('item7',to_char(v_total1, 'fm999,999,990.00'));   --?????????????????
+        obj_data.put('item8',to_char(v_total2, 'fm999,999,990.00'));   --?????????????????
+        obj_data.put('item9',to_char(v_total3, 'fm999,999,990.00'));   --?????????????????
         obj_row.put(to_char(v_rcnt-1),obj_data);
         insert_ttemprpt(obj_data);
     end if;
@@ -1606,8 +1606,8 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
     v_level1        number;
     v_level2        number;
     v_level3        number;
-    v_Behavior      number;--พฤติกรรม
-    v_Competency    number;--ข้อมูลศักยภาพ (Competency)
+    v_Behavior      number;--????????
+    v_Competency    number;--????????????? (Competency)
     v_Kpi           number;--KPI
 
     v_numgrup     number;
@@ -1661,7 +1661,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
 
 
 
---เวลามาทำงาน/ผิดวินัย
+--???????????/????????
     for i in c1 loop
 ------------------------------------------
       v_flgdata := 'Y';
@@ -1681,7 +1681,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       obj_data.put('item3',b_index_numtime);
       obj_data.put('item4',p_codempid);
 ----
-      obj_data.put('item5',get_label_name ('HRAP3HX3' , global_v_lang ,30) ||' '||to_char(v_seq,'fm999,999,990')); --'ส่วนที่'
+      obj_data.put('item5',get_label_name ('HRAP3HX3' , global_v_lang ,30) ||' '||to_char(v_seq,'fm999,999,990')); --'???????'
       obj_data.put('item6',i.desgrup);
       obj_data.put('item7',' ');
       obj_data.put('item8',' ');
@@ -1712,20 +1712,20 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
 ----------------------------------
           v_pctwgt := 0;
           v_remark := null;
-          --1-พนักงาน
+          --1-???????
           begin
             select numseq, qtybeh into v_maxseq1, v_qtybeh1
               from tappfm
              where dteyreap = b_index_dteyear
                and numtime  = b_index_numtime
                and codempid = p_codempid
-               and flgapman = '1'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+               and flgapman = '1'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                and numseq = (select max(numseq)
                                from tappfm
                               where dteyreap = b_index_dteyear
                                 and numtime  = b_index_numtime
                                 and codempid = p_codempid
-                                and flgapman = '1'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+                                and flgapman = '1'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                                );
             exception when no_data_found then
              v_maxseq1 := null;
@@ -1735,7 +1735,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
           begin
             select pctwgt,   qtyscorn, remark
                    ,qtyscorn/pctwgt qtybeh1--User37 #7268 30/12/2021
-              into v_pctwgt, v_qtyscorn1, v_remark   --คะแนน คะแนนสุทธิ
+              into v_pctwgt, v_qtyscorn1, v_remark   --????? ??????????
                    ,v_qtybeh1--User37 #7268 30/12/2021
               from tappbehi a
              where a.dteyreap = b_index_dteyear
@@ -1747,20 +1747,20 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
             exception when no_data_found then
               v_qtyscorn1 := null;
           end;
-          --2-หัวหน้า
+          --2-???????
           begin
             select numseq, qtybeh into v_maxseq2, v_qtybeh2
               from tappfm
              where dteyreap = b_index_dteyear
                and numtime  = b_index_numtime
                and codempid = p_codempid
-               and flgapman = '2'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+               and flgapman = '2'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                and numseq = (select max(numseq)
                                from tappfm
                               where dteyreap = b_index_dteyear
                                 and numtime  = b_index_numtime
                                 and codempid = p_codempid
-                                and flgapman = '2'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+                                and flgapman = '2'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                                );
             exception when no_data_found then
              v_maxseq2 := null;
@@ -1770,7 +1770,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
           begin
             select pctwgt,   qtyscorn, remark
                    ,qtyscorn/pctwgt qtybeh2--User37 #7268 30/12/2021
-              into v_pctwgt, v_qtyscorn2, v_remark   --คะแนน คะแนนสุทธิ
+              into v_pctwgt, v_qtyscorn2, v_remark   --????? ??????????
                    ,v_qtybeh2--User37 #7268 30/12/2021
               from tappbehi a
              where a.dteyreap = b_index_dteyear
@@ -1782,20 +1782,20 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
             exception when no_data_found then
               v_qtyscorn2 := null;
           end;
-          --3-ผู้ประเมินสุดท้าย
+          --3-?????????????????
           begin
             select numseq, qtybeh into v_maxseq3, v_qtybeh3
               from tappfm
              where dteyreap = b_index_dteyear
                and numtime  = b_index_numtime
                and codempid = p_codempid
-               and flgapman = '3'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+               and flgapman = '3'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                and numseq = (select max(numseq)
                                from tappfm
                               where dteyreap = b_index_dteyear
                                 and numtime  = b_index_numtime
                                 and codempid = p_codempid
-                                and flgapman = '3'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+                                and flgapman = '3'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                                );
             exception when no_data_found then
              v_maxseq3 := null;
@@ -1805,7 +1805,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
           begin
             select pctwgt,   qtyscorn, remark
                    ,qtyscorn/pctwgt qtybeh3--User37 #7268 30/12/2021
-              into v_pctwgt, v_qtyscorn3, v_remark   --คะแนน คะแนนสุทธิ
+              into v_pctwgt, v_qtyscorn3, v_remark   --????? ??????????
                    ,v_qtybeh3--User37 #7268 30/12/2021
               from tappbehi a
              where a.dteyreap = b_index_dteyear
@@ -1852,13 +1852,13 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
         obj_data.put('item4',p_codempid);
         obj_data.put('item5',' ');
         obj_data.put('item6',get_label_name ('HRAP3HX2' , global_v_lang ,153)); --'TOTAL'
-        obj_data.put('item7',to_char(v_total1, 'fm999,999,990.00'));   --รวมคะแนนที่ถูกหัก
-        obj_data.put('item8',to_char(v_total2, 'fm999,999,990.00'));   --รวมคะแนนที่ถูกหัก
-        obj_data.put('item9',to_char(v_total3, 'fm999,999,990.00'));   --รวมคะแนนที่ถูกหัก
-        obj_data.put('item10',to_char(v_total4, 'fm999,999,990.00'));   --รวมคะแนนที่ถูกหัก
-        obj_data.put('item11',to_char(v_total5, 'fm999,999,990.00'));   --รวมคะแนนที่ถูกหัก
-        obj_data.put('item12',to_char(v_total6, 'fm999,999,990.00'));   --รวมคะแนนที่ถูกหัก
-        obj_data.put('item13',to_char(v_total7, 'fm999,999,990.00'));   --รวมคะแนนที่ถูกหัก
+        obj_data.put('item7',to_char(v_total1, 'fm999,999,990.00'));   --?????????????????
+        obj_data.put('item8',to_char(v_total2, 'fm999,999,990.00'));   --?????????????????
+        obj_data.put('item9',to_char(v_total3, 'fm999,999,990.00'));   --?????????????????
+        obj_data.put('item10',to_char(v_total4, 'fm999,999,990.00'));   --?????????????????
+        obj_data.put('item11',to_char(v_total5, 'fm999,999,990.00'));   --?????????????????
+        obj_data.put('item12',to_char(v_total6, 'fm999,999,990.00'));   --?????????????????
+        obj_data.put('item13',to_char(v_total7, 'fm999,999,990.00'));   --?????????????????
         obj_row.put(to_char(v_rcnt-1),obj_data);
         insert_ttemprpt(obj_data);
     end if;
@@ -1898,8 +1898,8 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
     v_level1        number;
     v_level2        number;
     v_level3        number;
-    v_Behavior      number;--พฤติกรรม
-    v_Competency    number;--ข้อมูลศักยภาพ (Competency)
+    v_Behavior      number;--????????
+    v_Competency    number;--????????????? (Competency)
     v_Kpi           number;--KPI
 
     v_numgrup     number;
@@ -1969,7 +1969,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
     obj_row := json_object_t();
 
 
---เวลามาทำงาน/ผิดวินัย
+--???????????/????????
     for i in c1 loop
 ------------------------------------------
       v_flgdata := 'Y';
@@ -2000,20 +2000,20 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
           v_pctwgt := 0;
           v_remark := null;
 ----------------------------------
-          --1-พนักงาน
+          --1-???????
           begin
             select numseq, qtycmp into v_maxseq1, v_qtycmp1
               from tappfm
              where dteyreap = b_index_dteyear
                and numtime  = b_index_numtime
                and codempid = p_codempid
-               and flgapman = '1'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+               and flgapman = '1'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                and numseq = (select max(numseq)
                                from tappfm
                               where dteyreap = b_index_dteyear
                                 and numtime  = b_index_numtime
                                 and codempid = p_codempid
-                                and flgapman = '1'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+                                and flgapman = '1'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                                );
             exception when no_data_found then
              v_maxseq1 := null;
@@ -2052,20 +2052,20 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
              v_qtyscorn1 := null;
           end;
 
-          --2-หัวหน้า
+          --2-???????
           begin
             select numseq, qtycmp into v_maxseq2, v_qtycmp2
               from tappfm
              where dteyreap = b_index_dteyear
                and numtime  = b_index_numtime
                and codempid = p_codempid
-               and flgapman = '2'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+               and flgapman = '2'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                and numseq = (select max(numseq)
                                from tappfm
                               where dteyreap = b_index_dteyear
                                 and numtime  = b_index_numtime
                                 and codempid = p_codempid
-                                and flgapman = '2'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+                                and flgapman = '2'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                                );
             exception when no_data_found then
              v_maxseq2 := null;
@@ -2101,20 +2101,20 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
              v_qtyscorn2 := null;
           end;
 
-          --3-ผู้ประเมินสุดท้าย
+          --3-?????????????????
           begin
             select numseq, qtycmp into v_maxseq3, v_qtycmp3
               from tappfm
              where dteyreap = b_index_dteyear
                and numtime  = b_index_numtime
                and codempid = p_codempid
-               and flgapman = '3'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+               and flgapman = '3'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                and numseq = (select max(numseq)
                                from tappfm
                               where dteyreap = b_index_dteyear
                                 and numtime  = b_index_numtime
                                 and codempid = p_codempid
-                                and flgapman = '3'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+                                and flgapman = '3'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                                );
             exception when no_data_found then
              v_maxseq3 := null;
@@ -2194,16 +2194,16 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
         obj_data.put('item6',' ');
         obj_data.put('item7',' ');
         obj_data.put('item8',get_label_name ('HRAP3HX2' , global_v_lang ,153)); --'TOTAL'
---        obj_data.put('item9',to_char(v_total1, 'fm999,999,990.00'));    --รวมระดับที่คาดหวัง
+--        obj_data.put('item9',to_char(v_total1, 'fm999,999,990.00'));    --??????????????????
         obj_data.put('item9',' ');
---        obj_data.put('item10',to_char(v_total2, 'fm999,999,990.00'));   --รวมระดับที่ได้
+--        obj_data.put('item10',to_char(v_total2, 'fm999,999,990.00'));   --??????????????
         obj_data.put('item10',' ');
-        obj_data.put('item11',to_char(v_total3, 'fm999,999,990.00'));   --รวมคะแนนที่ได้ พนักงาน
-        obj_data.put('item12',to_char(v_total4, 'fm999,999,990.00'));   --รวมคะแนนที่ได้ หัวหน้างาน
-        obj_data.put('item13',to_char(v_total5, 'fm999,999,990.00'));   --รวมคะแนนที่ได้ ผู้ประเมินสุดท้าย
-        obj_data.put('item14',to_char(v_total6, 'fm999,999,990.00'));   --รวมคะแนนสุทธิ พนักงาน
-        obj_data.put('item15',to_char(v_total7, 'fm999,999,990.00'));   --รวมคะแนนสุทธิ หัวหน้างาน
-        obj_data.put('item16',to_char(v_total8, 'fm999,999,990.00'));   --รวมคะแนนสุทธิ ผู้ประเมินสุดท้าย
+        obj_data.put('item11',to_char(v_total3, 'fm999,999,990.00'));   --?????????????? ???????
+        obj_data.put('item12',to_char(v_total4, 'fm999,999,990.00'));   --?????????????? ??????????
+        obj_data.put('item13',to_char(v_total5, 'fm999,999,990.00'));   --?????????????? ?????????????????
+        obj_data.put('item14',to_char(v_total6, 'fm999,999,990.00'));   --????????????? ???????
+        obj_data.put('item15',to_char(v_total7, 'fm999,999,990.00'));   --????????????? ??????????
+        obj_data.put('item16',to_char(v_total8, 'fm999,999,990.00'));   --????????????? ?????????????????
         obj_row.put(to_char(v_rcnt-1),obj_data);
         insert_ttemprpt(obj_data);
     end if;
@@ -2243,8 +2243,8 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
     v_level1        number;
     v_level2        number;
     v_level3        number;
-    v_Behavior      number;--พฤติกรรม
-    v_Competency    number;--ข้อมูลศักยภาพ (Competency)
+    v_Behavior      number;--????????
+    v_Competency    number;--????????????? (Competency)
     v_Kpi           number;--KPI
 
     v_numgrup     number;
@@ -2255,7 +2255,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
     v_typkpi      varchar2(10);
 
     cursor c1 is
---           รหัส KPI,เป้าหมาย, มูลค่า,     Weight%,ผลงานล่าสุด, คะแนนสุทธิ
+--           ???? KPI,????????, ??????,     Weight%,???????????, ??????????
       select codkpi, target, mtrfinish, pctwgt, achieve, qtyscorn
              ,kpides--User37 #7268 30/12/2021
         from tkpiemp
@@ -2323,7 +2323,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
   begin
     obj_row := json_object_t();
     begin
-        select qtykpic, qtykpid -- KPI หน่วยงาน, องค์กร
+        select qtykpic, qtykpid -- KPI ????????, ??????
           into v_qtykpic, v_qtykpid
           from tappemp
          where dteyreap = b_index_dteyear
@@ -2334,7 +2334,7 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
          v_qtykpid := null;
     end;
 
-    for v_loop in 1..3 loop --ประเภท KPI (D-Department KPI, J-Funtional KPI, I-Individual KPI)
+    for v_loop in 1..3 loop --?????? KPI (D-Department KPI, J-Funtional KPI, I-Individual KPI)
         if v_loop = 1 then
             v_typkpi := 'D';  --D-Department KPI
         elsif v_loop = 2 then
@@ -2372,14 +2372,14 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
         ----
         --<<User37 #7268 30/12/2021
         if v_typkpi = 'D' then  --D-Department KPI
-          obj_data.put('item6',get_label_name ('HRAP3HX5' , global_v_lang ,21)); --'KPI หน่วยงาน'
+          obj_data.put('item6',get_label_name ('HRAP3HX5' , global_v_lang ,21)); --'KPI ????????'
         elsif v_typkpi = 'J' then  --J-Funtional KPI
           obj_data.put('item6',get_label_name ('HRAP3HX5' , global_v_lang ,22)); --'Functional KPI'
         elsif v_typkpi = 'I' then  --I-Individual KPI
           obj_data.put('item6',get_label_name ('HRAP3HX5' , global_v_lang ,23)); --'Individual KPI'
         end if;
         obj_data.put('item5',' ');
-        /*obj_data.put('item5',get_label_name ('HRAP3HX5' , global_v_lang ,21)); --'KPI หน่วยงาน'
+        /*obj_data.put('item5',get_label_name ('HRAP3HX5' , global_v_lang ,21)); --'KPI ????????'
         obj_data.put('item6',' ');*/
         -->>User37 #7268 30/12/2021
         obj_data.put('item7',' ');
@@ -2418,8 +2418,8 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
           ----
           obj_data.put('item5',i.codkpi);
           obj_data.put('item6',i.kpides);--User37 #7268 30/12/2021 obj_data.put('item6',' ');
-          obj_data.put('item7',i.target);  --เป้าหมาย
-          obj_data.put('item8',to_char(i.mtrfinish,'fm999,999,990.00'));  --มูลค่า
+          obj_data.put('item7',i.target);  --????????
+          obj_data.put('item8',to_char(i.mtrfinish,'fm999,999,990.00'));  --??????
           obj_data.put('item9',to_char(i.pctwgt,'fm999,999,990.00'));  --Weight%
 
           begin
@@ -2439,27 +2439,27 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
              v_descwork := null;
           end;
 
-          --1-พนักงาน (คะแนน)
+          --1-??????? (?????)
           begin
             select numseq, qtykpi into v_maxseq1, v_qtykpi1
               from tappfm
              where dteyreap = b_index_dteyear
                and numtime  = b_index_numtime
                and codempid = p_codempid
-               and flgapman = '1'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+               and flgapman = '1'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                and numseq = (select max(numseq)
                                from tappfm
                               where dteyreap = b_index_dteyear
                                 and numtime  = b_index_numtime
                                 and codempid = p_codempid
-                                and flgapman = '1'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+                                and flgapman = '1'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                                );
             exception when no_data_found then
              v_maxseq1 := null;
              v_qtykpi1 := null;
           end;
 
-          --คะแนนที่ได้, คะแนนสุทธิ, หมายเหตุ
+          --???????????, ??????????, ????????
           begin
             select qtyscor, qtyscorn, remark
               into v_qtyscor1, v_qtyscorn1, v_remark
@@ -2474,27 +2474,27 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
               v_qtyscorn1 := 0;
           end;
 
-          --2-หัวหน้า
+          --2-???????
           begin
             select numseq, qtykpi into v_maxseq2, v_qtykpi2
               from tappfm
              where dteyreap = b_index_dteyear
                and numtime  = b_index_numtime
                and codempid = p_codempid
-               and flgapman = '2'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+               and flgapman = '2'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                and numseq = (select max(numseq)
                                from tappfm
                               where dteyreap = b_index_dteyear
                                 and numtime  = b_index_numtime
                                 and codempid = p_codempid
-                                and flgapman = '2'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+                                and flgapman = '2'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                                );
             exception when no_data_found then
              v_maxseq2 := null;
              v_qtykpi2 := null;
           end;
 
-          --คะแนนที่ได้, คะแนนสุทธิ, หมายเหตุ
+          --???????????, ??????????, ????????
           begin
             select qtyscor, qtyscorn, remark
               into v_qtyscor2, v_qtyscorn2, v_remark
@@ -2509,27 +2509,27 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
               v_qtyscorn2 := 0;
           end;
 
-          --3-ผู้ประเมินสุดท้าย
+          --3-?????????????????
           begin
             select numseq, qtykpi into v_maxseq3, v_qtykpi3
               from tappfm
              where dteyreap = b_index_dteyear
                and numtime  = b_index_numtime
                and codempid = p_codempid
-               and flgapman = '3'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+               and flgapman = '3'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                and numseq = (select max(numseq)
                                from tappfm
                               where dteyreap = b_index_dteyear
                                 and numtime  = b_index_numtime
                                 and codempid = p_codempid
-                                and flgapman = '3'  --ประเมินในฐานะ (1-พนักงาน, 2-หัวหน้า, 3-ผู้ประเมินสุดท้าย, 4-คนอื่นๆ)
+                                and flgapman = '3'  --????????????? (1-???????, 2-???????, 3-?????????????????, 4-???????)
                                );
             exception when no_data_found then
              v_maxseq3 := null;
              v_qtykpi3 := null;
           end;
 
-          --คะแนนที่ได้, คะแนนสุทธิ, หมายเหตุ
+          --???????????, ??????????, ????????
           begin
             select qtyscor, qtyscorn, remark
               into v_qtyscor3, v_qtyscorn3, v_remark
@@ -2544,23 +2544,23 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
               v_qtyscorn3 := 0;
           end;
 
-          obj_data.put('item10',v_descwork);                              --ผลงานล่าสุด
-          obj_data.put('item11',to_char(v_qtyscor1,'fm999,999,990.00'));  --คะแนนที่ได้ พนง.
-          obj_data.put('item12',to_char(v_qtyscor2,'fm999,999,990.00'));  --คะแนนที่ได้ หัวหน้า
-          obj_data.put('item13',to_char(v_qtyscor3,'fm999,999,990.00'));  --คะแนนที่ได้ ผู้ประเมินสุดท้าย
-          obj_data.put('item14',to_char(v_qtyscorn1,'fm999,999,990.00'));  --คะแนนสุทธิ พนง.
-          obj_data.put('item15',to_char(v_qtyscorn2,'fm999,999,990.00'));  --คะแนนสุทธิ หัวหน้า
-          obj_data.put('item16',to_char(v_qtyscorn3,'fm999,999,990.00'));  --คะแนนสุทธิ ผู้ประเมินสุดท้าย
-          obj_data.put('item17',v_remark);  --หมายเหตุ
+          obj_data.put('item10',v_descwork);                              --???????????
+          obj_data.put('item11',to_char(v_qtyscor1,'fm999,999,990.00'));  --??????????? ???.
+          obj_data.put('item12',to_char(v_qtyscor2,'fm999,999,990.00'));  --??????????? ???????
+          obj_data.put('item13',to_char(v_qtyscor3,'fm999,999,990.00'));  --??????????? ?????????????????
+          obj_data.put('item14',to_char(v_qtyscorn1,'fm999,999,990.00'));  --?????????? ???.
+          obj_data.put('item15',to_char(v_qtyscorn2,'fm999,999,990.00'));  --?????????? ???????
+          obj_data.put('item16',to_char(v_qtyscorn3,'fm999,999,990.00'));  --?????????? ?????????????????
+          obj_data.put('item17',v_remark);  --????????
           insert_ttemprpt(obj_data);--User37 #7268 30/12/2021
     ----
           v_total1 := nvl(v_total1,0) + nvl(i.pctwgt,0);  --Weight%
-          v_total2 := nvl(v_total2,0) + nvl(v_qtyscor1,0); --คะแนนที่ได้ พนง.
-          v_total3 := nvl(v_total3,0) + nvl(v_qtyscor2,0); --คะแนนที่ได้ หัวหน้า
-          v_total4 := nvl(v_total4,0) + nvl(v_qtyscor3,0); --คะแนนที่ได้ ผู้ประเมินสุดท้าย
-          v_total5 := nvl(v_total5,0) + nvl(v_qtyscorn1,0); --คะแนนสุทธิ พนง.
-          v_total6 := nvl(v_total6,0) + nvl(v_qtyscorn2,0); --คะแนนสุทธิ หัวหน้า
-          v_total7 := nvl(v_total7,0) + nvl(v_qtyscorn3,0); --คะแนนสุทธิ ผู้ประเมินสุดท้าย
+          v_total2 := nvl(v_total2,0) + nvl(v_qtyscor1,0); --??????????? ???.
+          v_total3 := nvl(v_total3,0) + nvl(v_qtyscor2,0); --??????????? ???????
+          v_total4 := nvl(v_total4,0) + nvl(v_qtyscor3,0); --??????????? ?????????????????
+          v_total5 := nvl(v_total5,0) + nvl(v_qtyscorn1,0); --?????????? ???.
+          v_total6 := nvl(v_total6,0) + nvl(v_qtyscorn2,0); --?????????? ???????
+          v_total7 := nvl(v_total7,0) + nvl(v_qtyscorn3,0); --?????????? ?????????????????
     ----------------------------------
         end loop;  --for i in c1 loop
 
@@ -2581,17 +2581,17 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
             obj_data.put('item8',' ');
             obj_data.put('item9',to_char(v_total1, 'fm999,999,990.00'));   --Weight%
             obj_data.put('item10',' ');
-            obj_data.put('item11',to_char(v_total2, 'fm999,999,990.00'));   --คะแนนที่ได้ พนง.
-            obj_data.put('item12',to_char(v_total3, 'fm999,999,990.00'));   --คะแนนที่ได้ หัวหน้า
-            obj_data.put('item13',to_char(v_total4, 'fm999,999,990.00'));   --คะแนนที่ได้ ผู้ประเมินสุดท้าย
-            obj_data.put('item14',to_char(v_total5, 'fm999,999,990.00'));   --คะแนนสุทธิ พนง.
-            obj_data.put('item15',to_char(v_total6, 'fm999,999,990.00'));   --คะแนนสุทธิ หัวหน้า
-            obj_data.put('item16',to_char(v_total7, 'fm999,999,990.00'));   --คะแนนสุทธิ ผู้ประเมินสุดท้าย
+            obj_data.put('item11',to_char(v_total2, 'fm999,999,990.00'));   --??????????? ???.
+            obj_data.put('item12',to_char(v_total3, 'fm999,999,990.00'));   --??????????? ???????
+            obj_data.put('item13',to_char(v_total4, 'fm999,999,990.00'));   --??????????? ?????????????????
+            obj_data.put('item14',to_char(v_total5, 'fm999,999,990.00'));   --?????????? ???.
+            obj_data.put('item15',to_char(v_total6, 'fm999,999,990.00'));   --?????????? ???????
+            obj_data.put('item16',to_char(v_total7, 'fm999,999,990.00'));   --?????????? ?????????????????
             obj_row.put(to_char(v_rcnt-1),obj_data);
             insert_ttemprpt(obj_data);
         end if;
         end if;--User37 #7268 30/12/2021
-    end loop; --for v_loop in 1..3 loop --ประเภท KPI (D-Department KPI, J-Funtional KPI, I-Individual KPI)
+    end loop; --for v_loop in 1..3 loop --?????? KPI (D-Department KPI, J-Funtional KPI, I-Individual KPI)
 
 /*    if v_flgdata = 'N' then
       param_msg_error := get_error_msg_php('HR2055', global_v_lang, 'tappemp');
@@ -2642,8 +2642,8 @@ pctkpiem  น.น. kpi เฉพาะบุคคล
       obj_data.put('item5',get_tcomptnc_name(i.codtency,global_v_lang));
       obj_data.put('item6',i.codskill);
       obj_data.put('item7',get_tcodec_name('TCODSKIL',i.codskill,global_v_lang));
-      obj_data.put('item8',to_char(i.gradexpct,'fm999,999,990.00'));  --Level ที่คาดหวัง
-      obj_data.put('item9',to_char(i.grade,'fm999,999,990.00'));      --Level ที่ได้
+      obj_data.put('item8',to_char(i.gradexpct,'fm999,999,990.00'));  --Level ??????????
+      obj_data.put('item9',to_char(i.grade,'fm999,999,990.00'));      --Level ??????
       obj_row.put(to_char(v_rcnt-1),obj_data);
       insert_ttemprpt(obj_data);
 ----------------------------------

@@ -121,7 +121,7 @@ begin
         null;
     end;
     --------------------------------------
-    --ERROR ต้องหาจาก  TAPBUDGET
+    --ERROR ?????????  TAPBUDGET
     v_formusal := 'MITPOINT * (PCTINCR/100)';
 
     ---------------------------------------

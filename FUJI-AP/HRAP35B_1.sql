@@ -3,6 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRAP35B" as
+  -- Site: STD
+  -- Author: Bow Sarunya (000554)
+  -- Date updated: 14/08/2025
+  -- Comment: 4449#12007: remove condition if p_flgcal cuz p_flgcal Removed since 4448#9769
 
   procedure initial_value (json_str in clob) is
       json_obj        json_object_t;
@@ -22,8 +26,6 @@
       p_codcomp           := hcm_util.get_string_t(json_obj,'p_codcomp');
       p_codempid          := hcm_util.get_string_t(json_obj,'p_codempid_query');
       p_codreq            := hcm_util.get_string_t(json_obj,'p_codreq');
-      p_flgcal            := hcm_util.get_string_t(json_obj,'p_flgcal');
-
 
       hcm_secur.get_global_secur(global_v_coduser,global_v_zminlvl,global_v_zwrklvl,global_v_numlvlsalst,global_v_numlvlsalen);
 
@@ -190,13 +192,12 @@
                   from tkpidph
                  where dteyreap = r_tappemp.dteyreap
                    and numtime  = r_tappemp.numtime
-                 --  and codcomp  = r_tappemp.codcomp;
-                  and codcomp  = substr(r_tappemp.codcomp,1,8)||'000000000000000000000000';
+                   and codcomp  = r_tappemp.codcomp;
             exception when no_data_found then
                v_qtyscorn := 0;
             end;
             if nvl(v_qtyscorn,0) = 0 then
-              param_msg_error := get_error_msg_php('AP0062', global_v_lang); --'ยังไม่ได้บันทึกการประเมิน KPI หน่วยงาน';
+              param_msg_error := get_error_msg_php('AP0062', global_v_lang); --'????????????????????????? KPI ????????';
               return;
               exit;
             end if;
@@ -212,7 +213,7 @@
                v_qtyscor := 0;
             end;
             if nvl(v_qtyscor,0) = 0 then
-              param_msg_error := get_error_msg_php('AP0063', global_v_lang, 'p_codcomp'); --'ยังไม่ได้บันทึกการประเมิน KPI องค์กร';
+              param_msg_error := get_error_msg_php('AP0063', global_v_lang, 'p_codcomp'); --'????????????????????????? KPI ??????';
               return;
               exit;
             end if;
@@ -241,15 +242,16 @@
     v_numrec	    number;
     v_numqtyproc    number;
   begin
+    --< [START] STD | 000554-bow.sarunya-dev | 4449#12007: remove condition if p_flgcal cuz p_flgcal Removed since 4448#9769 | 14/08/2025
 --    if p_flgcal = '1' then
-      hrap35b_batch.start_process (p_dteyreap,
-                                   p_numtime,
-                                   p_codcomp,
-                                   p_codempid,
-                                   p_codreq,
-                                   p_flgcal,
-                                   global_v_coduser,
-                                   global_v_lang);
+--      hrap35b_batch.start_process (p_dteyreap,
+--                                   p_numtime,
+--                                   p_codcomp,
+--                                   p_codempid,
+--                                   p_codreq,
+--                                   p_flgcal,
+--                                   global_v_coduser,
+--                                   global_v_lang);
 --    elsif p_flgcal = '2' then
 --      hrap35b_batch.start_process_9box (p_dteyreap,
 --                                         p_numtime,
@@ -260,6 +262,14 @@
 --                                         global_v_coduser,
 --                                         global_v_lang);
 --    end if;
+      hrap35b_batch.start_process (p_dteyreap,
+       p_numtime,
+       p_codcomp,
+       p_codempid,
+       p_codreq,
+       global_v_coduser,
+       global_v_lang);
+    --> [END] STD | 000554-bow.sarunya-dev | 4449#12007: remove condition if p_flgcal cuz p_flgcal Removed since 4448#9769 | 14/08/2025
     -------------------------------------------------------
 		v_numrec  := 0;
 --		exp_text;
@@ -339,22 +349,11 @@
   procedure get_detail(json_str_input in clob, json_str_output out clob) as
     obj_data      json_object_t;
     obj_row       json_object_t;
-    v_row		   number := 0;
+    v_row		  number := 0;
     v_amtpay      number := 0;
-    v_taplvl_codcomp  varchar2(100 char) ;
-    v_taplvl_dteeffec  date ;
 
-    v_pctbeh            taplvl.pctbeh%type;
-    v_pctcmp            taplvl.pctcmp%type;
-    v_pctkpicp          taplvl.pctkpicp%type;
-    v_pctkpiem          taplvl.pctkpiem%type;
-    v_pctkpirt          taplvl.pctkpirt%type;
-    v_pctta             taplvl.pctta%type;
-    v_pctpunsh          taplvl.pctpunsh%type;
-    
-    
     cursor c_tappemp is
-      select codempid,qtyta,qtypuns,qtybeh3,qtycmp3,qtykpie3,qtykpid,qtykpic,qtytot3,grdappr,QTYTOTNET ,codcomp,codaplvl
+      select codempid,qtyta,qtypuns,qtybeh3,qtycmp3,qtykpie3,qtykpid,qtykpic,qtytot3,grdappr
         from tappemp
        where codcomp   like p_codcomp||'%'
          and dteyreap  = p_dteyreap
@@ -370,32 +369,16 @@
     for i in c_tappemp loop
         v_row      := v_row + 1;
         obj_data := json_object_t();
-        hrap31e.get_taplvl_where(i.codcomp,i.codaplvl,v_taplvl_codcomp,v_taplvl_dteeffec);
-        begin
-            select pctbeh,pctcmp,pctkpicp,pctkpiem,pctkpirt,pctta,pctpunsh
-            into v_pctbeh,v_pctcmp,v_pctkpicp,v_pctkpiem,v_pctkpirt,v_pctta,v_pctpunsh
-            from taplvl
-            where codcomp = v_taplvl_codcomp
-            and codaplvl = i.codaplvl
-            and dteeffec = v_taplvl_dteeffec;
-        exception when no_data_found then
-         null;
-        end;
-    
+
         obj_data.put('coderror', '200');
         obj_data.put('codempid',i.codempid);
         obj_data.put('desc_codempid', get_temploy_name(i.codempid,global_v_lang) );
         obj_data.put('image', get_emp_img(i.codempid)); -- softberry || 10/07/2023 || #9531
-        if  nvl(v_pctta,0) + nvl(v_pctpunsh,0) > 0 then   
-            obj_data.put('qtytapuns', nvl(i.qtyta,0) + nvl(i.qtypuns,0));
-        else
-           obj_data.put('qtytapuns', 0);
-        end if;
-        obj_data.put('qtybeh', nvl(i.qtybeh3,0) *v_pctbeh/100 );
-        obj_data.put('qtycmp', round(nvl(i.qtycmp3,0)*v_pctcmp/100,2));
-       -- obj_data.put('kpi', nvl(i.qtykpie3,0) + nvl(i.qtykpid,0) + nvl(i.qtykpic,0)); -- softberry || 1/08/2023 || #9768 || obj_data.put('qtykpi', nvl(i.qtykpie3,0) + nvl(i.qtykpid,0) + nvl(i.qtykpic,0));
-        obj_data.put('kpi', round( nvl( nvl(i.qtykpie3,0)*v_pctkpiem/100 ,0),2)+ round( nvl(nvl(i.qtykpid,0)*v_pctkpirt/100 ,0),2) + round( nvl(nvl(i.qtykpic,0) * v_pctkpicp /100 ,0),2)); -- softberry || 1/08/2023 || #9768 || obj_data.put('qtykpi', nvl(i.qtykpie3,0) + nvl(i.qtykpid,0) + nvl(i.qtykpic,0));
-        obj_data.put('total', nvl(i.qtytotnet,0)); -- softberry || 1/08/2023 || #9768 || obj_data.put('qtytot', nvl(i.qtytot3,0));
+        obj_data.put('qtytapuns', nvl(i.qtyta,0) + nvl(i.qtypuns,0));
+        obj_data.put('qtybeh', nvl(i.qtybeh3,0));
+        obj_data.put('qtycmp', nvl(i.qtycmp3,0));
+        obj_data.put('kpi', nvl(i.qtykpie3,0) + nvl(i.qtykpid,0) + nvl(i.qtykpic,0)); -- softberry || 1/08/2023 || #9768 || obj_data.put('qtykpi', nvl(i.qtykpie3,0) + nvl(i.qtykpid,0) + nvl(i.qtykpic,0));
+        obj_data.put('total', nvl(i.qtytot3,0)); -- softberry || 1/08/2023 || #9768 || obj_data.put('qtytot', nvl(i.qtytot3,0));
         obj_data.put('grade', i.grdappr);
 
         obj_row.put(to_char(v_row-1),obj_data);

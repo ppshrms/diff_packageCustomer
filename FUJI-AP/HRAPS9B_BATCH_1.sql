@@ -173,14 +173,12 @@
           v_codincom(7):= null; v_codincom(8) := null;
           v_codincom(9):= null; v_codincom(10):= null;
       end;
-  
+
       hcm_secur.get_global_secur(p_coduser,global_v_zminlvl,global_v_zwrklvl,v_numlvlsalst,v_numlvlsalen);
       for r_temploy in c_temploy loop
           v_flgsecu := secur_main.secur2(r_temploy.codempid,v_coduser,global_v_zminlvl,global_v_zwrklvl,v_zupdsal,v_numlvlsalst,v_numlvlsalen);
           v_flgsecu := true;
           v_codempid := r_temploy.codempid;
- 
- --           update a set a  = ' v_process  '  ||v_process ; 
           if v_flgsecu then
               if v_process = 'HRAPS9B' then
                   begin
@@ -195,7 +193,7 @@
                          and dteyreap = b_index_dteyreap
                          and numtime  = b_index_numtime
                          and r_temploy.codcomp like codcomp||'%'
-                         and codcomp = (select max(codcomp) --–เช็คตรงนี้เพื่อหาหน่วยงานที่ใกล้ตัวพนักงานที่สุดเพียง 1 เงื่อนไขการจ่ายโบนัส
+                         and codcomp = (select max(codcomp) --�????????????????????????????????????????????????????? 1 ????????????????????
                                           from ttbonparh
                                          where codbon   = b_index_codbon
                                            and dteyreap = b_index_dteyreap
@@ -220,7 +218,7 @@
                          and dteyreap = b_index_dteyreap
                          and numtime  = b_index_numtime
                          and r_temploy.codcomp like codcomp||'%'
-                         and codcomp = (select max(codcomp) --–เช็คตรงนี้เพื่อหาหน่วยงานที่ใกล้ตัวพนักงานที่สุดเพียง 1 เงื่อนไขการจ่ายโบนัส
+                         and codcomp = (select max(codcomp) --�????????????????????????????????????????????????????? 1 ????????????????????
                                           from tbonparh
                                          where codbon   = b_index_codbon
                                            and dteyreap = b_index_dteyreap
@@ -232,7 +230,6 @@
                   end;
               end if;
 
-    
                 v_daycalcu := (v_dteend - v_dtestr) + 1;
                 get_service_year(r_temploy.dteempmt,v_dteend,'Y',v_year,v_month,v_day) ;
                 if v_year < 1 then
@@ -266,13 +263,8 @@
                   v_bonconds := replace(v_bonconds,'V_TEMPLOY.CODPOS',''''||r_temploy.codpos||'''');
                   v_bonconds := replace(v_bonconds,'V_TEMPLOY.JOBGRADE',''''||r_temploy.jobgrade||'''');
                   v_bonconds := replace(v_bonconds,'V_TEMPLOY.CODEMPMT',''''||r_temploy.codempmt||'''');
-                  
-                  v_bonconds := replace(v_bonconds,'TAPPEMP',' V_TEMPLOY');--User37 #4442 07/10/2021
-                  v_bonconds := replace(v_bonconds,'V_TEMPLOY',' V_TEMPLOY_AP');--User37 #4442 07/10/2021
-                  v_bonconds := 'select count(*) from V_TEMPLOY_AP where '||v_bonconds||' and codempid ='''||r_temploy.codempid||'''' ;
-                  
 
-                 -- v_bonconds := 'select count(*) from V_TEMPLOY where '||v_bonconds||' and codempid ='''||r_temploy.codempid||'''' ;
+                  v_bonconds := 'select count(*) from V_TEMPLOY where '||v_bonconds||' and codempid ='''||r_temploy.codempid||'''' ;
                   v_flgfound  := execute_qty(v_bonconds) ;
               end if;
 
@@ -458,7 +450,7 @@
                               end if;
 
                               v_amtdedbon := 0;
-                              if v_typbon = '1' and nvl(v_pctdbon,0) <> 0 then---% หักโบนัส
+                              if v_typbon = '1' and nvl(v_pctdbon,0) <> 0 then---% ????????
                                   v_amtdedbon := v_amtbon * (v_pctdbon/100) ;
                                   v_amtbon    := v_amtbon - v_amtdedbon;
                               end if;
@@ -507,8 +499,7 @@
                                   values      (b_index_dteyreap,b_index_numtime,b_index_codbon,
                                                r_temploy.codempid,r_temploy.codcomp,r_temploy.typpayroll,
                                                r_temploy.dteempmt,v_daycalcu,v_grdap,
-                                               --stdenc(v_amtincom,r_temploy.codempid,v_chken) ,stdenc(v_amtsalstr,r_temploy.codempid,v_chken) ,v_qtynbon,
-                                               stdenc(v_amtincom,r_temploy.codempid,v_chken) ,stdenc(v_amtsalstr,r_temploy.codempid,v_chken) ,v_qtybon,
+                                               stdenc(v_amtincom,r_temploy.codempid,v_chken) ,stdenc(v_amtsalstr,r_temploy.codempid,v_chken) ,v_qtynbon,
                                                stdenc(v_amtbon,r_temploy.codempid,v_chken) ,v_flgbonus,v_pctdbon,
                                                stdenc(v_amtbon,r_temploy.codempid,v_chken) ,v_desnote,v_codcomp,
                                                b_index_codreq,'N','P',
@@ -663,9 +654,7 @@
 
       v_sqlerrm           varchar2(1000 char) ;
       v_numcond           number;
-      v_qtytotnet         number;  
-      
-      v_codaplvl          varchar2(1000 char) ;
+      v_qtytotnet         number;
 
     type arr_codincom is table of varchar2(20 char) index by binary_integer;
       v_codincom	  arr_codincom;
@@ -732,8 +721,6 @@
            order by numseq;
 
   begin
-
--- insert into a (a) values (' call process '||v_codaplvl)  ;     commit; 
       b_index_dteyreap    := p_dteyreap;
       b_index_numtime     := p_numtime;
       b_index_codcomp     := p_codcomp;
@@ -777,8 +764,6 @@
           v_codincom(9):= null; v_codincom(10):= null;
       end;
       hcm_secur.get_global_secur(p_coduser,global_v_zminlvl,global_v_zwrklvl,v_numlvlsalst,v_numlvlsalen);
--- insert into a (a) values (' qqqqqq '||v_codaplvl)  ;     commit; 
-
       for r_temploy in c_temploy loop
           v_flgsecu := secur_main.secur2(r_temploy.codempid,v_coduser,global_v_zminlvl,global_v_zwrklvl,v_zupdsal,v_numlvlsalst,v_numlvlsalen);
           v_flgsecu := true;
@@ -797,7 +782,7 @@
                          and dteyreap = b_index_dteyreap
                          and numtime  = b_index_numtime
                          and r_temploy.codcomp like codcomp||'%'
-                         and codcomp = (select max(codcomp) --–เช็คตรงนี้เพื่อหาหน่วยงานที่ใกล้ตัวพนักงานที่สุดเพียง 1 เงื่อนไขการจ่ายโบนัส
+                         and codcomp = (select max(codcomp) --�????????????????????????????????????????????????????? 1 ????????????????????
                                           from ttbonparh
                                          where codbon   = b_index_codbon
                                            and dteyreap = b_index_dteyreap
@@ -822,7 +807,7 @@
                          and dteyreap = b_index_dteyreap
                          and numtime  = b_index_numtime
                          and r_temploy.codcomp like codcomp||'%'
-                         and codcomp = (select max(codcomp) --–เช็คตรงนี้เพื่อหาหน่วยงานที่ใกล้ตัวพนักงานที่สุดเพียง 1 เงื่อนไขการจ่ายโบนัส
+                         and codcomp = (select max(codcomp) --�????????????????????????????????????????????????????? 1 ????????????????????
                                           from tbonparh
                                          where codbon   = b_index_codbon
                                            and dteyreap = b_index_dteyreap
@@ -834,20 +819,6 @@
                   end;
               end if;
 
-
-             begin
-                  select codaplvl  into v_codaplvl
-                    from tappemp
-                   where codempid = r_temploy.codempid
-                     and dteyreap = v_grdyear
-                     and numtime  = v_grdnumtime;
-              exception when no_data_found then
-                 v_codaplvl := null ;
-              end;
---insert into a (a) values (' v_codaplvl '||v_codaplvl)  ;
-                              
-                          
-                          
                 v_daycalcu := (v_dteend - v_dtestr) + 1;
                 get_service_year(r_temploy.dteempmt,v_dteend,'Y',v_year,v_month,v_day) ;
                 if v_year < 1 then
@@ -876,13 +847,7 @@
                   v_bonconds := replace(v_bonconds,'V_HRAP51.DTEEMPMT',''''||r_temploy.dteempmt||'''');
                   v_bonconds := replace(v_bonconds,'V_TEMPLOY.DTEEMPMT',''''||r_temploy.dteempmt||'''');
                   v_bonconds := replace(v_bonconds,'V_TEMPLOY.CODEMPMT',''''||r_temploy.codempmt||'''');--User37 #4442 07/10/2021
-                  v_bonconds := replace(v_bonconds,'TAPPEMP.CODAPLVL',''''||v_codaplvl||'''');--User37 #4442 07/10/2021
-                  
-                   v_bonconds := replace(v_bonconds,'TAPPEMP',' V_TEMPLOY');--User37 #4442 07/10/2021
-                   v_bonconds := replace(v_bonconds,'V_TEMPLOY',' V_TEMPLOY_AP');--User37 #4442 07/10/2021
-                  v_bonconds := 'select count(*) from V_TEMPLOY_AP where '||v_bonconds||' and codempid ='''||r_temploy.codempid||'''' ;
-                  
-  --                insert into a (a) values (' 2 '||v_bonconds)  ;
+                  v_bonconds := 'select count(*) from V_TEMPLOY where '||v_bonconds||' and codempid ='''||r_temploy.codempid||'''' ;
                   v_flgfound  := execute_qty(v_bonconds) ;
               end if;
 
@@ -1039,8 +1004,6 @@
                                       v_ratecondt := replace(v_ratecondt,'V_HRAP51.SCORE', v_qtytotnet );
                                       v_ratecondt := replace(v_ratecondt,'V_HRAP51.AGEPOS',( months_between(sysdate,r_temploy.dteempmt)));
                                       v_ratecondt := replace(v_ratecondt,'V_HRAP51.AGE_POS',( months_between(sysdate,r_temploy.dteempmt)));--User37 #4442 07/10/2021
-                    
-                                      
                                       v_ratecondt := 'select count(*) from temploy1 where '||v_ratecondt||' and codempid ='''||r_temploy.codempid||'''' ;
                                       v_flgfound  := execute_qty(v_ratecondt) ;--User37 #4485 12/10/2021 v_flgfound  := execute_qty(v_bonconds) ;
                                   end if;
@@ -1071,7 +1034,7 @@
                               end if;
 
                               v_amtdedbon := 0;
-                              if v_typbon = '1' and nvl(v_pctdbon,0) <> 0 then---% หักโบนัส
+                              if v_typbon = '1' and nvl(v_pctdbon,0) <> 0 then---% ????????
                                   v_amtdedbon := v_amtbon * (v_pctdbon/100) ;
                                   v_amtbon    := v_amtbon - v_amtdedbon;
                               end if;
@@ -1103,8 +1066,7 @@
                                   values      (b_index_dteyreap,b_index_numtime,b_index_codbon,
                                                r_temploy.codempid,r_temploy.codcomp,r_temploy.typpayroll,
                                                r_temploy.dteempmt,v_daycalcu,v_grdap,
-                                            --   stdenc(v_amtincom,r_temploy.codempid,v_chken) ,stdenc(v_amtsalstr,r_temploy.codempid,v_chken) ,v_qtynbon,v_numcond,
-                                               stdenc(v_amtincom,r_temploy.codempid,v_chken) ,stdenc(v_amtsalstr,r_temploy.codempid,v_chken) ,v_qtybon,v_numcond,
+                                               stdenc(v_amtincom,r_temploy.codempid,v_chken) ,stdenc(v_amtsalstr,r_temploy.codempid,v_chken) ,v_qtynbon,v_numcond,
                                                stdenc(v_amtbon,r_temploy.codempid,v_chken) ,v_pctdbon,v_coduser,
                                                r_temploy.codpos,r_temploy.jobgrade,
                                                v_coduser);
@@ -1121,9 +1083,7 @@
                                   values      (b_index_dteyreap,b_index_numtime,b_index_codbon,
                                                r_temploy.codempid,r_temploy.codcomp,r_temploy.typpayroll,
                                                r_temploy.dteempmt,v_daycalcu,v_grdap,
-                                             --  stdenc(v_amtincom,r_temploy.codempid,v_chken) ,stdenc(v_amtsalstr,r_temploy.codempid,v_chken) ,v_qtynbon,
-                                                stdenc(v_amtincom,r_temploy.codempid,v_chken) ,stdenc(v_amtsalstr,r_temploy.codempid,v_chken) ,v_qtybon,
-                                             
+                                               stdenc(v_amtincom,r_temploy.codempid,v_chken) ,stdenc(v_amtsalstr,r_temploy.codempid,v_chken) ,v_qtynbon,
                                                stdenc(v_amtbon,r_temploy.codempid,v_chken) ,v_flgbonus,v_pctdbon,
                                                stdenc(v_amtbon,r_temploy.codempid,v_chken) ,v_desnote,v_codcomp,
                                                b_index_codreq,'N','P',
@@ -1174,5 +1134,6 @@
     param_msg_error     := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
   end;
 end HRAPS9B_BATCH;
+
 
 /

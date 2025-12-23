@@ -24,9 +24,9 @@
     b_index_dteyear2   := hcm_util.get_string_t(json_obj,'p_year2');
     b_index_dteyear3   := hcm_util.get_string_t(json_obj,'p_year3');
 
-    --Group รายละเอียด
-    b_index_v_grp1     := get_label_name('HRAP3AX', global_v_lang, '70');  --จำนวนคนที่ได้รับ
-    b_index_v_grp2     := get_label_name('HRAP3AX', global_v_lang, '80');  --จำนวนเงินที่จ่าย
+    --Group ??????????
+    b_index_v_grp1     := get_label_name('HRAP3AX', global_v_lang, '70');  --????????????????
+    b_index_v_grp2     := get_label_name('HRAP3AX', global_v_lang, '80');  --????????????????
 
     hcm_secur.get_global_secur(global_v_coduser,global_v_zminlvl,global_v_zwrklvl,global_v_numlvlsalst,global_v_numlvlsalen);
 
@@ -119,7 +119,7 @@
 --          obj_data.put('codcomp',i.codcomp);
           obj_data.put('codcomp',get_tcenter_name(i.codcomp,global_v_lang));
 
-          if j = 1 then  --จำนวนคนที่ได้รับ
+          if j = 1 then  --????????????????
                 obj_data.put('description',b_index_v_grp1);
                 begin
                     select count(dteyreap) into v_cntemp1
@@ -168,7 +168,7 @@
                        and staappr = 'Y';
                 end;
                 obj_data.put('year3',v_cntemp3);
-          elsif j = 2 then  --จำนวนเงินที่จ่าย
+          elsif j = 2 then  --????????????????
                 obj_data.put('description',b_index_v_grp2);
                 begin
                     select sum(nvl(stddec(amtnbon,tbonus.codempid,v_chken),0))
@@ -296,7 +296,7 @@
         v_comp_length := nvl(v_comp_length , 3);
     end;
 
-    v_item31 := get_label_name('HRAP3AX', global_v_lang, '90'); --'สถิติการจ่ายโบนัสพนักงาน'
+    v_item31 := get_label_name('HRAP3AX', global_v_lang, '90'); --'????????????????????????'
 
     for i in c1 loop
         v_flgdata := 'Y';
@@ -313,12 +313,12 @@
                     ---------- Group1
                         v_item7  := j;
                         v_item8  := v_dteyreap + v_year;
-                        v_item9  := get_label_name('HRAP3AX', global_v_lang, '80'); --จำนวนเงินที่จ่าย;
-                    ----------แกน x
+                        v_item9  := get_label_name('HRAP3AX', global_v_lang, '80'); --????????????????;
+                    ----------??? x
                         v_item4  := i.codcomp;
                         v_item5  := get_tcenter_name(i.codcomp,global_v_lang);
-                        v_item6  := get_label_name('HRAP3AX', global_v_lang, '50'); --'หน่วยงาน';
-                    ----------ค่าข้อมูล
+                        v_item6  := get_label_name('HRAP3AX', global_v_lang, '50'); --'????????';
+                    ----------?????????
                         v_amtnbon := 0;
                         begin
                             select sum(nvl(stddec(amtnbon,tbonus.codempid,v_chken),0))

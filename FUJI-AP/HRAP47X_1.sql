@@ -524,15 +524,15 @@ begin
                                exception when no_data_found then
                                    v_kpivalue   := 0;
                             end;
-                            -----แกน y -----
+                            -----??? y -----
                             v_item7  := '';
                             v_item8  := '';
-                            v_item9  := get_label_name('HRAP47X3', global_v_lang, '20'); --'คะแนน KPI';
-                            -----แกน x -----
+                            v_item9  := get_label_name('HRAP47X3', global_v_lang, '20'); --'????? KPI';
+                            -----??? x -----
                             v_item4  := j;
                             v_item5  := get_tlistval_name('NAMMTHABB',j,global_v_lang);
                             v_item6  := b_index_dteyreap;
-                           -----ค่าข้อมูล -----
+                           -----????????? -----
                             v_item10 := v_kpivalue;
 
              ----------Insert ttemprpt

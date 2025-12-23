@@ -195,10 +195,10 @@ cursor c1 is
                 --obj_data.put('v_year',to_char(v_year,'fm90'));
                 --obj_data.put('v_month',to_char(v_month,'fm90'));
                 obj_data.put('qtywork',to_char(v_year,'fm90')||':'||to_char(v_month,'fm90'));
-                if i.typbon = '1' then--ตามผลการประเมิน
+                if i.typbon = '1' then--???????????????
                     obj_data.put('grade',i.grade);
                     obj_data.put('desc_grade',get_tstdis_name (i.codcomp, i.dteyreap, i.grade,global_v_lang) );
-                else  --ตามเงื่อนไข
+                else  --???????????
                     obj_data.put('grade','');
                     obj_data.put('desc_grade','');
                 end if;

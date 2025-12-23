@@ -154,7 +154,7 @@ cursor c1 is
                 obj_data.put('coderror', '200');
                 obj_data.put('flgsum','Y');
                 obj_data.put('codkpino','');
-                obj_data.put('kpinodes',get_label_name('HRAP3UXC2',global_v_lang,100));--Sumรวม
+                obj_data.put('kpinodes',get_label_name('HRAP3UXC2',global_v_lang,100));--Sum???
                 obj_data.put('wgt','');
                 obj_data.put('value','');
                 obj_data.put('target','');
@@ -207,7 +207,7 @@ cursor c1 is
             obj_data.put('coderror', '200');
             obj_data.put('flgsum','Y');
             obj_data.put('codkpino','');
-            obj_data.put('kpinodes',get_label_name('HRAP3UXC2',global_v_lang,100));--Sumรวม
+            obj_data.put('kpinodes',get_label_name('HRAP3UXC2',global_v_lang,100));--Sum???
             obj_data.put('wgt','');
             obj_data.put('value','');
             obj_data.put('target','');
@@ -220,7 +220,7 @@ cursor c1 is
             obj_data.put('coderror', '200');
             obj_data.put('flgsum','Y');
             obj_data.put('codkpino','');
-            obj_data.put('kpinodes',get_label_name('HRAP3UXC2',global_v_lang,90));--Total-รวมทั้งหมด
+            obj_data.put('kpinodes',get_label_name('HRAP3UXC2',global_v_lang,90));--Total-??????????
             obj_data.put('wgt',to_char(v_wgt_all,'fm999,999,999,990.00'));--User37 #7241 3. AP Module 03/12/2021 obj_data.put('wgt','');
             obj_data.put('value','');
             obj_data.put('target','');

@@ -1171,7 +1171,7 @@
 
     --<<nut
     if v_codappr is not null and v_dteappr is not null then
-      if v_typbon = '1' then--1-ตามผลการประเมิน tbonpard, 2-ตามเงื่อนไข tbonparc
+      if v_typbon = '1' then--1-??????????????? tbonpard, 2-??????????? tbonparc
         for r_ttbonpard in c_ttbonpard loop
           begin
             update tbonpard

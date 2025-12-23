@@ -39,8 +39,8 @@
   p_codcompy            tcenter.codcompy%type;
   p_codcomp             tcenter.codcomp%type;
   p_codaplvl            varchar2(30 char);
-  p_dteapstr            date;  --วันที่เริ่มรอบการประเมิน
-  p_dteapend            date;  --วันที่สิ้นรอบการประเมิน
+  p_dteapstr            date;  --????????????????????????
+  p_dteapend            date;  --???????????????????????
 
 --PAGE DRIL DOWN-------------------------------------------------------------------
   procedure get_data_detail(json_str_input in clob, json_str_output out clob);

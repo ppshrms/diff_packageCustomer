@@ -25,7 +25,7 @@
     b_index_dteyear2   := hcm_util.get_string_t(json_obj,'p_year2');
     b_index_dteyear3   := hcm_util.get_string_t(json_obj,'p_year3');
 
-    --Group รายละเอียด
+    --Group ??????????
     b_index_v_grp1     := get_label_name('HRAPSIX', global_v_lang, '60');
     b_index_v_grp2     := get_label_name('HRAPSIX', global_v_lang, '70');
     b_index_v_grp3     := get_label_name('HRAPSIX', global_v_lang, '80');
@@ -194,15 +194,15 @@
           v_sumemp1 := 0;
           v_sumemp2 := 0;
 --
-          if j = 1 then  --ปีที่1
+          if j = 1 then  --?????1
                 v_year := b_index_dteyear1;
-          elsif j = 2 then  --ปีที่2
+          elsif j = 2 then  --?????2
                 v_year := b_index_dteyear2;
-          else  --ปีที่3
+          else  --?????3
                 v_year := b_index_dteyear3;
           end if;
 --
---v_cntemp1(จำนวนพนักงาน)
+--v_cntemp1(????????????)
           begin
             select count(distinct codempid) into v_cntemp1
               from tapprais
@@ -211,7 +211,7 @@
                and numlvl between global_v_zminlvl and global_v_zwrklvl;
             exception when others then v_cntemp1 := 0;
           end;
---v_cntemp2(จำนวนพนักงานทั้งหมด)
+--v_cntemp2(???????????????????)
           v_stmt := 'select count(distinct codempid) from tapprais ';
           v_stmt := v_stmt ||' where codcomp like '''|| b_index_codcomp ||'%''';
           v_stmt := v_stmt ||' and dteyreap =  '|| v_year ;
@@ -225,7 +225,7 @@
                exception when others then v_cntemp2 := 0;
           end;
 --
-          if j = 1 then  --ปีที่1
+          if j = 1 then  --?????1
                 --<<User37 #3765 AP - PeoplePlus 29/11/2020
                 --obj_data.put('total1',to_char(v_cntemp1, 'fm999,999,990'));
                 --v_sumtotal1   := nvl(v_sumtotal1,0) + nvl(v_cntemp1,0);--User37 #3766 AP - PeoplePlus 24/12/2020
@@ -238,7 +238,7 @@
                 else
                     obj_data.put('percent1','0.00');
                 end if;
-          elsif j = 2 then  --ปีที่2
+          elsif j = 2 then  --?????2
                 --<<User37 #3765 AP - PeoplePlus 29/11/2020
                 --obj_data.put('total2',to_char(v_cntemp1, 'fm999,999,990'));
                 --v_sumtotal2   := nvl(v_sumtotal2,0) + nvl(v_cntemp1,0);--User37 #3766 AP - PeoplePlus 24/12/2020
@@ -251,7 +251,7 @@
                 else
                     obj_data.put('percent2','0.00');
                 end if;
-          else  --ปีที่3
+          else  --?????3
                 --<<User37 #3765 AP - PeoplePlus 29/11/2020
                 --obj_data.put('total3',to_char(v_cntemp1, 'fm999,999,990'));
                 --v_sumtotal3   := nvl(v_sumtotal3,0) + nvl(v_cntemp1,0);--User37 #3766 AP - PeoplePlus 24/12/2020
@@ -279,16 +279,16 @@
         obj_data.put('seq',v_rcnt);
         obj_data.put('grade','');
         obj_data.put('description',get_label_name('HRAPSIX', global_v_lang, '100'));
-        if b_index_dteyear1 is not null then  --ปีที่1
+        if b_index_dteyear1 is not null then  --?????1
             obj_data.put('total1',to_char(v_sumtotal1, 'fm999,999,990'));
             obj_data.put('percent1',to_char(v_sumpercent1, 'fm999,999,990.00'));
         end if;
-        if b_index_dteyear2 is not null then  --ปีที่2
+        if b_index_dteyear2 is not null then  --?????2
             obj_data.put('total2',to_char(v_sumtotal2, 'fm999,999,990'));
             obj_data.put('percent2',to_char(v_sumpercent2, 'fm999,999,990.00'));
         end if;
 
-        if b_index_dteyear3 is not null then  --ปีที่3
+        if b_index_dteyear3 is not null then  --?????3
             obj_data.put('total3',to_char(v_sumtotal3, 'fm999,999,990'));
             obj_data.put('percent3',to_char(v_sumpercent3, 'fm999,999,990.00'));
         end if;
@@ -360,8 +360,8 @@
 
   begin
     param_msg_error := null;
-    v_item1  := get_label_name('HRAPSIX', global_v_lang, '80'); --'จำนวนพนักงาน'
-    v_item31 := get_label_name('HRAPSIX', global_v_lang, '110'); --'เปรียบเทียบ Performance Grade ของพนักงานในแต่ละปี'
+    v_item1  := get_label_name('HRAPSIX', global_v_lang, '80'); --'????????????'
+    v_item31 := get_label_name('HRAPSIX', global_v_lang, '110'); --'??????????? Performance Grade ???????????????????'
     v_item14 := '1';
 
     for i in c1 loop
@@ -379,12 +379,12 @@
                     ---------- Group1
                         v_item7  := j;
                         v_item8  := v_dteyreap + global_v_zyear;
-                        v_item9  := get_label_name('HRAPSIX', global_v_lang, '80'); --'จำนวนพนักงาน';
-                    ----------แกน x
+                        v_item9  := get_label_name('HRAPSIX', global_v_lang, '80'); --'????????????';
+                    ----------??? x
                         v_item4  := i.grade;
                         v_item5  := i.grade;
-                        v_item6  := get_label_name('HRAPSIX', global_v_lang, '30'); --'ปี';
-                    ----------ค่าข้อมูล (จำนวนพนักงานทั้งหมด)
+                        v_item6  := get_label_name('HRAPSIX', global_v_lang, '30'); --'??';
+                    ----------????????? (???????????????????)
                         v_dipsal := 0;
                         begin
                             select count(distinct codempid) into v_dipsal
@@ -485,8 +485,8 @@
 
   begin
     param_msg_error := null;
-    v_item1  := get_label_name('HRAPSIX', global_v_lang, '90'); --'% พนักงาน'
-    v_item31 := get_label_name('HRAPSIX', global_v_lang, '110'); --'เปรียบเทียบ Performance Grade ของพนักงานในแต่ละปี'
+    v_item1  := get_label_name('HRAPSIX', global_v_lang, '90'); --'% ???????'
+    v_item31 := get_label_name('HRAPSIX', global_v_lang, '110'); --'??????????? Performance Grade ???????????????????'
     v_item14 := '2';
 
     for i in c1 loop
@@ -504,13 +504,13 @@
                     ---------- Group1
                         v_item7  := j;
                         v_item8  := v_dteyreap + global_v_zyear;
-                        v_item9  := get_label_name('HRAPSIX', global_v_lang, '90'); --'% พนักงาน';
-                    ----------แกน x
+                        v_item9  := get_label_name('HRAPSIX', global_v_lang, '90'); --'% ???????';
+                    ----------??? x
                         v_item4  := i.grade;
                         v_item5  := i.grade;
-                        v_item6  := get_label_name('HRAPSIX', global_v_lang, '30'); --'ปี';
+                        v_item6  := get_label_name('HRAPSIX', global_v_lang, '30'); --'??';
 
-                    ----------ค่าข้อมูล (จำนวนพนักงานทั้งหมด)
+                    ----------????????? (???????????????????)
                         v_cntemp1 := 0;  v_cntemp2:= 0;  v_dipsal := 0;
                         begin
                             select count(distinct codempid) into v_cntemp1
@@ -521,7 +521,7 @@
                             exception when others then v_cntemp1 := 0;
                         end;
 
-            --v_cntemp2(จำนวนพนักงานตามเกรด)
+            --v_cntemp2(???????????????????)
                         v_stmt := 'select count(distinct codempid) from tapprais ';
                         v_stmt := v_stmt ||' where codcomp like '''|| b_index_codcomp ||'%''';
                         v_stmt := v_stmt ||' and dteyreap =  '|| v_dteyreap ;

@@ -97,15 +97,15 @@
 
    select a.codempid,a.codpos,a.qtyta,a.qtypuns,a.qtybeh3,a.qtycmp3,a.qtykpie3,a.qtytot3,
              a.grdap,a.grdadj,a.dteupd,a.coduser,a.codcreate,a.dteadj,a.codadj,a.flgsal,a.flgbonus,a.pctdbon,a.pctdsal,
-             a.codcomp,a.codaplvl,a.qtykpic,a.qtykpid , QTYTOTNET
+             a.codcomp,a.codaplvl,a.qtykpic,a.qtykpid
         from tappemp a
        where a.dteyreap = p_dteyreap
          and a.numtime  = p_numtime
          and a.codcomp  like p_codcomp || '%'
          and a.flgappr  = 'C'
---         and a.flgconfemp is null
---         and a.flgconfhd  is null
---         and a.flgconflhd is null
+         and a.flgconfemp is null
+         and a.flgconfhd  is null
+         and a.flgconflhd is null
          and a.grdap      is not null
          /*and ((p_dtest is not null and a.codempid in  (  select b.codempid
                                                         from  tappfm b
@@ -159,26 +159,14 @@
                 obj_data.put('desc_codempid',get_temploy_name(r1.codempid,global_v_lang));
                 obj_data.put('codpos',r1.codpos);
                 obj_data.put('desc_codpos',get_tpostn_name(r1.codpos,global_v_lang));
-               -- obj_data.put('qtytapuns',((nvl(r1.qtyta,0) * nvl(t_taplvl.pctta,0)) /100) + ((nvl(r1.qtypuns,0) * nvl(t_taplvl.pctpunsh,0)) /100));
-                obj_data.put('qtytapuns', nvl(r1.qtyta,0)    +  nvl(r1.qtypuns,0)  );
-                
-                
+                obj_data.put('qtytapuns',((nvl(r1.qtyta,0) * nvl(t_taplvl.pctta,0)) /100) + ((nvl(r1.qtypuns,0) * nvl(t_taplvl.pctpunsh,0)) /100));
                 obj_data.put('qtybeh',(nvl(r1.qtybeh3,0) * nvl(t_taplvl.pctbeh,0)) / 100);
                 obj_data.put('qtycmp',(nvl(r1.qtycmp3,0) * nvl(t_taplvl.pctcmp,0)) /100);
                 obj_data.put('qtykpi',((nvl(r1.qtykpic,0) * nvl(t_taplvl.pctkpirt,0)) /100) +  ((nvl(r1.qtykpid,0) * nvl(t_taplvl.pctkpicp,0)) /100) + ((nvl(r1.qtykpie3,0) * nvl(t_taplvl.pctkpiem,0)) / 100));
-                
-                
-                obj_data.put('amount',r1.QTYTOTNET);
+                obj_data.put('amount',r1.qtytot3);
                 obj_data.put('grade',r1.grdap);
                 obj_data.put('flgupsal',r1.flgsal);
                 obj_data.put('pctdsal',r1.pctdsal);
-                
-           
-                
-                 obj_data.put('desc_codpos', nvl(t_taplvl.pctta,0)  ||' - ' ||nvl(t_taplvl.pctpunsh ,0) ||' - '||nvl(t_taplvl.pctbeh,0)  ||' - '||nvl(t_taplvl.pctcmp,0) ||' - '||nvl(t_taplvl.pctkpicp ,0)||' - '||  nvl(t_taplvl.pctkpirt,0) ||' - '||nvl(t_taplvl.pctkpiem,0)   );
-                                
-                                
-                                
                 if r1.flgsal = 'Y' then
                   obj_data.put('html_flgupsal','<div class="badge-custom _bg-green"><i class="fa fa-check-circle"></i>Yes</div>');
                 else
@@ -1550,7 +1538,7 @@
                 obj_data.put('coderror','200');
                 obj_data.put('numgrup',r1.numgrup);
                 if v_temp_no = '!@#' or v_temp_no <> v_numgrup then
-                    obj_data.put('number','ส่วนที่ '||v_numgrup);
+                    obj_data.put('number','??????? '||v_numgrup);
                     v_temp_no := v_numgrup;
                     obj_row.put(to_char(v_row), obj_data);
                     v_row := v_row + 1;
@@ -2024,5 +2012,6 @@
     end loop;
   end;
 end hrap33e;
+
 
 /
