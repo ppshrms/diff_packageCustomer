@@ -482,7 +482,7 @@
     v2_stakpi       varchar2(1 char);
 
     cursor c1 is
-      select grade,desgrade,score,color,kpides,stakpi,'I' as flgdefault
+      select grade,desgrade,score,color,kpides,stakpi,'N' as flgdefault
         from tkpiempg
        where dteyreap   = b_index_dteyreap
          and numtime    = b_index_numtime
@@ -492,15 +492,15 @@
       select grade,desgrade,score,color,measuredes as kpides,'' as stakpi,'Y' as flgdefault
         from tgradekpi
        where codcompy   = v_codcompy
-         and dteyreap   = ( select max(dteyreap)
-                                        from tgradekpi
-                                        where codcompy = v_codcompy
-                                        and dteyreap <= to_number(to_char(sysdate,'yyyy')))
+         and dteyreap   = (select max(dteyreap)
+                             from tgradekpi
+                            where codcompy = v_codcompy
+                              and dteyreap <= to_number(to_char(sysdate,'yyyy')))
          and not exists (select 1
-                            from tkpiempg em
-                            where em.dteyreap   = b_index_dteyreap
+                           from tkpiempg em
+                          where em.dteyreap   = b_index_dteyreap
                             and em.numtime    = b_index_numtime
-                            and em.codempid   = b_index_codempid 
+                            and em.codempid   = b_index_codempid
                             and em.codkpi     = v_codkpi)
       order by grade desc; --#7160 || USER39 || 04/11/2021
   begin
@@ -539,35 +539,33 @@
                  and codkpi       = v_codkpi
                  and qtyscor      = i.score;                                 
              exception when no_data_found then
-              v_flgkpi :=  'Y';
+              null;
              end;
              obj_data.put('kpides',v_descgrd);
              obj_data.put('stakpi',v_flgkpi);
              obj_data.put('flgAdd',v_true);
-
       else
          --<< #7462 || USER39 || 12/01/2022
---            if true then -- softberry || 07/08/2023 || #9460 || if (i.kpides is null) and (i.stakpi is null) then
---                    begin
---                       select kpides , stakpi
---                       into v2_kpides , v2_stakpi
---                        from tkpidpg
---                       where dteyreap   = b_index_dteyreap
---                         and numtime    = b_index_numtime
---                         and codcomp    = v_codcomp
---                         and codkpino   = v_codkpi
---                         and grade      = i.grade;
---                    exception when no_data_found then
---                          v2_kpides := null;
---                          v2_stakpi := null;
---                    end;
---              else
+            if true then -- softberry || 07/08/2023 || #9460 || if (i.kpides is null) and (i.stakpi is null) then
+                    begin
+                       select kpides , stakpi
+                       into v2_kpides , v2_stakpi
+                        from tkpidpg
+                       where dteyreap   = b_index_dteyreap
+                         and numtime    = b_index_numtime
+                         and codcomp    = v_codcomp
+                         and codkpino   = v_codkpi
+                         and grade      = i.grade;
+                    exception when no_data_found then
+                          v2_kpides := null;
+                          v2_stakpi := null;
+                    end;
+              else
                   v2_kpides :=  i.kpides;
                   v2_stakpi :=  i.stakpi;
---              end if;
+              end if;
 
-          obj_data.put('kpides',v2_kpides);
-       --     obj_data.put('kpides','v2_kpides');
+            obj_data.put('kpides',v2_kpides);
             obj_data.put('stakpi',v2_stakpi);
         -->> #7462 || USER39 || 12/01/2022
 
@@ -1157,8 +1155,7 @@
              and numtime     = b_index_numtime
              and codempid    = b_index_codempid
              and codkpi      = v_codkpi
-            -- and grade       is not null
-             and grade      = 'XXX'
+             and grade       is not null
              and v_flg_copy_str = 'N';
              param_msg_error := get_error_msg_php('HR1450',global_v_lang);
              exit;
@@ -2485,19 +2482,19 @@
       v_dteyreap          := hcm_util.get_string_t(param_json_row,'dteyreap');
       v_numtime           := hcm_util.get_string_t(param_json_row,'numtime');
       v_codempid          := hcm_util.get_string_t(param_json_row,'codempid');
---      begin
---        select 'Y'
---          into v_check
---          from tkpiemp
---         where codempid   = v_codempid
---           and numtime    = v_numtime
---           and dteyreap   = v_dteyreap
---           and grade is not null
---           and rownum = 1;
---        param_msg_error := get_error_msg_php('HR1450',global_v_lang);
---        exit;
---      exception when no_data_found then null;
---      end;
+      begin
+        select 'Y'
+          into v_check
+          from tkpiemp
+         where codempid   = v_codempid
+           and numtime    = v_numtime
+           and dteyreap   = v_dteyreap
+           and grade is not null
+           and rownum = 1;
+        param_msg_error := get_error_msg_php('HR1450',global_v_lang);
+        exit;
+      exception when no_data_found then null;
+      end;
       delete tobjemp
        where dteyreap    = v_dteyreap
          and numtime     = v_numtime
@@ -2522,5 +2519,6 @@
     json_str_output := get_response_message('400',param_msg_error,global_v_lang);
   end;
 end;
+
 
 /

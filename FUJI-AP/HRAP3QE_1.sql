@@ -15,8 +15,7 @@
     b_index_numtime     := hcm_util.get_string_t(json_obj,'p_numtime');
     b_index_codcomp     := hcm_util.get_string_t(json_obj,'p_codcomp');
     b_index_sumwgt      := hcm_util.get_string_t(json_obj,'p_sumwgt');      -- << Apisit || 04/08/2023 || issue #9849
-    --
-    b_index_codcomp := rpad(b_index_codcomp,32,'0');
+
     hcm_secur.get_global_secur(global_v_coduser,global_v_zminlvl,global_v_zwrklvl,global_v_numlvlsalst,global_v_numlvlsalen);
   end;
   --
@@ -61,7 +60,7 @@
         from tkpidph
        where dteyreap   = b_index_dteyreap
          and numtime    = b_index_numtime
-         and codcomp   like  b_index_codcomp||'%'
+         and codcomp    = b_index_codcomp
       union
       select d.codkpino,h.kpides,null as wgt,d.target,d.kpivalue,
              'Y' as flgdefault
@@ -169,7 +168,6 @@
   begin
     json_input    := json_object_t(json_str_input);
     v_codkpino    := hcm_util.get_string_t(json_input,'p_codkpino');
-    b_index_codcomp := rpad(b_index_codcomp,32,'0');
 
     obj_data_kpi    := json_object_t();
     obj_data_kpi.put('coderror','200');
@@ -587,7 +585,7 @@
 
     if v_found = 'Y' or v_flg_delete = 'N' then
     -- << Apisit || 04/08/2023 || issue #9849
-     --   if b_index_sumwgt = 100 then
+        if b_index_sumwgt = 100 then
           begin
             insert into tobjdep(dteyreap,numtime,codcomp,
                                 objective,codcreate,coduser)
@@ -601,9 +599,9 @@
                and numtime     = b_index_numtime
                and codcomp     = b_index_codcomp;
           end;
---        else
---            param_msg_error   := get_error_msg_php('AP0041',global_v_lang);
---        end if;
+        else
+            param_msg_error   := get_error_msg_php('AP0041',global_v_lang);
+        end if;
     -- >>
     else
       delete tobjdep
@@ -624,5 +622,6 @@
     json_str_output := get_response_message('400',param_msg_error,global_v_lang);
   end;
 end;
+
 
 /

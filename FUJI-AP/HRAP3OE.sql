@@ -3,6 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRAP3OE" as
+-- Site: ST11 
+-- Author: Bow Sarunya (000554)
+-- Date updated: 02/04/2025
+-- Comment: 4449#2832: add nvl cuz p_codaplvl can be null
   v_chken      varchar2(100 char);
 
   param_msg_error     varchar2(4000 char);
@@ -39,7 +43,7 @@
   procedure get_tappfm_data(json_str_input in clob, json_str_output out clob);
   procedure post_save(json_str_input in clob, json_str_output out clob);
   procedure save_data(json_str_input in clob);
-  procedure post_process(json_str_input in clob, json_str_output out clob);
+  procedure post_process (json_str_input in clob, json_str_output out clob);
   procedure post_import_process(json_str_input in clob, json_str_output out clob);
   procedure format_text_json(json_str_input in clob, v_rec_tran out number, v_rec_error out number);
   procedure get_head( v_tmp_codcomp in varchar2,
@@ -55,6 +59,5 @@
                       taplvl_codaplvl out varchar2,
                       v_flgpass out boolean);
 end hrap3oe;
-
 
 /

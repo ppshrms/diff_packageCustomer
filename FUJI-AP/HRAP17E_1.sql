@@ -3,10 +3,7 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRAP17E" is
-  -- FUJI
-  -- Chinnawat (000553)
-  -- 17/11/2025
-  -- Support#25930 Add condition to check null value of flgDelete
+-- last update: 07/08/2020 09:40
 
   procedure initial_value(json_str in clob) is
     json_obj            json_object_t;
@@ -836,9 +833,7 @@
                         tb1_flgAdd       := hcm_util.get_boolean_t(v_table1_row,'flgAdd');
                         tb1_flgEdit      := hcm_util.get_boolean_t(v_table1_row,'flgEdit');
                         v_codleave       := hcm_util.get_string_t(v_table1_row,'codleave');
-                        -- softberry || 03/08/2023 || #9446 if not tb1_flgDelete then
-                        -- FUJI|Chinnawat (000553)|17/11/2025| Support#25930 add condition to check null value of flgDelete
-                        if (not tb1_flgDelete and tb1_flgAdd) or (tb1_flgDelete is null and tb1_flgAdd) then
+                        if not tb1_flgDelete and tb1_flgAdd then -- softberry || 03/08/2023 || #9446 if not tb1_flgDelete then
                             insert into tattprelv (codcompy,codaplvl,dteeffec,codgrplv,codleave,
                                                    dtecreate,codcreate,dteupd,coduser)
                                            values (p_codcompy,p_codaplvl,p_dteeffec,v_codgrplv,v_codleave,
@@ -860,9 +855,7 @@
                         v_pctdedbon         := to_number(hcm_util.get_string_t(v_table2_row,'pctdedbon'));
                         v_pctdedsal         := to_number(hcm_util.get_string_t(v_table2_row,'pctdedsal'));
 
-                        -- softberry || 03/08/2023 || #9446 || if not tb2_flgDelete or tb2_flgAdd then
-                        -- FUJI|Chinnawat (000553)|17/11/2025| Support#25930 add condition to check null value of flgDelete
-                        if (not tb2_flgDelete and tb2_flgAdd) or (tb2_flgDelete is null and tb2_flgAdd) then
+                        if not tb2_flgDelete and tb2_flgAdd then -- softberry || 03/08/2023 || #9446 || if not tb2_flgDelete or tb2_flgAdd then
                             v_numseq    := v_numseq + 1;
                             insert into tattpre2 (codcompy,codaplvl,dteeffec,codgrplv,numseq,
                                                   qtymin,qtymax,scorded,flgsal,flgbonus,
@@ -1172,5 +1165,6 @@
   end;
 
 end;
+
 
 /

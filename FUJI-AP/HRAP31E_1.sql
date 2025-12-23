@@ -73,7 +73,6 @@
     v_codcomp           temploy1.codcomp%type;
     v_codpos            temploy1.codpos%type;
     count_numseq        number;
-    count_numseq_c     number;
     v_flgRightDisable   boolean;
     v_flgtypap          tstdisd.flgtypap%type;
     v_last_flgappr      tappfm.flgappr%type;
@@ -106,9 +105,9 @@
                           and codempid = p_codapman
                     ))
                )
-           and  codempid = nvl(p_codempid_query , codempid)
-           and  codcomp like p_codcomp||'%'
-           and  codaplvl = nvl(p_codaplvl,codaplvl) 
+           and (codempid = nvl(p_codempid_query , codempid)
+                or (p_codcomp is not null and codcomp like p_codcomp||'%')
+                or (p_codaplvl is not null and codaplvl = nvl(p_codaplvl,codaplvl)) )
       order by codempid,numseq;
   begin
     obj_row := json_object_t();
@@ -125,14 +124,6 @@
       obj_data.put('codaplvl',i.codaplvl);
       obj_data.put('desc_codaplvl',get_tcodec_name('TCODAPLV', i.codaplvl, global_v_lang));
       obj_data.put('dteapman',to_char(i.dteapman,'dd/mm/yyyy'));
-      select count(numseq)
-        into count_numseq_c
-        from tappfm
-       where codempid = i.codempid
-         and dteyreap = i.dteyreap
-         and numtime = i.numtime
-         and  FLGAPPR = 'C';
-         
       obj_data.put('numseq',i.numseq);
       obj_data.put('codapman',p_codapman);
 
@@ -143,7 +134,7 @@
          and dteyreap = i.dteyreap
          and numtime = i.numtime;
 
-      obj_data.put('count_numseq',count_numseq_c||'/'||count_numseq);
+      obj_data.put('count_numseq',count_numseq);
 
 --Redmine #5552
       v_codaplvl := get_codaplvl(i.dteyreap, i.numtime, i.codempid);
@@ -189,7 +180,6 @@
             v_next_flgappr := 'P';
             v_next_dteapman := null;
         end;
-        
         if (nvl(v_last_flgappr,'P') != 'C' and i.numseq > 1) or v_next_dteapman is not null  then
             v_flgRightDisable := true;
         end if;
@@ -512,7 +502,6 @@
     v_qtyscor           number;
     v_qtypunsh          number;
     v_codaplvl          tstdisd.codaplvl%type;
-    v_weigth_kpi      varchar2(100 char); 
 
     cursor c_behavior is
         select qtybeh,qtybehf
@@ -751,18 +740,14 @@
 
         if v_flgapman in ('1','4') then
             v_emp_qty       := round((v_qtyta + v_qtypuns)/2,2);
-            v_emp_qty      :=  v_qtyta *( v_pctta/100)  + v_qtypuns * (v_pctpunsh/100) ;
             v_sum_emp_qty   := v_sum_emp_qty + round(nvl(v_qtyta,0)/100 * nvl(v_pctta,0),2) + round(nvl(v_qtypuns,0)/100 * nvl(v_pctpunsh,0),2);  
         elsif v_flgapman = '2' then
             v_leader_qty        := round((v_qtyta + v_qtypuns)/2,2);
-             v_leader_qty      :=  v_qtyta *( v_pctta/100)  + v_qtypuns * (v_pctpunsh/100) ;
             v_sum_leader_qty    := v_sum_leader_qty + round(nvl(v_qtyta,0)/100 * nvl(v_pctta,0),2) + round(nvl(v_qtypuns,0)/100 * nvl(v_pctpunsh,0),2);
             v_emp_qty       := v_leader_qty;
             v_sum_emp_qty   := v_sum_leader_qty;
         elsif v_flgapman = '3' then
             v_last_qty      := round((v_qtyta + v_qtypuns)/2,2);
-             v_last_qty      :=  v_qtyta *( v_pctta/100)  + v_qtypuns * (v_pctpunsh/100) ;
-             
             v_sum_last_qty  := v_sum_last_qty + round(nvl(v_qtyta,0)/100 * nvl(v_pctta,0),2) + round(nvl(v_qtypuns,0)/100 * nvl(v_pctpunsh,0),2);
             v_emp_qty           := v_last_qty;
             v_sum_emp_qty       := v_sum_last_qty;
@@ -770,8 +755,6 @@
             v_sum_leader_qty    := v_sum_last_qty;
         end if;
 
-    
- 
         v_sum_weight := v_sum_weight + nvl(v_pctta,0) + nvl(v_pctpunsh,0);
 
         obj_data    := json_object_t();
@@ -781,7 +764,7 @@
         else
             obj_data.put('icon','<i class="fa fa-pencil"></i>');
         end if;
-        obj_data.put('desc_codform',get_label_name('HRAP31E1', global_v_lang, 170) ||' (' ||v_pctta||'/' ||v_pctpunsh  ||')'  );
+        obj_data.put('desc_codform',get_label_name('HRAP31E1', global_v_lang, 170));
         obj_data.put('weight',nvl(v_pctta,0) + nvl(v_pctpunsh,0));
         obj_data.put('emp_qty',to_char(v_emp_qty,'fm9,999,990.00'));
         obj_data.put('leader_qty',to_char(v_leader_qty,'fm9,999,990.00'));
@@ -837,7 +820,7 @@
         v_sum_emp_qty       := v_sum_emp_qty + round(nvl(v_emp_qty,0)/100 * nvl(v_pctbeh,0),2);
         v_sum_leader_qty    := v_sum_leader_qty + round(nvl(v_leader_qty,0)/100 * nvl(v_pctbeh,0),2);
         v_sum_last_qty      := v_sum_last_qty + round(nvl(v_last_qty,0)/100 * nvl(v_pctbeh,0),2);
-        
+
         obj_data.put('coderror','200');
         if v_global_flgRightDisable then
             obj_data.put('icon','<i class="fa fa-info-circle"></i>');
@@ -898,6 +881,7 @@
         v_sum_emp_qty       := v_sum_emp_qty + round(nvl(v_emp_qty,0)/100 * nvl(v_pctcmp,0),2);
         v_sum_leader_qty    := v_sum_leader_qty + round(nvl(v_leader_qty,0)/100 * nvl(v_pctcmp,0),2);
         v_sum_last_qty      := v_sum_last_qty + round(nvl(v_last_qty,0)/100 * nvl(v_pctcmp,0),2);
+
         v_sum_weight := v_sum_weight + nvl(v_pctcmp,0);
 
         obj_data.put('coderror','200');
@@ -908,11 +892,9 @@
         end if;
         obj_data.put('desc_codform',get_label_name('HRAP31E1', global_v_lang, 190));
         obj_data.put('weight',nvl(v_pctcmp,0));
---         obj_data.put('emp_qty',to_char(v_emp_qty,'fm9,999,990.00'));
---        obj_data.put('leader_qty',to_char(v_leader_qty,'fm9,999,990.00'));
-         obj_data.put('emp_qty',to_char(v_emp_qty*(v_pctcmp/100),'fm9,999,990.00'));
-         obj_data.put('leader_qty',to_char(v_leader_qty*(v_pctcmp/100),'fm9,999,990.00'));
-        obj_data.put('last_qty',to_char(v_last_qty*(v_pctcmp/100),'fm9,999,990.00'));
+        obj_data.put('emp_qty',to_char(v_emp_qty,'fm9,999,990.00'));
+        obj_data.put('leader_qty',to_char(v_leader_qty,'fm9,999,990.00'));
+        obj_data.put('last_qty',to_char(v_last_qty,'fm9,999,990.00'));
         obj_data.put('flgTopic','competency');
         obj_row.put(to_char(v_rcnt),obj_data);
         v_rcnt      := v_rcnt + 1;
@@ -935,10 +917,7 @@
             v_qtykpid     := 0;
             v_qtykpic     := 0;
         end;
-        
-        
-        
-v_leader_qty := null ;
+
         for r_flgapman in c_flgapman loop
             v_max_numseq    := r_flgapman.numseq;
             for r_kpi in c_kpi loop
@@ -961,7 +940,6 @@ v_leader_qty := null ;
         end if;
 
         -- default from before evalation
-        
         if v_flgtypap = 'T' and v_qtykpi is null then
             v_max_numseq    := p_numseq - 1;
             for r_kpi in c_kpi loop
@@ -969,29 +947,20 @@ v_leader_qty := null ;
                     v_emp_qty           := round(r_kpi.qtykpi / r_kpi.qtykpif * 100,2);
                 elsif  v_flgapman = '2' then
                     v_leader_qty        := round(r_kpi.qtykpi / r_kpi.qtykpif * 100,2);
-                    
---                    v_sum_leader_qty    := v_sum_leader_qty +
---                               round(nvl(v_leader_qty,0)/100 * nvl(v_pctkpiem,0),2) +
---                               round(nvl(v_qtykpic,0)/100 * nvl(v_pctkpicp,0),2) +
---                               round(nvl(v_qtykpid,0)/100 * nvl(v_pctkpirt,0),2);
-                  
                 elsif  v_flgapman = '3' then
                     v_last_qty          := round(r_kpi.qtykpi / r_kpi.qtykpif * 100,2);
                 end if;
             end loop;
         end if;
+
         v_sum_emp_qty       := v_sum_emp_qty +
                                round(nvl(v_emp_qty,0)/100 * nvl(v_pctkpiem,0),2) +
                                round(nvl(v_qtykpic,0)/100 * nvl(v_pctkpicp,0),2) +
                                round(nvl(v_qtykpid,0)/100 * nvl(v_pctkpirt,0),2);
-                               if v_leader_qty >0  then
-                                  v_sum_leader_qty    := v_sum_leader_qty +
-                                   round(nvl(v_leader_qty,0)/100 * nvl(v_pctkpiem,0),2) +
-                                   round(nvl(v_qtykpic,0)/100 * nvl(v_pctkpicp,0),2) +
-                                   round(nvl(v_qtykpid,0)/100 * nvl(v_pctkpirt,0),2);
-                              else
-                                 v_sum_leader_qty := 0 ;
-                               end if;
+        v_sum_leader_qty    := v_sum_leader_qty +
+                               round(nvl(v_leader_qty,0)/100 * nvl(v_pctkpiem,0),2) +
+                               round(nvl(v_qtykpic,0)/100 * nvl(v_pctkpicp,0),2) +
+                               round(nvl(v_qtykpid,0)/100 * nvl(v_pctkpirt,0),2);
         v_sum_last_qty      := v_sum_last_qty +
                                round(nvl(v_last_qty,0)/100 * nvl(v_pctkpiem,0),2) +
                                round(nvl(v_qtykpic,0)/100 * nvl(v_pctkpicp,0),2) +
@@ -1004,43 +973,11 @@ v_leader_qty := null ;
         else
             obj_data.put('icon','<i class="fa fa-pencil"></i>');
         end if;
-        v_weigth_kpi := null;
-       if global_v_lang = '102' then        
-            if   nvl(v_pctkpicp,0) > 0 then
-                 v_weigth_kpi := ' องค์กร : ' ||v_pctkpicp ||',';
-            end if;
-            if   nvl(v_pctkpirt,0) > 0 then 
-                 v_weigth_kpi := v_weigth_kpi || 'หน่วยงาน : ' ||v_pctkpirt||',';
-            end if ;
-            if   nvl(v_pctkpiem,0) > 0 then 
-                 v_weigth_kpi := v_weigth_kpi || ' บุคคล : ' ||v_pctkpiem;
-            end if;
-        else
-           if   nvl(v_pctkpicp,0) > 0 then
-                 v_weigth_kpi := 'Company : ' ||v_pctkpicp ||',';
-            end if;
-            if   nvl(v_pctkpirt,0) > 0 then 
-                 v_weigth_kpi := v_weigth_kpi || 'Unit  : ' ||v_pctkpirt;
-            end if ;
-            if   nvl(v_pctkpiem,0) > 0 then 
-                 v_weigth_kpi := v_weigth_kpi || ' Individual : ' ||v_pctkpiem;
-            end if;
-            
-
-        end if;
-        obj_data.put('desc_codform',get_label_name('HRAP31E1', global_v_lang, 200) ||' ('|| v_weigth_kpi ||')'  );
-        
-        
+        obj_data.put('desc_codform',get_label_name('HRAP31E1', global_v_lang, 200));
         obj_data.put('weight', nvl(v_pctkpicp,0) + nvl(v_pctkpiem,0) + nvl(v_pctkpirt,0));
---        obj_data.put('emp_qty',to_char(v_emp_qty,'fm9,999,990.00'));
---        obj_data.put('leader_qty',to_char(v_leader_qty,'fm9,999,990.00'));
---        obj_data.put('last_qty',to_char(v_last_qty,'fm9,999,990.00'));
-        obj_data.put('emp_qty',to_char(v_emp_qty*(v_pctkpiem/100) + round(nvl(v_qtykpic,0)/100 * nvl(v_pctkpicp,0),2) +
-                               round(nvl(v_qtykpid,0)/100 * nvl(v_pctkpirt,0),2) ,'fm9,999,990.00'));
-        obj_data.put('leader_qty',to_char(v_leader_qty*(v_pctkpiem/100) + round(nvl(v_qtykpic,0)/100 * nvl(v_pctkpicp,0),2) +
-                               round(nvl(v_qtykpid,0)/100 * nvl(v_pctkpirt,0),2),'fm9,999,990.00'));
-        obj_data.put('last_qty',to_char(v_last_qty*(v_pctkpiem/100) + round(nvl(v_qtykpic,0)/100 * nvl(v_pctkpicp,0),2) +
-                               round(nvl(v_qtykpid,0)/100 * nvl(v_pctkpirt,0),2),'fm9,999,990.00'));
+        obj_data.put('emp_qty',to_char(v_emp_qty,'fm9,999,990.00'));
+        obj_data.put('leader_qty',to_char(v_leader_qty,'fm9,999,990.00'));
+        obj_data.put('last_qty',to_char(v_last_qty,'fm9,999,990.00'));
         obj_data.put('flgTopic','kpi');
         obj_row.put(to_char(v_rcnt),obj_data);
         v_rcnt          := v_rcnt + 1;
@@ -1048,13 +985,8 @@ v_leader_qty := null ;
 
     obj_data    := json_object_t();obj_data.put('coderror','200');
     obj_data.put('icon','');
-    obj_data.put('desc_codform',get_label_name('HRAP31E2', global_v_lang, 200) );
+    obj_data.put('desc_codform',get_label_name('HRAP31E2', global_v_lang, 200));
     obj_data.put('weight', v_sum_weight);
-  --   obj_data.put('weight', );
-   -- v_pctkpicp ||','||v_pctkpiem||','||v_pctkpirt
-    
-    
-    
     obj_data.put('emp_qty',to_char(v_sum_emp_qty,'fm9,999,990.00'));
     obj_data.put('leader_qty',to_char(v_sum_leader_qty,'fm9,999,990.00'));
     obj_data.put('last_qty',to_char(v_sum_last_qty,'fm9,999,990.00'));
@@ -1500,8 +1432,7 @@ v_leader_qty := null ;
         v_tappemp_qtyta   := null;
         v_tappemp_qtypuns := null;
       end;
-   v_tappemp_qtyta   := null;
-        v_tappemp_qtypuns := null;
+
       begin
           select dteeffec, scorfta, scorfpunsh
             into v_dteeffec, v_scorfta, v_scorfpunsh
@@ -1705,12 +1636,10 @@ v_leader_qty := null ;
       v_scoreta             := greatest(v_scoreta,0);
       obj_data.put('description',get_label_name('HRAP31E1', global_v_lang, 210));
       obj_data.put('fullscore',v_scorfta);
-      obj_data.put('reducescore',v_scorfta - v_scoreta);
-      obj_data.put('qtyscore',v_scoreta);
+      obj_data.put('reducescore',1);
+      obj_data.put('qtyscore',2);
       obj_data.put('weight',v_pctta);
-      if v_pctta > 0 then
-      obj_data.put('netscore',round((v_pctta * v_scoreta) / (v_pctta * v_scorfta) * 100,2));
-      end if;
+      obj_data.put('netscore',3);
       obj_discipline_row.put(to_char(v_rcnt-1),obj_data);
 
       v_rcnt                := v_rcnt + 1;
@@ -1721,9 +1650,7 @@ v_leader_qty := null ;
       obj_data.put('reducescore',v_scorfpunsh-v_scorepunsh);
       obj_data.put('qtyscore',v_scorepunsh);
       obj_data.put('weight',v_pctpunsh);
-if v_pctpunsh > 0 then
       obj_data.put('netscore',round((v_pctpunsh * v_scorepunsh) / (v_pctpunsh * v_scorfpunsh) * 100,2));
-end if;      
       obj_discipline_row.put(to_char(v_rcnt-1),obj_data);
 
 
@@ -1751,12 +1678,10 @@ end if;
       obj_detail.put('scorfpunsh',v_scorfpunsh);     
       obj_detail.put('scorepunsh',v_tappemp_qtypuns);
       --obj_detail.put('scorepunsh',v_scorepunsh);  --#7434
-if v_pctta > 0 then
+
       obj_detail.put('netscoreta',round((v_pctta * v_scoreta)/(v_pctta * v_scorfta) * 100,2));--- #9859
-end if;      
-if v_pctpunsh > 0 then      
       obj_detail.put('netscorepunsh',round((v_pctpunsh * v_scorepunsh) / (v_pctpunsh * v_scorfpunsh) * 100,2));--- #9859
-end if;
+
       obj_data      := json_object_t();
       obj_data.put('coderror','200');
       obj_data.put('detail', obj_detail);
@@ -2302,7 +2227,7 @@ end if;
         from taplvld
        where p_codcomp like codcomp||'%'
          and codaplvl = p_codaplvl
-         and dteeffec <= sysdate--v_dteapend
+         and dteeffec <= v_dteapend
       order by codcomp desc,dteeffec desc;
 
     cursor c_taplvld is
@@ -2643,8 +2568,7 @@ end if;
         from taplvld
        where p_codcomp like codcomp||'%'
          and codaplvl = p_codaplvl
-         --and dteeffec <= v_dteapend
-         and dteeffec <= sysdate
+         and dteeffec <= v_dteapend
       order by codcomp desc,dteeffec desc;
 
     cursor c_taplvld is
@@ -3257,7 +3181,6 @@ end if;
     obj_detail.put('dteapstr',to_char(v_dteapstr,'dd/mm/yyyy'));
     obj_detail.put('dteapend',to_char(v_dteapend,'dd/mm/yyyy'));
     obj_detail.put('score',v_score);
-   -- obj_detail.put('score','66/500');
     obj_detail.put('remarkkpi', v_remarkkpi);
     obj_detail.put('commtkpi', v_commtkpi);
 
@@ -3976,15 +3899,6 @@ end if;
     obj_table               json_object_t;
     v_max_score             tkpiempg.score%type;
     v_codaplvl              tstdisd.codaplvl%type;
-    
-    v_QTYKPID        number ;
-    v_QTYKPIC        number ;
-  --  v_qtyscor        number ;
-    v_qtyfullscc        number ;
---     v_qtyscor     number ;
---     v_qtyfullscc     number ;
-    
-    
 
   begin
     initial_value(json_str_input);
@@ -4127,42 +4041,12 @@ end if;
 
     insert_tappemp(p_codempid_query, p_dteyreap, p_numtime, p_numseq);
 
-
---------------------
-            begin
-            select sum(qtyscor),count(*) * 5  into v_qtyscor,v_qtyfullscc
-              from tkpicmph
-             where dteyreap = p_dteyreap
-               and codcompy =  hcm_util.get_codcomp_level(p_codcomp,1) ;
-        exception when no_data_found then
-           v_qtyscor := 0;
-        end;
-        if v_qtyscor <> 0 then
-             v_qtykpic  := round((v_qtyscor/v_qtyfullscc) * 100,2);
-        end if;
-        -- KPI หน่วยงาน
-        v_qtyscor := 0;
-        begin
-            select sum(qtyscorn),sum(wgt) * 5  into v_qtyscor,v_qtyfullscc
-              from tkpidph
-             where dteyreap = p_dteyreap
-               and numtime  = p_numtime
-               and codcomp  = substr(p_codcomp,1,8)||'000000000000000000000000';
-        exception when no_data_found then
-           v_qtyscor := 0;
-        end;
-        if v_qtyscor > 0 then
-            v_QTYKPID  := round((v_qtyscor/v_qtyfullscc) * 100,2);
-       end if;
-        ------------------------
     update tappemp
        set qtykpie = nvl(v_qtykpie1,qtykpie),
            qtykpie2 = nvl(v_qtykpie2,qtykpie2),
            qtykpie3 = nvl(v_qtykpie3,qtykpie3),
            dteupd = sysdate,
-           coduser = global_v_coduser,
-           QTYKPID = v_QTYKPID,
-           qtykpic  =v_qtykpic          
+           coduser = global_v_coduser
      where codempid = p_codempid_query
        and dteyreap = p_dteyreap
        and numtime = p_numtime;
@@ -4563,8 +4447,7 @@ end if;
         from taplvld
        where p_codcomp like codcomp||'%'
          and codaplvl = p_codaplvl
-         --and dteeffec <= v_dteapend
-         and dteeffec <= sysdate
+         and dteeffec <= v_dteapend
       order by codcomp desc,dteeffec desc;
 
   begin
@@ -4797,14 +4680,7 @@ end if;
            and dteyreap = p_dteyreap
            and numtime = p_numtime
            and numseq = p_numseq
-           and codtency = v_codtency
-           -- FUJI|Chinnawat (000553)|04/11/2025|Issue Support#25947 where clause add codskill in subquery
-           and codskill in (select codskill 
-                    from tjobposskil
-                    where codpos = p_codpos
-                      and codcomp = p_codcomp
-                      and codtency = v_codtency);
-          -- FUJI|Chinnawat (000553)|04/11/2025|Issue Support#25947 where clause add codskill in subquery
+           and codtency = v_codtency;
 
         begin
             select qtywgt
@@ -5214,10 +5090,10 @@ end if;
       rollback;
     end if;
     json_str_output := get_response_message(null,param_msg_error,global_v_lang);
---  exception when others then
---    rollback;
---    param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
---    json_str_output := get_response_message('400',param_msg_error,global_v_lang);
+  exception when others then
+    rollback;
+    param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
+    json_str_output := get_response_message('400',param_msg_error,global_v_lang);
   end;
 
   procedure save_lastapp is
@@ -5376,7 +5252,7 @@ end if;
         from taplvl
        where p_codcomp_in like codcomp||'%'
          and codaplvl = p_codaplvl
-         and dteeffec <= nvl(v_global_dteapend,sysdate)
+         and dteeffec <= v_global_dteapend
       order by codcomp desc,dteeffec desc;
   begin
     for r_taplvl in c_taplvl loop
@@ -5541,5 +5417,6 @@ end if;
     end if;
   end;
 end;
+
 
 /

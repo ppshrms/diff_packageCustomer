@@ -263,9 +263,9 @@
             v_codcomlvl := r_tapbudgt.codcomp;
 
             for r_tstdis in c_tstdis loop
-                v_numsyn := v_numsyn + 1; -- ลำดับที่ array
-                v_arrgrdap(v_numsyn)  := r_tstdis.grade; -- เกรด
-                v_arrnumemp(v_numsyn) := trunc((v_numempap * r_tstdis.pctemp)/100); -- จำนวนพนักงานที่จะได้ในแต่ละเกรด
+                v_numsyn := v_numsyn + 1; -- ???????? array
+                v_arrgrdap(v_numsyn)  := r_tstdis.grade; -- ????
+                v_arrnumemp(v_numsyn) := trunc((v_numempap * r_tstdis.pctemp)/100); -- ???????????????????????????????
                 v_dteyreap := r_tstdis.dteyreap;
             end loop;
 
@@ -369,7 +369,7 @@
                         v_qtybeh3n  := 	round(nvl(v_qtybeh3,0) / v_timbeh3,2);
                     end if;
 
-                    --cal grade 1-กำหนดคะแนน
+                    --cal grade 1-??????????
                     if r_tapbudgt.flggrade = '1' then
                         v_grdap := null;
                         for r_tstdis in c_tstdis loop
@@ -389,7 +389,7 @@
                                         if v_process = 'HRAP3XE' then
                                             v_empgrd := 0;
                                             begin
-                                                select count(codempid) into v_empgrd--จำนวนพนักงานทั้งหมดที่ได้เกรดนี้ไปแล้ว
+                                                select count(codempid) into v_empgrd--??????????????????????????????????????
                                                   from tappraism
                                                  where dteyreap = p_dteyreap
                                                    and codcomp  like v_codcomp||'%'
@@ -400,7 +400,7 @@
                                         else
                                             v_empgrd := 0;
                                             begin
-                                                select count(codempid) into v_empgrd--จำนวนพนักงานทั้งหมดที่ได้เกรดนี้ไปแล้ว
+                                                select count(codempid) into v_empgrd--??????????????????????????????????????
                                                   from tapprais
                                                  where dteyreap = p_dteyreap
                                                    and codcomp  like v_codcomp||'%'

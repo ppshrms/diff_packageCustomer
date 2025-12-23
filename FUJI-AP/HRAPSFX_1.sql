@@ -256,7 +256,7 @@ begin
 
     if v_flgdata = 'Y' then
         param_msg_error := null;
-        v_item1  := get_label_name('HRAPSFX', global_v_lang, '60'); --'% ขึ้นตามนโยบาย'
+        v_item1  := get_label_name('HRAPSFX', global_v_lang, '60'); --'% ?????????????'
         v_item14 := '1';
         v_seq_grd := 0;
         for i in c1 loop
@@ -273,7 +273,7 @@ begin
               for k in 1..v_seq_yre loop
                 v_cs := v_cs+1;
                 if  v_cs = v_cs1 then
-                    ----------ค่าข้อมูล
+                    ----------?????????
                   begin
                         select  to_char(pctpostr,'fm990.00'), to_char(pctpoend,'fm990.00')
                           into  v_pctpostr, v_pctpoend
@@ -286,16 +286,16 @@ begin
                     v_pctpostr := null;
                     v_pctpoend := null;
                   end;
-                  ----------แกน X
-                      v_item6  := get_label_name('HRAPSFXC1', global_v_lang, '60'); --'เกรด';
+                  ----------??? X
+                      v_item6  := get_label_name('HRAPSFXC1', global_v_lang, '60'); --'????';
                       v_item4  := v_seq_grd;
                       v_item5  := i.grade;
                     --v_itemXX  := get_tstdis_name(i.codcomp,v_dteyreap,i.grade,global_v_lang);
-                      v_item31 := get_label_name('HRAPSFXC1', global_v_lang, '10'); --'สรุปอัตราการจ่ายโบนัสแยกตาม'|| 'เกรด'
-                  ----------แกน Y
+                      v_item31 := get_label_name('HRAPSFXC1', global_v_lang, '10'); --'???????????????????????????'|| '????'
+                  ----------??? Y
 --                      v_item7  := k;
                       v_item8  := j.dteyreap;
-                      v_item9  := get_label_name('HRAPSFXC1', global_v_lang, '50'); --'% การขึ้นเงินเดือน'
+                      v_item9  := get_label_name('HRAPSFXC1', global_v_lang, '50'); --'% ????????????????'
                       v_item10 := v_per_policy;
                   ----------Insert ttemprpt
                       begin
@@ -410,7 +410,7 @@ begin
 
 if v_flgdata = 'Y' then
     param_msg_error := null;
-    v_item1  := get_label_name('HRAPSFX', global_v_lang, '70'); --'% ขึ้นจริง'
+    v_item1  := get_label_name('HRAPSFX', global_v_lang, '70'); --'% ????????'
     v_item14 := '2';
     v_seq_grd := 0;
     for i in c1 loop
@@ -426,7 +426,7 @@ if v_flgdata = 'Y' then
               for k in 1..v_seq_yre loop
                 v_cs := v_cs+1;
              if  v_cs = v_cs1 then
-        ----------ค่าข้อมูล
+        ----------?????????
                      begin
                             select  to_char(pctactstr,'fm990.00'), to_char(pctactend,'fm990.00')
                               into  v_pctactstr, v_pctactend
@@ -439,16 +439,16 @@ if v_flgdata = 'Y' then
                                  v_pctactstr := null;
                                  v_pctactend := null;
                         end;
-                   ----------แกน X
-                    v_item6  := get_label_name('HRAPSFXC1', global_v_lang, '60'); --'เกรด';
+                   ----------??? X
+                    v_item6  := get_label_name('HRAPSFXC1', global_v_lang, '60'); --'????';
                     v_item4  := v_seq_grd;
                     v_item5  := i.grade;
                   --v_itemXX  := get_tstdis_name(i.codcomp,v_dteyreap,i.grade,global_v_lang);
-                    v_item31 := get_label_name('HRAPSFXC1', global_v_lang, '10'); --'สรุป%การขึ้นเงินเดือนแยกตามเกรด'
-           ----------แกน Y
+                    v_item31 := get_label_name('HRAPSFXC1', global_v_lang, '10'); --'????%??????????????????????????'
+           ----------??? Y
                     v_item7  := k;
                     v_item8  := j.dteyreap;
-                    v_item9  := get_label_name('HRAPSFXC1', global_v_lang, '50'); --'% การขึ้นเงินเดือน'
+                    v_item9  := get_label_name('HRAPSFXC1', global_v_lang, '50'); --'% ????????????????'
                     v_item10 := v_per_actual;
                 ----------Insert ttemprpt
                     begin

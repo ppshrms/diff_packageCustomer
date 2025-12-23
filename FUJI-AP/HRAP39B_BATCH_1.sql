@@ -136,8 +136,8 @@
       exception when no_data_found then
           null;
       end;
-      -- ต้องแก้
-      ---v_formusal ให้หาจาก TAPBUDGT
+      -- ???????
+      ---v_formusal ???????? TAPBUDGT
       v_formusal := 'MITPOINT * (PCTINCR/100)' ;
       -----------------------------------------
       for r_tstdis in c_tstdis loop

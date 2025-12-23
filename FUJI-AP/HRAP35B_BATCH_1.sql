@@ -3,13 +3,16 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRAP35B_BATCH" as
+  -- Site: STD
+  -- Author: Bow Sarunya (000554)
+  -- Date updated: 14/08/2025
+  -- Comment: 4449#12007: change query cursor c_tapbudgt
 
   procedure  start_process (p_dteyreap   number,
                           p_numtime    number,
                           p_codcomp    varchar2,
                           p_codempid   varchar2,
                           p_codreq     varchar2,
-                          p_flgcal     varchar2,
                           p_coduser    in varchar2,
                           p_lang       in varchar2) is
 
@@ -72,18 +75,16 @@
           from tappemp a,temploy1 b
          where dteyreap   = p_dteyreap
            and numtime    = p_numtime
-          and a.codcomp  like p_codcomp||'%'
-          and a.codempid = nvl(p_codempid,a.codempid)
+           and a.codcomp  like p_codcomp||'%'
+           and a.codempid = nvl(p_codempid,a.codempid)
            and a.codempid = b.codempid
         order by a.codempid;
 
     cursor c_tapbudgt is
         select codcomp,flggrade
           from tapbudgt
-         where dteyreap   = p_dteyreap
-           --and codcomp    like p_codcomp||'%'
-            and codcomp    like v_codcompy||'%'
-           
+         where dteyreap = p_dteyreap
+           and p_codcomp like codcomp || '%' -- STD | 000554-bow.sarunya-dev | 4449#12007: change from codcomp like p_codcomp || '%' | 14/08/2025
         order by codcomp desc;
 
     cursor c_tappemp_grade is
@@ -92,9 +93,8 @@
           from tappemp
          where dteyreap   = p_dteyreap
            and numtime    = p_numtime
-
-          and codcomp    like v_codcomp||'%'
-          and codempid   = nvl(p_codempid,codempid)
+           and codcomp    like v_codcomp||'%'
+           and codempid   = nvl(p_codempid,codempid)
            and grdadj     is null
         order by qtytotnet desc,codcomp,codempid;
 
@@ -136,9 +136,7 @@
                               and dteeffec <= trunc(sysdate));
 
 begin
-
     for r_tappemp in c_tappemp loop
-
         begin
             select pctbeh,pctcmp,pctkpicp,pctkpiem,pctkpirt,pctta,pctpunsh
               into v_pctbeh,v_pctcmp,v_pctkpicp,v_pctkpiem,v_pctkpirt,v_pctta,v_pctpunsh
@@ -178,7 +176,7 @@ begin
         exception when no_data_found then
            v_qtymaxsc := 1;
         end;
-        --KPI องค์กร
+        --KPI ??????
         v_qtyscor := 0;
         begin
             select sum(qtyscor),count(*) * v_qtymaxsc  into v_qtyscor,v_qtyfullscc
@@ -190,24 +188,22 @@ begin
         end;
         if v_qtyscor <> 0 then
             v_qtyscort  := round((v_qtyscor/v_qtyfullscc) * 100,2);
-            --v_qtykpic   := round(((nvl(v_qtyscort,0)  * v_pctkpirt) / 100),2 );
-            v_qtykpic   := round(((nvl(v_qtyscort,0)  * v_pctkpicp ) / 100),2 );
+            v_qtykpic   := round(((nvl(v_qtyscort,0)  * v_pctkpirt) / 100),2 );
         end if;
-        -- KPI หน่วยงาน
+        -- KPI ????????
         v_qtyscor := 0;
         begin
             select sum(qtyscorn),sum(wgt) * v_qtymaxsc  into v_qtyscorn,v_qtyfullscp
               from tkpidph
              where dteyreap = r_tappemp.dteyreap
                and numtime  = r_tappemp.numtime
-               and codcomp  = substr(r_tappemp.codcomp,1,8)||'000000000000000000000000';
+               and codcomp  = r_tappemp.codcomp;
         exception when no_data_found then
            v_qtyscorn := 0;
         end;
-        if v_qtyscorn <> 0  then
+        if v_qtyscorn <> 0 then
             v_qtyscornn  := round((v_qtyscorn/v_qtyfullscp) * 100,0) ;
-           -- v_qtykpid    := round(((nvl(v_qtyscornn,0)  * v_pctkpicp) / 100),2 );
-            v_qtykpid    := round(((nvl(v_qtyscornn,0)  * v_pctkpirt) / 100),2 );
+            v_qtykpid    := round(((nvl(v_qtyscornn,0)  * v_pctkpicp) / 100),2 );
         end if;
 
         begin
@@ -224,17 +220,17 @@ begin
            v_scorfta    := 0;
            v_scorfpunsh := 0;
         end;
-        v_qtyta   := r_tappemp.qtyta;
-        v_qtypuns := r_tappemp.qtypuns;
---        if nvl(v_scorfta,0) <> 0 then
---            v_qtyta     := round((((nvl(r_tappemp.qtyta,0)/v_scorfta)*100  * v_pctta) / 100),2 );
---        end if;
---        if nvl(v_scorfpunsh,0) <> 0 then
---            v_qtypuns   := round((((nvl(r_tappemp.qtypuns,0)/v_scorfpunsh)*100  * v_pctpunsh) / 100),2 );
---        end if;
+        v_qtyta   := 0;
+        v_qtypuns := 0;
+        if nvl(v_scorfta,0) <> 0 then
+            v_qtyta     := round((((nvl(r_tappemp.qtyta,0)/v_scorfta)*100  * v_pctta) / 100),2 );
+        end if;
+        if nvl(v_scorfpunsh,0) <> 0 then
+            v_qtypuns   := round((((nvl(r_tappemp.qtypuns,0)/v_scorfpunsh)*100  * v_pctpunsh) / 100),2 );
+        end if;
 
         v_qtytot    := nvl(v_qtybeh,0) +  nvl(v_qtycmp,0) + nvl(v_qtykpie,0) +
-                            nvl(v_qtykpic,0) + nvl(v_qtykpid,0) + nvl(v_qtyta,0) + nvl(v_qtypuns,0);
+                       nvl(v_qtykpic,0) + nvl(v_qtykpid,0) + nvl(v_qtyta,0) + nvl(v_qtypuns,0);
 
         update tappemp set qtytotnet = v_qtytot ,
                            qtykpic   = v_qtyscort ,
@@ -248,12 +244,10 @@ begin
            and numtime  = r_tappemp.numtime;
 
     end loop;
-
     for r_tapbudgt in c_tapbudgt loop
         v_codcomp := r_tapbudgt.codcomp;
         v_codcomlvl := r_tapbudgt.codcomp;
-        --cal grade 1-กำหนดคะแนน
-
+        --cal grade 1-??????????
         if r_tapbudgt.flggrade = '1' then
 
             for i in c_tappemp_grade loop
@@ -265,8 +259,6 @@ begin
                    v_numappl := null;
                 end;
                 v_grdap := null;
-
-            
                 for r_tstdis in c_tstdis loop
                     if i.qtytotnet between r_tstdis.pctwkstr and r_tstdis.pctwkend then
                         v_grdap := r_tstdis.grade;
@@ -284,7 +276,7 @@ begin
                 update_tcmptncy(i.dteyreap,i.numtime,i.codempid,v_numappl,p_codreq);
 
             end loop;
-        elsif r_tapbudgt.flggrade = '2' then --2-กำหนดคะแนนและ %พนักงาน
+        elsif r_tapbudgt.flggrade = '2' then --2-????????????? %???????
 
             for i in 1..20 loop
                 v_arrgrdap(i)  := null;
@@ -303,9 +295,9 @@ begin
             end;
 
             for r_tstdis in c_tstdis loop
-                v_numsyn := v_numsyn + 1; -- ลำดับที่ array
-                v_arrgrdap(v_numsyn)  := r_tstdis.grade; -- เกรด
-                v_arrnumemp(v_numsyn) := trunc((v_numempap * r_tstdis.pctemp)/100); -- จำนวนพนักงานที่จะได้ในแต่ละเกรด
+                v_numsyn := v_numsyn + 1; -- ???????? array
+                v_arrgrdap(v_numsyn)  := r_tstdis.grade; -- ????
+                v_arrnumemp(v_numsyn) := trunc((v_numempap * r_tstdis.pctemp)/100); -- ???????????????????????????????
                 v_dteyreap := r_tstdis.dteyreap;
             end loop;
 
@@ -319,7 +311,7 @@ begin
                             if v_arrgrdap(j) = r_tstdis.grade then
                                 v_empgrd := 0;
                                 begin
-                                    select count(codempid) into v_empgrd--จำนวนพนักงานทั้งหมดที่ได้เกรดนี้ไปแล้ว
+                                    select count(codempid) into v_empgrd--??????????????????????????????????????
                                       from tappemp
                                      where dteyreap = p_dteyreap
                                        and numtime  = p_numtime
@@ -369,7 +361,7 @@ begin
                    and dteyreap = i.dteyreap
                    and numtime  = i.numtime;
             end loop;
-        elsif r_tapbudgt.flggrade = '3' then --3- โดยการคิดคะแนนตามกลุ่ม 9 box
+        elsif r_tapbudgt.flggrade = '3' then --3- ?????????????????????? 9 box
             for i in c_tappemp_grade loop
                 for c9box in c_tnineboxap loop
                     v_syncond := c9box.syncond;
@@ -444,7 +436,6 @@ end;
                                 p_codcomp    varchar2,
                                 p_codempid   varchar2,
                                 p_codreq     varchar2,
-                                p_flgcal     varchar2,
                                 p_coduser    in varchar2,
                                 p_lang       in varchar2) is
 

@@ -3,6 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRAP3OE" as
+-- Site: ST11 
+-- Author: Bow Sarunya (000554)
+-- Date updated: 02/04/2025
+-- Comment: 4449#2832: add nvl cuz p_codaplvl can be null
   procedure initial_value(json_str in clob) is
     json_obj        json_object_t;
   begin
@@ -188,21 +192,21 @@
         param_msg_error := get_error_msg_php('HR2010', global_v_lang,'TCODAPLV');
         return;
       end;
---      begin
---        select count(*) into v_count
---          from taplvl a
---         where a.codaplvl = p_codaplvl
---           and a.codcomp  = p_codcomp
---           and a.dteeffec = (select max(b.dteeffec)
---                               from taplvl b
---                              where b.codaplvl = a.codaplvl
---                                and b.codcomp  = a.codcomp
---                                and b.dteeffec <= trunc(sysdate));
---      end;
---      if v_count = 0 then
---        param_msg_error := get_error_msg_php('HR2010', global_v_lang,'TAPLVL');
---        return;
---      end if;
+      begin
+        select count(*) into v_count
+          from taplvl a
+         where a.codaplvl = p_codaplvl
+           and a.codcomp  = p_codcomp
+           and a.dteeffec = (select max(b.dteeffec)
+                               from taplvl b
+                              where b.codaplvl = a.codaplvl
+                                and b.codcomp  = a.codcomp
+                                and b.dteeffec <= trunc(sysdate));
+      end;
+      if v_count = 0 then
+        param_msg_error := get_error_msg_php('HR2010', global_v_lang,'TAPLVL');
+        return;
+      end if;
     elsif p_codempid is not null then
       begin
         select staemp into v_staemp
@@ -681,12 +685,19 @@
     v_isCopy      := hcm_util.get_string_t(obj_detail,'isCopy');
     v_isEdit      := hcm_util.get_string_t(obj_detail,'isEdit');
 
+    --<< STD ST11 | Nuii Kowit (000551) | 20/01/2025 15:00 | redmine4448#11518
+    if p_codempid = '%' then
+        p_codempid := null;
+    end if;
+    -->> STD ST11 | Nuii Kowit (000551)  | 20/01/2025 15:00 | redmine4448#11518
+
     -- second phase, process data
     if param_msg_error is null then
       for r1 in c1 loop
         v_isExist := 'Y';
         exit;
       end loop;
+
       begin
         delete tappfm
          where numtime  = p_numtime
@@ -770,7 +781,7 @@
                           select dteapstr, dteapend into v_dteapstr, v_dteapend
                             from tstdisd
                            where nvl(p_codcomp,temploy1_codcomp) like codcomp||'%'
-                             and codaplvl = p_codaplvl
+                             and codaplvl = nvl(p_codaplvl, codaplvl) -- STD | 000554-bow.sarunya-dev | 4449#2832: add nvl cuz p_codaplvl can be null | 02/04/2025
                              and dteyreap = p_dteyreap
                              and numtime = p_numtime
             --Redmine #5552
@@ -803,7 +814,7 @@
                                      flgtypap = v_flgtypap,
                                      dteapstr = v_dteapstr,
                                      dteapend = v_dteapend,
-                              --       flgappr  =  '',
+                                     --flgappr  =  '',
                                      flgapman = r2.flgdisp,
                                      codcreate = global_v_coduser,
                                      coduser   = global_v_coduser
@@ -925,7 +936,7 @@
               select dteapstr, dteapend into v_dteapstr, v_dteapend
                 from tstdisd
                where nvl(p_codcomp,temploy1_codcomp) like codcomp||'%'
-                 and codaplvl = p_codaplvl
+                 and codaplvl = nvl(p_codaplvl, codaplvl) -- STD | 000554-bow.sarunya-dev | 4449#2832: add nvl cuz p_codaplvl can be null | 02/04/2025
                  and dteyreap = p_dteyreap
                  and numtime = p_numtime
 --Redmine #5552
@@ -958,7 +969,7 @@
                          flgtypap = v_flgtypap,
                          dteapstr = v_dteapstr,
                          dteapend = v_dteapend,
-                  --       flgappr  =  '',
+                         flgappr  =  '',
                          flgapman = r2.flgdisp,
                          codcreate = global_v_coduser,
                          coduser   = global_v_coduser
@@ -1289,6 +1300,13 @@
     v_tmp_codposap      tappasgn.codpospap%type;
     v_tmp_codaplvl      tappasgn.codaplvl%type;
     v_staemp            temploy1.staemp%type;
+
+    --<< STD ST11 | Nuii Kowit (000551) | 17/01/2025 15:13 | redmine4448#11518
+    json_str_input_process   clob; 
+    json_str_output_process  clob;
+    json_obj                 JSON_OBJECT_T;
+      obj_row  JSON_OBJECT_T;
+    -->> STD ST11 | Nuii Kowit (000551) | 17/01/2025 15:13 | redmine4448#11518
 
     v_cnt_flgdisp1      number := 0;
     v_cnt_flgdisp2      number := 0;
@@ -1760,6 +1778,25 @@
             end;
             v_flgappr_last_loop := v_flgappr;
           end;
+
+
+          --<< STD ST11 | Nuii Kowit (000551) | 17/01/2025 16:53 | redmine4448#11518
+            json_str_input_process := '{"detail": {"dteyear": "' || v_dteyreap || '", ' ||
+                            '"numtime": "' || v_numtime || '", ' ||
+                            '"codcomp": "' || v_codcomp || '", ' ||
+                            '"codempid": "' || v_codempid || '", ' ||
+                            '"codaplvl": "' || v_codaplvl || '"}, ' ||
+                            '"params": {"numseq": "' || v_numseq || '", ' ||
+                            '"flg": "' || 'add' || '", ' ||
+                            '"flgappr": "' || v_flgappr || '", ' ||
+                            '"codcompap": "' || v_codcompap || '", ' ||
+                            '"codposap": "' || v_codposap || '", ' ||
+                            '"codempap": "' || v_codempap || '", ' ||
+                            '"flgdisp": "' || v_flgdisp || '"}}';
+
+          post_process(json_str_input_process, json_str_output_process);
+
+          -->> STD ST11 | Nuii Kowit (000551) | 17/01/2025 16:53 | redmine4448#11518
 
           -- check after save
           v_flgappr_last := '9';

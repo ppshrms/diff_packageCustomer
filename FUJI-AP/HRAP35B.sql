@@ -3,6 +3,11 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRAP35B" as
+    -- Site: STD
+    -- Author: Bow Sarunya (000554)
+    -- Date updated: 14/08/2025
+    -- Comment: 4449#12007: remove condition if p_flgcal cuz p_flgcal Removed since 4448#9769
+
     param_msg_error           varchar2(4000 char);
     v_chken                   varchar2(10 char);
     global_v_coduser          varchar2(100 char);
@@ -21,7 +26,6 @@
     p_codempid                varchar2(100 char);
     p_codreq                  varchar2(100 char);
     p_codcacultr              varchar2(100 char);
-    p_flgcal                  varchar2(100 char);
 
 
     b_var_codempid    temploy1.codempid%type;
@@ -33,6 +37,5 @@
     procedure get_detail(json_str_input in clob, json_str_output out clob);
 
 end HRAP35B;
-
 
 /

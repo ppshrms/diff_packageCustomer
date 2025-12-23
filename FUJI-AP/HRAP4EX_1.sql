@@ -295,15 +295,15 @@ begin
             v_flgsecu := 'Y';
             v_flgdata := 'Y';
              v_seq_grd := v_seq_grd+1;
-            ----------แกน X
+            ----------??? X
             v_item6  := null;
             v_item4  := v_seq_grd;
             v_item5  := i.codkpino||'-'||i.kpides;
-            ----------แกน Y
+            ----------??? Y
             v_item7  := null;
             v_item8  := get_label_name('HRAP4EX1', global_v_lang, '120');
             v_item9  := get_label_name('HRAP4EX1', global_v_lang, '120');
-            v_item10 := to_char(nvl(i.qtyscor,0),'fm990.00');   ----------ค่าข้อมูล
+            v_item10 := to_char(nvl(i.qtyscor,0),'fm990.00');   ----------?????????
            ----------Insert ttemprpt
             begin
              insert into ttemprpt

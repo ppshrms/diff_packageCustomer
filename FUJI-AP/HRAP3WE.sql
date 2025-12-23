@@ -17,7 +17,6 @@
   global_v_numlvlsalst      number;
   global_v_numlvlsalen 	    number;
   global_v_zupdsal          varchar2(10 char);
-  v_global_dteapend       date ;
 
   p_dteyreap                TAPPEMP.DTEYREAP%type;
   p_numtime                 TAPPEMP.NUMTIME%type;
@@ -41,8 +40,8 @@
   procedure save_process (json_str_input in clob,json_str_output out clob);
   procedure post_save_index(json_str_input in clob,json_str_output out clob);
   procedure get_grade (json_str_input in clob,json_str_output out clob);
-  procedure get_taplvl_where(p_codcomp_in in varchar2,p_codaplvl in varchar2,p_codcomp_out out varchar2,p_dteeffec out date);
 
 end hrap3we;
+
 
 /

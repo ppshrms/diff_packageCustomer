@@ -358,7 +358,7 @@ cursor c2 is
                 obj_data.put('desc_codempid','');
                 obj_data.put('typkpi','');
                 obj_data.put('codkpi','');
-                obj_data.put('kpides',get_label_name('HRAP3VXC2',global_v_lang,100));--Sumรวม
+                obj_data.put('kpides',get_label_name('HRAP3VXC2',global_v_lang,100));--Sum???
                 obj_data.put('pctwgt',to_char(v_pctwgt_comp,'fm990.00'));
                 obj_data.put('target','');
                 obj_data.put('mtrfinish','');
@@ -377,7 +377,7 @@ cursor c2 is
                 obj_data.put('flgsum','Y');
                 obj_data.put('typkpi','');
                 obj_data.put('codkpi','');
-                obj_data.put('kpides',get_label_name('HRAP3VXC2',global_v_lang,100));--Sumรวม
+                obj_data.put('kpides',get_label_name('HRAP3VXC2',global_v_lang,100));--Sum???
                 obj_data.put('pctwgt',to_char(v_pctwgt_emp,'fm990.00'));
                 obj_data.put('target','');
                 obj_data.put('mtrfinish','');

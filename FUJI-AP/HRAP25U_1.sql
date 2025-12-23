@@ -678,7 +678,7 @@
                     v_rowid := null;
                 end;
 
-                ---ส่งเมลหาผู้ขออนุมัติ
+                ---????????????????????
                 begin
                     excel_mail('item1,item2,item3,item4,item5,item6','label1,label2,label3,label4,label5,label6',null,global_v_codempid, 'HRAP25U',v_filename);
                     v_error := chk_flowmail.send_mail_reply('HRAP25U', v_codemprq, v_codemprq , global_v_codempid, global_v_coduser, v_filename, 'HRAP25U1', 140, 'U', v_staappr, v_approvno, null, null, 'TTEMADJ1', v_rowid, '1', 'Oracle');  

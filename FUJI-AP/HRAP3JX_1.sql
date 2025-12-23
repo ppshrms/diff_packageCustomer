@@ -222,14 +222,14 @@
             obj_data.put('desc_emp',get_temploy_name(i.codempid,global_v_lang));
             obj_data.put('desc_codempid',get_temploy_name(i.codempid,global_v_lang));
             obj_data.put('desc_pos',get_tpostn_name(i.codpos,global_v_lang));
---            obj_data.put('grade',i.grade);
---            obj_data.put('score',i.qtyscore);
---            obj_data.put('percent','');
---            obj_data.put('sallast','');
---            if v_zupdsal = 'Y' then
---                obj_data.put('percent',to_char(i.pctadjsal,'fm999,999,990.00'));
---                obj_data.put('sallast',to_char(stddec(i.amtsaln,i.codempid,v_chken),'fm999,999,990.00'));
---            end if;
+            obj_data.put('grade',i.grade);
+            obj_data.put('score',i.qtyscore);
+            obj_data.put('percent','');
+            obj_data.put('sallast','');
+            if v_zupdsal = 'Y' then
+                obj_data.put('percent',to_char(i.pctadjsal,'fm999,999,990.00'));
+                obj_data.put('sallast',to_char(stddec(i.amtsaln,i.codempid,v_chken),'fm999,999,990.00'));
+            end if;
             exit;
         end if;
     end loop;
@@ -348,11 +348,6 @@
                 v_amtsaln   := null;
             end;
 
-        v_pctadjsal := null;
-                v_amtbudg   := null;
-                v_amtadj    := null;
-                v_amtsaln   := null;
-                
             obj_data.put('pctadjsal',v_pctadjsal);
             obj_data.put('amtbudg',stddec(v_amtbudg,i.codempid,v_chken));
             obj_data.put('amtsaln',stddec(v_amtsaln,i.codempid,v_chken));
@@ -638,5 +633,6 @@
 ----
 
 end;
+
 
 /

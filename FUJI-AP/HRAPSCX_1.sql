@@ -209,12 +209,12 @@ state_query     varchar2(5000 char);
                and  nvl(flgappr,'P') = 'C'
                and  grdap       = i.grade;
           end;
-          -- 1-กำหนดคะแนน
+          -- 1-??????????
 
           if v_flggrade = '1' then
             obj_data.put('totalemp','');
             obj_data.put('policy',cs_emp_grd);
-          -- 2-กำหนดคะแนนและ %พนักงาน
+          -- 2-????????????? %???????
           else
             begin
               select  count(codempid)
@@ -321,7 +321,7 @@ state_query     varchar2(5000 char);
       v_item14 := '';
       v_item31 := get_label_name('HRAPSCX', global_v_lang, '130');
       v_seq_grd := 0;
-      --วิธีการตัดเกรด      
+      --??????????????      
       begin
        select a.flggrade
          into v_flggrade
@@ -372,17 +372,17 @@ state_query     varchar2(5000 char);
           ---
 --======================================================
           for j in 1..2 loop
-            if j = 1  then --จำนวนคนตามนโยบาย
+            if j = 1  then --????????????????
               v_item7  := j;
-              v_item8  := get_label_name('HRAPSCX', global_v_lang, '70'); --'จำนวนคนตามนโยบาย';
-              v_item10 := v_policy; ----------ค่าข้อมูล
-            else--จำนวนคนที่ได้จากการประเมิน
+              v_item8  := get_label_name('HRAPSCX', global_v_lang, '70'); --'????????????????';
+              v_item10 := v_policy; ----------?????????
+            else--??????????????????????????
               v_item7  := j;
-              v_item8  := get_label_name('HRAPSCX', global_v_lang, '80'); --'จำนวนคนที่ได้จากการประเมิน';
-              v_item10 := cs_emp_grd; ----------ค่าข้อมูล
+              v_item8  := get_label_name('HRAPSCX', global_v_lang, '80'); --'??????????????????????????';
+              v_item10 := cs_emp_grd; ----------?????????
             end if;
-            v_item9  := get_label_name('HRAPSCX', global_v_lang, '140'); --'จำนวนคน';
-            ----------แกน x
+            v_item9  := get_label_name('HRAPSCX', global_v_lang, '140'); --'???????';
+            ----------??? x
             v_item6  := null;
             v_item4  := v_seq_grd;
             v_item5  := i.grade;

@@ -97,7 +97,7 @@
                                  from tsalstr
                                 where codcompy = hcm_util.get_codcomp_level(b_index_codcomp,1)
                                   and jobgrade = i.jobgrade
-                                  and trunc(dteyreap) <=  to_number(to_char(trunc(sysdate),'yyyy')));--User37 29/09/2020 stuctor เปลี่ยน trunc(sysdate));
+                                  and trunc(dteyreap) <=  to_number(to_char(trunc(sysdate),'yyyy')));--User37 29/09/2020 stuctor ??????? trunc(sysdate));
         exception when no_data_found then
             v_salarymin := null;
             v_salarymax := null;
@@ -382,7 +382,7 @@
 
     delete ttemprpt where codempid = v_codempid and codapp = v_codapp; commit;
 
-    v_item31 := get_label_name('HRAPS8XC1', global_v_lang, '50'); --'จำนวนเงินที่จ่าย'
+    v_item31 := get_label_name('HRAPS8XC1', global_v_lang, '50'); --'????????????????'
     v_chksecu := '2';
 
     for i in c1 loop
@@ -390,7 +390,7 @@
         v_item5  := get_tcodec_name('TCODJOBG',i.jobgrade,global_v_lang);
 --        v_item7  := i.jobgrade;
         v_item8  := get_tcenter_name(b_index_codcomp,global_v_lang);
-        v_item9  := get_label_name('HRAPS8XC1', global_v_lang, '60'); --'เงินเดือนเฉลี่ย (บาท)';
+        v_item9  := get_label_name('HRAPS8XC1', global_v_lang, '60'); --'??????????????? (???)';
         begin
             select avg(stddec(b.amtincom1,a.codempid,v_chken))
               into v_amtavg
@@ -406,7 +406,7 @@
         exception when no_data_found then
             v_amtavg := null;
         end;
-        v_item10  := round(v_amtavg,2); --'เงินเดือนเฉลี่ย (บาท)';
+        v_item10  := round(v_amtavg,2); --'??????????????? (???)';
 
         ----------Insert ttemprpt
         begin

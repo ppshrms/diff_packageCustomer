@@ -24,7 +24,7 @@
     b_index_dteyear2   := hcm_util.get_string_t(json_obj,'p_dteyear2');
     b_index_dteyear3   := hcm_util.get_string_t(json_obj,'p_dteyear3');
 
-    --Group รายละเอียด
+    --Group ??????????
     b_index_v_grp1     := get_label_name('HRAPSBX', global_v_lang, '60');
     b_index_v_grp2     := get_label_name('HRAPSBX', global_v_lang, '70');
     b_index_v_grp3     := get_label_name('HRAPSBX', global_v_lang, '80');
@@ -132,7 +132,7 @@
           obj_data.put('codcomp',i.codcomp);
           obj_data.put('desc_codcomp',get_tcenter_name(i.codcomp,global_v_lang));
 
-          if j = 1 then  --จำนวนคน
+          if j = 1 then  --???????
                 obj_data.put('description',b_index_v_grp1);
                 begin
                     select count(dteyreap) into v_cntemp1
@@ -160,7 +160,7 @@
                        and numlvl between global_v_zminlvl and global_v_zwrklvl;
                 end;
                 obj_data.put('year3',v_cntemp3);
-          elsif j = 2 then  --จำนวนเงิน(ปรับสุทธิ)
+          elsif j = 2 then  --?????????(?????????)
                 obj_data.put('description',b_index_v_grp2);
                 begin
                     select sum(nvl(stddec(amtsal,tapprais.codempid,v_chken),0))  ,
@@ -197,7 +197,7 @@
                     v_dipsal3 := (nvl(v_amtsaln,0) - nvl(v_amtsal,0));
                 end;
                 obj_data.put('year3',to_char(v_dipsal3,'fm99,999,990.00'));
-          else  -- % การขึ้นเงินเดือนเฉลี่ย
+          else  -- % ??????????????????????
                 obj_data.put('description',b_index_v_grp3);
                 v_perc1 := null;
                 if nvl(v_cntemp1,0) > 0 then
@@ -329,8 +329,8 @@
         v_comp_length := nvl(v_comp_length , 3);
     end;
 
-    v_item1  := get_label_name('HRAPSBX', global_v_lang, '90'); --'จำนวนเงินที่จ่าย'
-    v_item31 := get_label_name('HRAPSBX', global_v_lang, '110'); --'สถิติการขึ้นเงินเดือนประจำปี'
+    v_item1  := get_label_name('HRAPSBX', global_v_lang, '90'); --'????????????????'
+    v_item31 := get_label_name('HRAPSBX', global_v_lang, '110'); --'????????????????????????????'
     v_item14 := '1';
 
     for i in c1 loop
@@ -349,12 +349,12 @@
                         v_item7  := j;
 --                        v_item8  := v_dteyreap;
                         v_item8  := hcm_util.get_year_buddhist_era(v_dteyreap);
-                        v_item9  := get_label_name('HRAPSBX', global_v_lang, '90'); --'จำนวนเงินที่จ่าย';
-                    ----------แกน x
+                        v_item9  := get_label_name('HRAPSBX', global_v_lang, '90'); --'????????????????';
+                    ----------??? x
                         v_item4  := i.codcomp;
                         v_item5  := get_tcenter_name(i.codcomp,global_v_lang);
-                        v_item6  := get_label_name('HRAPSBX', global_v_lang, '40'); --'หน่วยงาน';
-                    ----------ค่าข้อมูล
+                        v_item6  := get_label_name('HRAPSBX', global_v_lang, '40'); --'????????';
+                    ----------?????????
                         v_dipsal := 0;
                         begin
                             select sum(nvl(stddec(amtsal,tapprais.codempid,v_chken),0))  ,
@@ -443,8 +443,8 @@
         v_comp_length := nvl(v_comp_length , 3);
     end;
 
-    v_item1  := get_label_name('HRAPSBX', global_v_lang, '100'); --'% การขึ้นเงินเดือน'
-    v_item31 := get_label_name('HRAPSBX', global_v_lang, '110'); --'สถิติการขึ้นเงินเดือนประจำปี'
+    v_item1  := get_label_name('HRAPSBX', global_v_lang, '100'); --'% ????????????????'
+    v_item31 := get_label_name('HRAPSBX', global_v_lang, '110'); --'????????????????????????????'
     v_item14 := '2';
 
     for i in c1 loop
@@ -463,12 +463,12 @@
                     ---------- Group1
                         v_item7  := j;
                         v_item8  := hcm_util.get_year_buddhist_era(v_dteyreap);
-                        v_item9  := get_label_name('HRAPSBX', global_v_lang, '100'); --'% การขึ้นเงินเดือน';
-                    ----------แกน Y
+                        v_item9  := get_label_name('HRAPSBX', global_v_lang, '100'); --'% ????????????????';
+                    ----------??? Y
                         v_item4  := i.codcomp;
                         v_item5  := get_tcenter_name(i.codcomp,global_v_lang);
-                        v_item6  := get_label_name('HRAPSBX', global_v_lang, '40'); --'หน่วยงาน';
-                    ----------ค่าข้อมูล
+                        v_item6  := get_label_name('HRAPSBX', global_v_lang, '40'); --'????????';
+                    ----------?????????
                         v_dipsal := 0;
                         begin
                             select sum(nvl(stddec(amtsal,tapprais.codempid,v_chken),0))  ,

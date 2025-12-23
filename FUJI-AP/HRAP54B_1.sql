@@ -270,7 +270,7 @@ begin
                    and dteyreap = i.dteyreap
                    and numtime  = i.numtime
                    and i.codcomp like codcomp||'%'
-                   and codcomp = (select max(codcomp) --–เช็คตรงนี้เพื่อหาหน่วยงานที่ใกล้ตัวพนักงานที่สุดเพียง 1 เงื่อนไขการจ่ายโบนัส
+                   and codcomp = (select max(codcomp) --�????????????????????????????????????????????????????? 1 ????????????????????
                                     from tbonparh
                                    where codbon   = i.codbon
                                      and dteyreap = i.dteyreap
@@ -312,9 +312,6 @@ begin
 
         end loop;
     else
-    
-
-      
         insert_data_parallel (p_codapp,global_v_coduser,v_numproc)  ;
         hraps9b_batch.start_process('HRAP54B',global_v_coduser,global_v_lang,v_numproc,p_codapp,p_dteyreap,p_numtime,p_codcomp,p_codbon)  ;
     end if;
@@ -374,9 +371,8 @@ end;
     v_typbon        varchar2(1 char);
 
     cursor c_tbonus is
-      select codempid,grade,numcond,codpos,jobgrade,dteempmt,qtybon,pctdedbo,qtydaybon,
+      select codempid,grade,numcond,codpos,jobgrade,dteempmt,qtybon,pctdedbo,
              stddec(amtsal,codempid,v_chken) amtsal,
-             stddec(amtsalc,codempid,v_chken) amtsalc,
              stddec(amtnbon,codempid,v_chken) amtnbon
         from tbonus
        where dteyreap  = p_dteyreap
@@ -456,11 +452,9 @@ end;
         obj_data.put('codempid', i.codempid);
         obj_data.put('desc_codempid', get_temploy_name(i.codempid,global_v_lang) );
         obj_data.put('desc_codpos', get_tpostn_name(i.codpos,global_v_lang));
-        obj_data.put('jobgrade', i.qtydaybon);
+        obj_data.put('jobgrade', i.jobgrade);
         obj_data.put('dtewkstart', to_char(i.dteempmt,'dd/mm/yyyy'));
-       -- obj_data.put('qtysal', i.amtsal );
-         obj_data.put('qtysal', i.amtsalc );
-        
+        obj_data.put('qtysal', i.amtsal );
         obj_data.put('payrate', i.qtybon);
         obj_data.put('pctdbon', i.pctdedbo);
         obj_data.put('amount', i.amtnbon);
@@ -546,5 +540,6 @@ end;
         json_str_output   := get_response_message('400',param_msg_error,global_v_lang);
 	end ;
 end HRAP54B;
+
 
 /

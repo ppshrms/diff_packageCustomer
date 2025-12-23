@@ -3,10 +3,7 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRAP17E" is
-  -- FUJI
-  -- Chinnawat (000553)
-  -- 17/11/2025
-  -- Support#25930 Add condition to check null value of flgDelete
+-- last update: 07/08/2020 09:40
 
   v_chken               varchar2(100 char);
 

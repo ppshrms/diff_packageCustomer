@@ -127,7 +127,7 @@
             obj_data.put('detail','');
             obj_data.put('discout','');
             obj_data.put('discard','');
-            if i.typbon = '1' then --“ตามผลการประเมิน”
+            if i.typbon = '1' then --�???????????????�
                 v_codempid := i.codempid;
                 for n in c2 loop
                     obj_data.put('score',to_char(n.qtyadjtot,'fm9,990.00'));
@@ -136,7 +136,7 @@
                     obj_data.put('discout',to_char(n.qtyta,'fm9,990.00'));
                     obj_data.put('discard',to_char(n.qtypuns,'fm9,990.00'));
                 end loop;
-            else--“ตามเงื่อนไข”
+            else--�???????????�
                 v_codempid := i.codempid;
                 for k in c3 loop
                     obj_data.put('score','');

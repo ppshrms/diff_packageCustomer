@@ -235,7 +235,7 @@
     for i in c1 loop
       array_label.append(i.codcomp);
       for j in 1..3 loop
-        if j = 1 then  --จำนวนคน
+        if j = 1 then  --???????
           begin
             select count(dteyreap) into v_cntemp1
               from tapprais
@@ -271,7 +271,7 @@
                             where tapprais.codcomp    like us.codcomp||'%'
                               and us.coduser          = global_v_coduser);
           end;
-        elsif j = 2 then  --จำนวนเงิน(ปรับสุทธิ)
+        elsif j = 2 then  --?????????(?????????)
           begin
             select sum(nvl(stddec(amtsal,tapprais.codempid,global_v_chken),0))  ,
                    sum(nvl(stddec(amtsaln,tapprais.codempid,global_v_chken),0))
@@ -322,7 +322,7 @@
             v_dipsal3 := (nvl(v_amtsaln,0) - nvl(v_amtsal,0));
           end;
           array_qty3.append(to_char(v_dipsal3,'fm99999990.00'));
-        else  -- % การขึ้นเงินเดือนเฉลี่ย
+        else  -- % ??????????????????????
           v_perc1 := null;
           if nvl(v_cntemp1,0) > 0 then
             v_perc1 := (v_dipsal1 / v_cntemp1) / 100;
