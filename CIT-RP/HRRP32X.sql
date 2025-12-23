@@ -33,4 +33,5 @@
     procedure gen_index_detail(json_str_output out clob);
 end HRRP32X;
 
+
 /

@@ -201,7 +201,7 @@
                 obj_data.put('desc_codcomp',get_tcenter_name(r1.codcomp,global_v_lang));
                 obj_data.put('codpos',r1.codpos);
                 obj_data.put('desc_codpos',get_tpostn_name(r1.codpos,global_v_lang));
-                obj_data.put('agepos',r1.agepos);
+                obj_data.put('agepos',floor(r1.agepos/12)||'('||mod(r1.agepos,12)||')'); -- softberry || 13/10/2023 || #9365 || obj_data.put('agepos',r1.agepos);
                 obj_data.put('othdetail',r1.othdetail);
                 obj_data.put('dteeffec',to_char(r1.dteeffec,'dd/mm/yyyy'));
                 obj_data.put('codcompy',r1.codcompy);
@@ -771,5 +771,6 @@ end gen_index;
     param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
   end gen_numpath;
 end hrrp49x;
+
 
 /

@@ -16,8 +16,11 @@
     b_index_codlinef    := hcm_util.get_string_t(json_obj,'p_codlinef');
     b_index_dteeffec    := to_date(hcm_util.get_string_t(json_obj,'p_dteeffec'),'dd/mm/yyyy');
     b_index_dteeffec2   := to_date(hcm_util.get_string_t(json_obj,'p_dteeffec2'),'dd/mm/yyyy');
-    b_index_codcompst   := hcm_util.get_string_t(json_obj,'p_codcompst');   
-    b_index_comlevel    := hcm_util.get_string_t(json_obj,'p_comlevel');
+    b_index_codcompst   := hcm_util.get_string_t(json_obj,'p_codcompst');  
+    -->> Site: ST11 Author: Nuii Kowit (000551) Date updated: 11 April 2024 14:42 Comment: 4448#10516
+    -- Old Code :  b_index_comlevel    := hcm_util.get_string_t(json_obj,'p_comlevel');
+    b_index_comlevel    := nvl(hcm_util.get_string_t(json_obj,'p_comlevel'), 8);
+    --<< Site: ST11 Author: Nuii Kowit (000551) Date updated: 11 April 2024 14:42 Comment: 4448#10516
     b_index_flgemp      := hcm_util.get_string_t(json_obj,'p_flgemp');
     b_index_flgrate     := hcm_util.get_string_t(json_obj,'p_flgrate');
     b_index_flgjob      := hcm_util.get_string_t(json_obj,'p_flgjob');
@@ -214,7 +217,7 @@
       obj_data.put('desc_codpos',get_tpostn_name(i.codpospr,global_v_lang));
       obj_data.put('codempid',i.codresp);
       obj_data.put('desc_codempid',get_temploy_name(i.codresp,global_v_lang));
-      obj_data.put('image',i.codimage);
+      obj_data.put('image',LOWER(i.codimage)); --STD ST11 | Nuii Kowit (000551) | 26/03/2025 12:19 | redmine 4448#11814
       obj_data.put('image_path',i.codimage);
       begin
         select nvl(qtybgman,0)
@@ -431,7 +434,7 @@
       obj_data.put('desc_codpos',get_tpostn_name(i.codpospr,global_v_lang));
       obj_data.put('codempid',i.codresp);
       obj_data.put('desc_codempid',get_temploy_name(i.codresp,global_v_lang));
-      obj_data.put('image',i.codimage);
+      obj_data.put('image',LOWER(i.codimage)); --STD ST11 | Nuii Kowit (000551) | 26/03/2025 12:19 | redmine 4448#11814
       obj_data.put('image_path',i.codimage);
       begin
         select qtybgman

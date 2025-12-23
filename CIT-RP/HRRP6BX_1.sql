@@ -170,11 +170,11 @@
 
     end loop;
     */
-    
+
     if not v_flgExist then
       param_msg_error := get_error_msg_php('HR2055',global_v_lang,'TNINEBOX');
     end if;
-    
+
     if param_msg_error is null then
       json_str_output := obj_data.to_clob;
     else
@@ -248,7 +248,7 @@
   exception when others then
     param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
   end;
-  
+
   procedure get_name_box(p_codgroup in varchar2, p_codcompy in tninebox.codcompy%type, p_dteeffec in date,
                          p_namgroupt out varchar2, p_descgroup out varchar2) as
   begin
@@ -269,7 +269,7 @@
   exception when others then
     param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
   end;
-  
+
   procedure gen_detail(json_str_output out clob)as
     obj_data        json_object_t;
     obj_row         json_object_t;
@@ -522,5 +522,6 @@
     json_str_output   := get_response_message('400',param_msg_error,global_v_lang);
   end;
 END HRRP6BX;
+
 
 /

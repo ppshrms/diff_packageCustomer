@@ -56,4 +56,5 @@ PROCEDURE insert_tmanpwmd(p_year in number,p_month in number,p_codempid in varch
 
 end HRRP2PB_BATCH;
 
+
 /

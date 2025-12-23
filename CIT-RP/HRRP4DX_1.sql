@@ -53,7 +53,7 @@
            and a.codpos   = b_index_codpos
            and dteyear  = nvl(to_number(b_index_dteyear),dteyear)
            and numtime  = nvl(to_number(b_index_numtime),numtime)
-           and b.numlvl between global_v_zminlvl and global_v_zwrklvl
+           and b.numlvl between global_v_numlvlsalst and global_v_numlvlsalen
            and a.codempid = b.codempid
            and 0 <> (select count(ts.codcomp)
                        from tusrcom ts
@@ -222,7 +222,7 @@
       end if;
     end if;*/
     json_str_output := obj_row.to_clob; --user36 #3082 09/09/2021
-    
+
   exception when others then
     param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
     json_str_output := get_response_message('400',param_msg_error,global_v_lang);
@@ -270,5 +270,6 @@
   end;
   --
 end;
+
 
 /

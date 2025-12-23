@@ -65,7 +65,7 @@
       select codempid,codcomp,codpos,dteefpos,dteposdue,numseq
         from tposempd
        where codcomp like b_index_codcomp||'%'
-         and to_char(dteposdue,'yyyymm') <= b_index_year||lpad(b_index_month,2,'0') 
+         and to_char(dteposdue,'mm/yyyy') = lpad(b_index_month,2,'0')||'/'||b_index_year
         and dteefpos is not null
     order by codempid,numseq;
 
@@ -117,5 +117,6 @@
   end;
   --
 end;
+
 
 /

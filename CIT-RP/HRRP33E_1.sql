@@ -988,7 +988,6 @@
          where codapp = 'HRRP33E2'
            and codempid = global_v_codempid;
       end;
-
     for r1 in c1 loop
       v_rcnt        := v_rcnt+1;
       obj_data      := json_object_t();
@@ -1183,5 +1182,6 @@
     json_str_output := obj_row.to_clob;
   end;
 end;
+
 
 /

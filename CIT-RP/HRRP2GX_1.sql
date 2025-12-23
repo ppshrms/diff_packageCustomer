@@ -62,7 +62,7 @@
     v_item31    ttemprpt.item31%type;
 
     v_emp           number:= 0;--User37 #7505 1. RP Module 19/01/2022
-    
+
 --    v_flgdata   varchar2(1 char) := 'N';
 --    v_cntemp    number;
 --    v_flgsecur  varchar2(1 char) := 'N';
@@ -128,9 +128,9 @@
         order by 2;
 
   begin
-    
+
     select codcomp into b_index_codcomp from temploy1 where codempid = global_v_codempid; -- << Apisit || 07/11/2023 || issue 4448:#10134
-    
+
     for i in c_codcompy loop
         v_flgsecur := 'Y';
         exit;
@@ -149,15 +149,15 @@
         json_str_output := get_response_message('400',param_msg_error,global_v_lang);
         return;
     end if;
-    
+
     if not secur_main.secur7(b_index_codcomp, global_v_coduser) then
         param_msg_error := get_error_msg_php('HR3007',global_v_lang);
         json_str_output := get_response_message('400',param_msg_error,global_v_lang);
         return;
     end if;
-    
+
 -- END >> 
-    
+
     begin
       delete from ttemprpt
        where codempid = v_codempid
@@ -192,7 +192,7 @@
                             )
                         ,'') = r1.datarow;
             end;
-            
+
             obj_data.put('company'||to_char(v_col), to_char(v_cntemp, 'FM999,999,999'));
              ----------Axis X level 2(from data column)
             v_item7  := i.codcompy;
@@ -312,7 +312,7 @@
           null;
         end;
         v_emp := nvl(v_emp,0)+nvl(v_cntemp,0);
-        
+
         obj_data.put('company'||to_char(v_col), to_char(v_emp, 'FM999,999,999'));
         --obj_data.put('company'||to_char(v_col), v_cntemp);
         -->>User37 #7505 1. RP Module 19/01/2022
@@ -369,14 +369,14 @@
       order by codcompy;
 
   begin
-  
+
     select codcomp into b_index_codcomp from temploy1 where codempid = global_v_codempid;
-  
+
     for i in c_codcompy loop
         v_flgsecur := 'Y';
         exit;
     end loop;
-    
+
 -- << Apisit || 07/11/2023 || issue 4448:#10134
 
 --    if v_flgsecur = 'N' then
@@ -384,21 +384,21 @@
 --        json_str_output := get_response_message('400',param_msg_error,global_v_lang);
 --        return;
 --    end if;
-    
+
     if v_flgsecur = 'N' then
         param_msg_error := get_error_msg_php('HR2055',global_v_lang);
         json_str_output := get_response_message('400',param_msg_error,global_v_lang);
         return;
     end if;
-    
+
     if not secur_main.secur7(b_index_codcomp, global_v_coduser) then
         param_msg_error := get_error_msg_php('HR3007',global_v_lang);
         json_str_output := get_response_message('400',param_msg_error,global_v_lang);
         return;
     end if;
- 
+
  -- END >>
-    
+
     --
     obj_result := json_object_t();
     obj_data := json_object_t();
@@ -638,5 +638,6 @@
   end;
 
 end;
+
 
 /
