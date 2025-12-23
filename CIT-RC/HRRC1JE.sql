@@ -3,6 +3,9 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRRC1JE" AS
+--Date updated: 24/05/2024
+--Comment: 000554-bow.sarunya-dev | issue4448#10689: mail to dont show
+
     param_msg_error         varchar2(4000 char);
     global_v_coduser        varchar2(100 char);
     global_v_codempid       varchar2(100 char);
@@ -38,6 +41,7 @@
     p_codempmt              treqest2.codempmt%type;
     p_codbrlc               treqest2.codbrlc%type;
     p_mailto                varchar2(100 char);
+    p_codpose               tappeinf.codpose%type; -- 000554-bow.sarunya-dev | 10/05/2024 | issue4448#10689: mail to dont show
 
     procedure get_index(json_str_input in clob, json_str_output out clob);
 

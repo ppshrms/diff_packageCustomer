@@ -3,6 +3,9 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRRC34E" AS
+-- Date updated: 31/05/2024
+-- Comment: 000554-bow.sarunya-dev | issue4448#10772
+
     param_msg_error         varchar2(4000 char);
     global_v_coduser        varchar2(100 char);
     global_v_codempid       varchar2(100 char);
@@ -61,5 +64,7 @@
     procedure get_drilldown_interview(json_str_input in clob, json_str_output out clob);
 
 END HRRC34E;
+
+
 
 /

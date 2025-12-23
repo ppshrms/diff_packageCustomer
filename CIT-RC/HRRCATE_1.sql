@@ -490,7 +490,7 @@
             exception when no_data_found then
                 v_tmp   := null;
             end;
-            
+
             if v_tmp is not null then
                 param_msg_error := get_error_msg_php('HR1503',global_v_lang,get_label_name('HRTRATE1',global_v_lang,'80'));
                 json_str_output := get_response_message(null,param_msg_error,global_v_lang);
@@ -1097,5 +1097,6 @@
 	end;
 
 end HRRCATE;
+
 
 /

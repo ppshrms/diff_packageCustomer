@@ -75,4 +75,5 @@
 	procedure genAssign(json_str_output out clob);        
 end HRRCATE;
 
+
 /

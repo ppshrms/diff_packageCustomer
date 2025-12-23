@@ -3,6 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRRC49X" AS
+  -- Site: ST11
+  -- Author: Apisit Boy (000537)
+  -- Date updated: 14/06/2024 10:52
+  -- Comment: 4448#10780
     param_msg_error         varchar2(4000 char);
 	v_chken			          varchar2(10 char);
     global_v_coduser        varchar2(100 char);
@@ -51,5 +55,6 @@
     procedure printreport(json_str_input in clob, json_str_output out clob);
 
 END HRRC49X;
+
 
 /

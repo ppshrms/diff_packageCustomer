@@ -3,6 +3,11 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRRC5GE" AS
+    -- Site: ST11
+    -- Author: Chinnawat Wiw (000553)
+    -- Date updated: 2024/05/28
+    -- Comment: 4448#10730
+
     param_msg_error         varchar2(4000 char);
     global_v_coduser        varchar2(100 char);
     global_v_codempid       varchar2(100 char);
@@ -40,5 +45,7 @@
     procedure send_email(json_str_input in clob, json_str_output out clob);
 
 END HRRC5GE;
+
+
 
 /

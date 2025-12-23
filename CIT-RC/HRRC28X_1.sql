@@ -3,6 +3,8 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC28X" AS
+-- last update: 05/06/2024
+-- comment: 000554-bow.sarunya-dev | issue4448#10767
   procedure initial_value (json_str in clob) AS
     json_obj            json_object_t;
   begin
@@ -465,7 +467,7 @@
     v_table             varchar2(20 char);
 
     cursor c1 is
-      select numappl, codempid, statappl, codfoll, dtefoll, codpos2
+      select numappl, codempid, statappl, codfoll, dtefoll, codpos2, coduser -- 000554-bow.sarunya-dev | issue4448#10767: add coduser | 05/06/2024
         from tapplinf
        where numreql  = p_numreqst
          and codposl  = p_codpos
@@ -495,7 +497,7 @@
         obj_data.put('statappl', i.statappl);
         obj_data.put('desc_statappl', get_tlistval_name('STATAPPL', i.statappl, global_v_lang));
         obj_data.put('codfoll', i.codfoll);
-        obj_data.put('desc_codfoll', get_temploy_name(i.codfoll, global_v_lang));
+        obj_data.put('desc_codfoll', get_temploy_name(get_codempid(i.coduser), global_v_lang)); -- 000554-bow.sarunya-dev | issue4448#10767: change i.codfoll to get_codempid(i.coduser) | 05/06/2024
         obj_data.put('dtefoll', to_char(i.dtefoll, 'DD/MM/YYYY'));
         obj_data.put('codpos2', i.codpos2);
         obj_data.put('desc_codpos2', get_tpostn_name(i.codpos2, global_v_lang));
@@ -530,5 +532,6 @@
     end if;
   end gen_qtyappl_reject;
 end HRRC28X;
+
 
 /

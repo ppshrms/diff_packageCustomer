@@ -248,4 +248,5 @@ procedure get_welfare(json_str_input in clob, json_str_output out clob) as
 
 end HRRC72X;
 
+
 /

@@ -3,6 +3,11 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC35X" as
+  -- Site: ST11
+  -- Author: Apisit (000537)
+  -- Date updated: 09/04/2025
+  -- Comment: Requirement ???????????????????????? ??? ????????????????????????????????????????
+
    procedure initial_value(json_str in clob) is
     json_obj        json_object_t;
   begin
@@ -646,6 +651,7 @@
     v_chkdata   varchar2(10 char);
     v_codform   varchar2(100 char);
     v_numappl   varchar2(100 char);
+    v_numreqrq  varchar2(15 char);  --> Peerasak-(Dev) (000566) | Issue 4448 #11176
     v_codcomp   varchar2(100 char);
     v_codcompy  varchar2(10 char);
     json_obj		json_object_t;
@@ -655,6 +661,8 @@
       itemSelected  := hcm_util.get_json_t( p_data_row,to_char(i));
       v_codform    := hcm_util.get_string_t(itemSelected,'codform');
       v_numappl    := hcm_util.get_string_t(itemSelected,'numappl');
+      v_numreqrq    := hcm_util.get_string_t(itemSelected,'numreqrq');  --> Peerasak-(Dev) (000566) | Issue 4448 #11176
+
       if v_codform is null then
         param_msg_error := get_error_msg_php('RC0037',global_v_lang);
         return;
@@ -662,7 +670,8 @@
       begin
 				select codcomp into v_codcomp
           from tapplcfm
-				 where numappl = v_numappl;
+				 where numappl = v_numappl
+         and numreqrq = v_numreqrq;  --> Peerasak-(Dev) (000566) | Issue 4448 #11176
 			exception when no_data_found then null;
 			end;
       begin
@@ -683,12 +692,19 @@
     v_numappl   varchar2(100 char);
     v_codcomp   varchar2(100 char);
     v_codcompy  varchar2(10 char);
+--<< ST11 | Apisit Boy (000537) | 10/01/2025 | Fix issue Readmine 4448:#11176
+    v_numreqrq  varchar2(100 char);
+    v_codposrq  varchar2(100 char);
+-->> ST11 | Apisit Boy (000537) | 10/01/2025 | Fix issue Readmine 4448:#11176
     json_obj		json_object_t;
     itemSelected		json_object_t;
   begin
     v_codform    := hcm_util.get_string_t(p_data_row,'codform');
     v_numappl    := hcm_util.get_string_t(p_data_row,'numappl');
-
+--<< ST11 | Apisit Boy (000537) | 10/01/2025 | Fix issue Readmine 4448:#11176
+    v_numreqrq   := hcm_util.get_string_t(p_data_row,'numreqrq');
+    v_codposrq   := hcm_util.get_string_t(p_data_row,'codpos');
+-->> ST11 | Apisit Boy (000537) | 10/01/2025 | Fix issue Readmine 4448:#11176
     if v_codform is null then
       param_msg_error := get_error_msg_php('RC0037',global_v_lang);
       return;
@@ -696,9 +712,14 @@
     begin
       select codcomp into v_codcomp
         from tapplcfm
-       where numappl = v_numappl;
+       where numappl = v_numappl
+--<< ST11 | Apisit Boy (000537) | 10/01/2025 | Fix issue Readmine 4448:#11176
+         and numreqrq = v_numreqrq
+         and codposrq = v_codposrq;
+-->> ST11 | Apisit Boy (000537) | 10/01/2025 | Fix issue Readmine 4448:#11176
     exception when no_data_found then null;
     end;
+
     begin
       select codcompy into v_codcompy
         from tdocrnum
@@ -714,15 +735,15 @@
 		itemSelected		json_object_t := json_object_t();
 
     v_codlang		    tfmrefr.codlang%type;
-    v_day			      number;
+    v_day			    number;
     v_desc_month		varchar2(50 char);
     v_year			    varchar2(4 char);
-    tdata_dteprint	varchar2(100 char);
+    tdata_dteprint	    varchar2(100 char);
 
-    v_codempid      temploy1.codempid%type;
-    v_codcomp       temploy1.codcomp%type;
-    v_numlettr      varchar2(1000 char);
-    v_dteduepr      ttprobat.dteduepr%type;
+    v_codempid          temploy1.codempid%type;
+    v_codcomp           temploy1.codcomp%type;
+    v_numlettr          varchar2(1000 char);
+    v_dteduepr          ttprobat.dteduepr%type;
     temploy1_obj		temploy1%rowtype;
     temploy3_obj		temploy3%rowtype;
 
@@ -739,16 +760,14 @@
     fparam_value        varchar2(1000 char);
 
     data_file           clob;
-		v_flgstd		        tfmrefr.flgstd%type;
-		v_namimglet		      tfmrefr.namimglet%type;
-		v_folder		        tfolderd.folder%type;
+		v_flgstd		tfmrefr.flgstd%type;
+		v_namimglet		tfmrefr.namimglet%type;
+		v_folder		tfolderd.folder%type;
     o_message1          clob;
     o_namimglet         tfmrefr.namimglet%type;
     o_message2          clob;
     o_typemsg2          tfmrefr2.typemsg%type;
     o_message3          clob;
---    v_qtyexpand         ttprobat.qtyexpand%type;
---    v_amtinmth          ttprobat.amtinmth%type;
     p_signid            varchar2(1000 char);
     p_signpic           varchar2(1000 char);
     v_namesign          varchar2(1000 char);
@@ -764,34 +783,50 @@
     v_sysdate           varchar2(1000 char);
     v_desc_tabsal       varchar2(4000 char);
     v_sumamt            number := 0;
+
     type html_array   is varray(3) of clob;
-		list_msg_html     html_array;
+		list_msg_html   html_array;
     -- Return Data
 		v_resultcol		json_object_t ;
 		v_resultrow		json_object_t := json_object_t();
 		v_countrow		number := 0;
-		v_numseq		  number;
-    v_value       varchar2(1000 char);
+		v_numseq		number;
 
-    obj_fparam      json_object_t := json_object_t();
-    obj_rows        json_object_t;
-    obj_result      json_object_t;
-    v_amttotal    number;
+    v_value             varchar2(1000 char);
 
+    obj_fparam          json_object_t := json_object_t();
+    obj_rows            json_object_t;
+    obj_result          json_object_t;
+    v_amttotal          number;
+
+    v_namsign varchar2(2000 char); -- 4448#11176| yoksirianan (000569) | 28/01/2025 | ????????????????????
+
+-- << apisit ||09/04/2025 || Requirement ???????????????????????? ??? ????????????????????????????????????????
+    v_desc_namedoc varchar2(2000 char);
+    v_num_doc number := 0;
+    v_sum_amt number := 0;
+-- >> apisit ||09/04/2025 || Requirement ???????????????????????? ??? ????????????????????????????????????????
     cursor c1 is
       select *
         from tfmparam
        where codform = p_codform
          and flginput = 'Y'
        order by ffield ;
+
+    cursor c2 is
+      select coddoc, descdoc
+        from tnempdoc
+       where codcomp = rec_tapplcfm.codcomp
+         and codpos = v_codposrq;
+
 	begin
-    begin
-      select get_tsetup_value('PATHWORKPHP')||folder into v_folder
-        from tfolderd
-       where codapp = 'HRPMB9E';
-    exception when no_data_found then
-			v_folder := '';
-    end;
+        begin
+          select get_tsetup_value('PATHWORKPHP')||folder into v_folder
+            from tfolderd
+           where codapp = 'HRPMB9E';
+        exception when no_data_found then
+                v_folder := '';
+        end;
 		v_codlang := nvl(v_codlang,global_v_lang);
 
 		for i in 0..p_data_row.get_size - 1 loop
@@ -814,6 +849,7 @@
       exception when no_data_found then
         null;
       end;
+
       if v_numdoc is null then
         v_numdoc := get_docnum('4',hcm_util.get_codcomp_level(rec_tapplcfm.codcomp,1),global_v_lang);
 --        begin
@@ -826,14 +862,13 @@
         -- Read Document HTML
         gen_message(v_codform, o_message1, o_namimglet, o_message2, o_typemsg2, o_message3);
 				list_msg_html := html_array(o_message1,o_message2,o_message3);
-
         v_day         := to_number(to_char(sysdate,'dd'),'99');
         v_desc_month  := get_nammthful(to_number(to_char(sysdate,'mm')),v_codlang);
         v_year        := get_ref_year(v_codlang,global_v_zyear,to_number(to_char(sysdate,'yyyy')));
         v_sysdate := v_day ||' '||v_desc_month||' '||v_year;
 				for i in 1..3 loop
 					data_file := list_msg_html(i);
---          data_file := std_replace(data_file,p_codform,i,itemSelected, v_numappl, v_numreqrq, v_codposrq );
+          -- data_file := std_replace(data_file,p_codform,i,itemSelected, v_numappl, v_numreqrq, v_codposrq );
           data_file := std_replace_exist(data_file, v_numappl, v_numreqrq, v_codposrq );
           data_file := replace(data_file,'[PARAM-DOCID]', v_numdoc);
 					data_file := replace(data_file,'[PARAM-DATE]', v_sysdate);
@@ -855,89 +890,178 @@
           data_file := replace(data_file,'[PARAM-BAHTOTH]', get_amount_name(v_sumamt,v_codlang));
           --
           data_file := replace(data_file,'[PARAM-COMPANY]', get_tcenter_name(rec_tapplcfm.codcomp, global_v_lang));
+          --
+          -- 4448#11176| yoksirianan (000569) | 28/01/2025 | ???????????????????? ???????????????
+			begin
+				select get_tsetup_value('PATHWORKPHP')||get_tfolderd('HRPMC2E2') || '/' ||NAMSIGN
+				into v_namsign
+				from TEMPIMGE
+				where NAMSIGN is not null
+					and ROWNUM = 1;
+			exception when no_data_found then
+				v_namsign := null;
+			end;
+
+			if v_namsign is not null then
+				v_namsign := '<img src="'||p_url||'/'||v_namsign||'"width="100" height="60">';
+			end if;
+            data_file := replace(data_file,'[PARAM-SIGN]', v_namsign); 
+			-- 4448#11176| yoksirianan (000569) | 28/01/2025 | ???????????????????? ???????????????
+-- << apisit ||09/04/2025 || Requirement ???????????????????????? ??? ????????????????????????????????????????         
           -- codincom1
           v_desc_tabsal := '';
-          if rec_tapplcfm.codincom1 is not null then
-            v_desc_tabsal := v_desc_tabsal || '' ||
-                             get_tinexinf_name ( rec_tapplcfm.codincom1, global_v_lang)|| ' ' ||
-                             get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                             to_char(stddec(rec_tapplcfm.amtincom1, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+          if rec_tapplcfm.codincom1 is not null and stddec(rec_tapplcfm.amtincom1, rec_tapplcfm.numappl, v_chken) > 0 then
+            v_desc_tabsal := '<table class="border-table" width="auto">';
+            v_desc_tabsal := v_desc_tabsal||'<tr bgcolor="#819FF7">
+                                   <td class="border-table" width="25%" align="center">'||get_label_name('HRRC35XC3', v_codlang, 40)||'</td>
+                                   <td class="border-table" width="15%" align="center">'||get_label_name('HRRC35XC3', v_codlang, 50)||'</td>
+                                   <td class="border-table" width="15%" align="center">'||get_label_name('HRRC35XC3', v_codlang, 60)||'</td>
+                                 </tr>';
+            v_desc_tabsal := v_desc_tabsal||'</tr>';
+            v_desc_tabsal := v_desc_tabsal||'<tr>';
+            v_desc_tabsal := v_desc_tabsal ||
+                             '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom1, global_v_lang)|| ' ' ||
+                             '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
+                             '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom1, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+            v_desc_tabsal := v_desc_tabsal||'</tr>';
           end if;
           -- codincom2
-          if rec_tapplcfm.codincom2 is not null then
-            v_desc_tabsal := v_desc_tabsal || '' ||
-                             get_tinexinf_name ( rec_tapplcfm.codincom2, global_v_lang)|| ' ' ||
-                             get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                             to_char(stddec(rec_tapplcfm.amtincom2, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+          if rec_tapplcfm.codincom2 is not null and stddec(rec_tapplcfm.amtincom2, rec_tapplcfm.numappl, v_chken) > 0 then
+            v_desc_tabsal := v_desc_tabsal||'<tr>';
+            v_desc_tabsal := v_desc_tabsal ||
+                             '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom2, global_v_lang)||'</td>'||
+                             '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                             '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom2, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+            v_desc_tabsal := v_desc_tabsal||'</tr>';
           end if;
           -- codincom3
-          if rec_tapplcfm.codincom3 is not null then
-            v_desc_tabsal := v_desc_tabsal || '' ||
-                             get_tinexinf_name ( rec_tapplcfm.codincom3, global_v_lang)|| ' ' ||
-                             get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                             to_char(stddec(rec_tapplcfm.amtincom3, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+          if rec_tapplcfm.codincom3 is not null and stddec(rec_tapplcfm.amtincom3, rec_tapplcfm.numappl, v_chken) > 0 then
+            v_desc_tabsal := v_desc_tabsal||'<tr>';
+            v_desc_tabsal := v_desc_tabsal ||
+                             '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom3, global_v_lang)||'</td>'||
+                             '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                             '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom3, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+            v_desc_tabsal := v_desc_tabsal||'</tr>';
           end if;
           -- codincom4
-          if rec_tapplcfm.codincom4 is not null then
-            v_desc_tabsal := v_desc_tabsal || '' ||
-                             get_tinexinf_name ( rec_tapplcfm.codincom4, global_v_lang)|| ' ' ||
-                             get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                             to_char(stddec(rec_tapplcfm.amtincom4, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+          if rec_tapplcfm.codincom4 is not null and stddec(rec_tapplcfm.amtincom4, rec_tapplcfm.numappl, v_chken) > 0 then
+            v_desc_tabsal := v_desc_tabsal||'<tr>';
+            v_desc_tabsal := v_desc_tabsal ||
+                             '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom4, global_v_lang)||'</td>'||
+                             '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                             '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom4, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+            v_desc_tabsal := v_desc_tabsal||'</tr>';
           end if;
           -- codincom5
-          if rec_tapplcfm.codincom5 is not null then
-            v_desc_tabsal := v_desc_tabsal || '' ||
-                             get_tinexinf_name ( rec_tapplcfm.codincom5, global_v_lang)|| ' ' ||
-                             get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                             to_char(stddec(rec_tapplcfm.amtincom5, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+          if rec_tapplcfm.codincom5 is not null and stddec(rec_tapplcfm.amtincom5, rec_tapplcfm.numappl, v_chken) > 0 then
+            v_desc_tabsal := v_desc_tabsal||'<tr>';
+            v_desc_tabsal := v_desc_tabsal ||
+                             '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom5, global_v_lang)||'</td>'||
+                             '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                             '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom5, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+            v_desc_tabsal := v_desc_tabsal||'</tr>';
           end if;
           -- codincom6
-          if rec_tapplcfm.codincom6 is not null then
-            v_desc_tabsal := v_desc_tabsal || '' ||
-                             get_tinexinf_name ( rec_tapplcfm.codincom6, global_v_lang)|| ' ' ||
-                             get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                             to_char(stddec(rec_tapplcfm.amtincom6, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+          if rec_tapplcfm.codincom6 is not null and stddec(rec_tapplcfm.amtincom6, rec_tapplcfm.numappl, v_chken) > 0 then
+            v_desc_tabsal := v_desc_tabsal||'<tr>';
+            v_desc_tabsal := v_desc_tabsal ||
+                             '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom6, global_v_lang)||'</td>'||
+                             '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                             '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom6, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+            v_desc_tabsal := v_desc_tabsal||'</tr>';
           end if;
           -- codincom7
-          if rec_tapplcfm.codincom7 is not null then
-            v_desc_tabsal := v_desc_tabsal || '' ||
-                             get_tinexinf_name ( rec_tapplcfm.codincom7, global_v_lang)|| ' ' ||
-                             get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                             to_char(stddec(rec_tapplcfm.amtincom7, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+          if rec_tapplcfm.codincom7 is not null and stddec(rec_tapplcfm.amtincom7, rec_tapplcfm.numappl, v_chken) > 0 then
+            v_desc_tabsal := v_desc_tabsal||'<tr>';
+            v_desc_tabsal := v_desc_tabsal ||
+                             '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom7, global_v_lang)||'</td>'||
+                             '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                             '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom7, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+            v_desc_tabsal := v_desc_tabsal||'</tr>';
           end if;
           -- codincom8
-          if rec_tapplcfm.codincom8 is not null then
-            v_desc_tabsal := v_desc_tabsal || '' ||
-                             get_tinexinf_name ( rec_tapplcfm.codincom8, global_v_lang)|| ' ' ||
-                             get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                             to_char(stddec(rec_tapplcfm.amtincom8, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+          if rec_tapplcfm.codincom8 is not null and stddec(rec_tapplcfm.amtincom8, rec_tapplcfm.numappl, v_chken) > 0 then
+            v_desc_tabsal := v_desc_tabsal||'<tr>';
+            v_desc_tabsal := v_desc_tabsal ||
+                             '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom8, global_v_lang)||'</td>'||
+                             '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                             '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom8, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+            v_desc_tabsal := v_desc_tabsal||'</tr>';
           end if;
           -- codincom9
-          if rec_tapplcfm.codincom9 is not null then
-            v_desc_tabsal := v_desc_tabsal || '' ||
-                             get_tinexinf_name ( rec_tapplcfm.codincom9, global_v_lang)|| ' ' ||
-                             get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                             to_char(stddec(rec_tapplcfm.amtincom9, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+          if rec_tapplcfm.codincom9 is not null and stddec(rec_tapplcfm.amtincom9, rec_tapplcfm.numappl, v_chken) > 0 then
+            v_desc_tabsal := v_desc_tabsal||'<tr>';
+            v_desc_tabsal := v_desc_tabsal ||
+                             '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom9, global_v_lang)||'</td>'||
+                             '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                             '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom9, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+            v_desc_tabsal := v_desc_tabsal||'</tr>';
           end if;
           -- codincom10
-          if rec_tapplcfm.codincom10 is not null then
-            v_desc_tabsal := v_desc_tabsal || '' ||
-                             get_tinexinf_name ( rec_tapplcfm.codincom10, global_v_lang)|| ' ' ||
-                             get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                             to_char(stddec(rec_tapplcfm.amtincom10, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+          if rec_tapplcfm.codincom10 is not null and stddec(rec_tapplcfm.amtincom10, rec_tapplcfm.numappl, v_chken) > 0 then
+            v_desc_tabsal := v_desc_tabsal||'<tr>';
+            v_desc_tabsal := v_desc_tabsal ||
+                             '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom10, global_v_lang)||'</td>'||
+                             '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                             '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom10, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+            v_desc_tabsal := v_desc_tabsal||'</tr>';
           end if;
 
-					data_file := replace(data_file,'[PARAM-TABSAL]', v_desc_tabsal);
+          if v_desc_tabsal is not null then
+            v_sum_amt := stddec(rec_tapplcfm.amtincom1,rec_tapplcfm.numappl,v_chken) +
+                       stddec(rec_tapplcfm.amtincom2,rec_tapplcfm.numappl,v_chken) +
+                       stddec(rec_tapplcfm.amtincom3,rec_tapplcfm.numappl,v_chken) +
+                       stddec(rec_tapplcfm.amtincom4,rec_tapplcfm.numappl,v_chken) +
+                       stddec(rec_tapplcfm.amtincom5,rec_tapplcfm.numappl,v_chken) +
+                       stddec(rec_tapplcfm.amtincom6,rec_tapplcfm.numappl,v_chken) +
+                       stddec(rec_tapplcfm.amtincom7,rec_tapplcfm.numappl,v_chken) +
+                       stddec(rec_tapplcfm.amtincom8,rec_tapplcfm.numappl,v_chken) +
+                       stddec(rec_tapplcfm.amtincom9,rec_tapplcfm.numappl,v_chken) +
+                       stddec(rec_tapplcfm.amtincom10,rec_tapplcfm.numappl,v_chken);
+            v_desc_tabsal := v_desc_tabsal||'<tr>';
+            v_desc_tabsal := v_desc_tabsal ||
+                             '<td class="border-table" align="right" colspan="2">'||get_label_name('HRRC35XC3', global_v_lang, 90) ||'</td>'||
+                             '<td class="border-table" align="right">'||to_char(v_sum_amt,'fm999,999,990.00')|| ' ' ||
+                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+            v_desc_tabsal := v_desc_tabsal||'</tr>';
+            v_desc_tabsal := v_desc_tabsal||'</table>'||'<br><br>';
+          end if;
+
+          if stddec(rec_tapplcfm.amtsalpro, rec_tapplcfm.numappl, v_chken) > 0 then
+            v_desc_tabsal := v_desc_tabsal || get_label_name('HRRC35XC3', global_v_lang, 70) || '<br>';
+            v_desc_tabsal := v_desc_tabsal ||
+                             get_label_name('HRRC35XC3', global_v_lang, 80)|| ': \t\t\t\t' ||
+                             to_char(stddec(rec_tapplcfm.amtsalpro, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                             get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>'||
+                             rec_tapplcfm.welfare;
+          end if;
+
+          data_file := replace(data_file,'[PARAM-TABSAL]', v_desc_tabsal);
+          --
+          v_desc_namedoc := null; 
+          v_num_doc := 0;
+         insert into a (b) values (p_codcomp || ' | '|| v_codposrq);commit;
+          for r2 in c2 loop
+            v_num_doc := v_num_doc + 1;
+            v_desc_namedoc := v_desc_namedoc || to_char(v_num_doc) || '. ' ||r2.descdoc||'<br>';
+          end loop;
+
+          if v_desc_namedoc is not null then
+            data_file := replace(data_file,'[PARAM-NAMDOC]', v_desc_namedoc);
+          else
+            data_file := replace(data_file,'[PARAM-NAMDOC]', '');
+          end if;
+-- >> apisit ||09/04/2025 || Requirement ???????????????????????? ??? ????????????????????????????????????????
           --
           v_numseq := 23;
           for r1 in c1 loop
@@ -981,6 +1105,7 @@
               exception when no_data_found then null;
               end ;
             end if;
+
             data_file := replace(data_file, fparam_fparam, fparam_value);
           end loop;
           data_file := replace(data_file, '\t', '&nbsp;&nbsp;&nbsp;');
@@ -1088,20 +1213,34 @@
     obj_rows        json_object_t;
     obj_result      json_object_t;
     v_amttotal      number;
+
+    v_namsign varchar2(2000 char); -- 4448#11176| yoksirianan (000569) | 28/01/2025 | ????????????????????
+-- << apisit ||09/04/2025 || Requirement ???????????????????????? ??? ????????????????????????????????????????    
+    v_desc_namedoc varchar2(2000 char);
+    v_num_doc number := 0;
+    v_sum_amt number := 0;
+-- >> apisit ||09/04/2025 || Requirement ???????????????????????? ??? ????????????????????????????????????????
     cursor c1 is
       select *
         from tfmparam
        where codform = p_codform
          and flginput = 'Y'
        order by ffield ;
+
+    cursor c2 is
+      select coddoc, descdoc
+        from tnempdoc
+       where codcomp = rec_tapplcfm.codcomp
+         and codpos = v_codposrq;   
+
 	begin
-    begin
-      select get_tsetup_value('PATHWORKPHP')||folder into v_folder
-        from tfolderd
-       where codapp = 'HRPMB9E';
-    exception when no_data_found then
-			v_folder := '';
-    end;
+        begin
+          select get_tsetup_value('PATHWORKPHP')||folder into v_folder
+            from tfolderd
+           where codapp = 'HRPMB9E';
+        exception when no_data_found then
+                v_folder := '';
+        end;
 		v_codlang := nvl(v_codlang,global_v_lang);
 
     v_codform     := hcm_util.get_string_t(p_data_row,'codform');
@@ -1176,93 +1315,180 @@
       if v_sumamt < 0 then
         v_desc_sumamt :=  get_amount_name(v_sumamt,v_codlang);
       end if;
-      data_file := replace(data_file,'[PARAM-AMTOTH]', v_sumamt);
+
+			-- 4448#11176| yoksirianan (000569) | 28/01/2025 | ???????????????????? ???????????????
+			begin
+				select get_tsetup_value('PATHWORKPHP')||get_tfolderd('HRPMC2E2') || '/' ||NAMSIGN
+				into v_namsign
+				from TEMPIMGE
+				where NAMSIGN is not null
+					and ROWNUM = 1;
+			exception when no_data_found then
+				v_namsign := null;
+			end;
+
+			if v_namsign is not null then
+				v_namsign := '<img src="'||p_url||'/'||v_namsign||'"width="100" height="60">';
+			end if;
+			-- 4448#11176| yoksirianan (000569) | 28/01/2025 | ???????????????????? ???????????????
+
+      data_file := replace(data_file,'[PARAM-AMTOTH]', to_char(v_sumamt,'fm9,999,990.00'));
       data_file := replace(data_file,'[PARAM-BAHTOTH]', v_desc_sumamt);
       data_file := replace(data_file,'[PARAM-COMPANY]', get_tcenter_name(rec_tapplcfm.codcomp, global_v_lang));
+			data_file := replace(data_file,'[PARAM-SIGN]', v_namsign); -- 4448#11176| yoksirianan (000569) | 28/01/2025 | ????????????????????
 
+-- << apisit ||09/04/2025 || Requirement ???????????????????????? ??? ????????????????????????????????????????
       -- codincom1
       v_desc_tabsal := '';
-      if rec_tapplcfm.codincom1 is not null then
-        v_desc_tabsal := v_desc_tabsal || '' ||
-                         get_tinexinf_name ( rec_tapplcfm.codincom1, global_v_lang)|| ' ' ||
-                         get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                         to_char(stddec(rec_tapplcfm.amtincom1, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+      if rec_tapplcfm.codincom1 is not null and stddec(rec_tapplcfm.amtincom1, rec_tapplcfm.numappl, v_chken) > 0 then
+        v_desc_tabsal := '<table class="border-table" width="auto">';
+        v_desc_tabsal := v_desc_tabsal||'<tr bgcolor="#819FF7">
+                               <td class="border-table" width="25%" align="center">'||get_label_name('HRRC35XC3', v_codlang, 40)||'</td>
+                               <td class="border-table" width="15%" align="center">'||get_label_name('HRRC35XC3', v_codlang, 50)||'</td>
+                               <td class="border-table" width="15%" align="center">'||get_label_name('HRRC35XC3', v_codlang, 60)||'</td>
+                             </tr>';
+        v_desc_tabsal := v_desc_tabsal||'</tr>';
+        v_desc_tabsal := v_desc_tabsal||'<tr>';
+        v_desc_tabsal := v_desc_tabsal ||
+                         '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom1, global_v_lang)|| ' ' ||
+                         '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
+                         '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom1, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+        v_desc_tabsal := v_desc_tabsal||'</tr>';
       end if;
       -- codincom2
-      if rec_tapplcfm.codincom2 is not null then
-        v_desc_tabsal := v_desc_tabsal || '' ||
-                         get_tinexinf_name ( rec_tapplcfm.codincom2, global_v_lang)|| ' ' ||
-                         get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                         to_char(stddec(rec_tapplcfm.amtincom2, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+      if rec_tapplcfm.codincom2 is not null and stddec(rec_tapplcfm.amtincom2, rec_tapplcfm.numappl, v_chken) > 0 then
+        v_desc_tabsal := v_desc_tabsal||'<tr>';
+        v_desc_tabsal := v_desc_tabsal ||
+                         '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom2, global_v_lang)||'</td>'||
+                         '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                         '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom2, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+        v_desc_tabsal := v_desc_tabsal||'</tr>';
       end if;
       -- codincom3
-      if rec_tapplcfm.codincom3 is not null then
-        v_desc_tabsal := v_desc_tabsal || '' ||
-                         get_tinexinf_name ( rec_tapplcfm.codincom3, global_v_lang)|| ' ' ||
-                         get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                         to_char(stddec(rec_tapplcfm.amtincom3, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+      if rec_tapplcfm.codincom3 is not null and stddec(rec_tapplcfm.amtincom3, rec_tapplcfm.numappl, v_chken) > 0 then
+        v_desc_tabsal := v_desc_tabsal||'<tr>';
+        v_desc_tabsal := v_desc_tabsal ||
+                         '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom3, global_v_lang)||'</td>'||
+                         '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                         '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom3, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+        v_desc_tabsal := v_desc_tabsal||'</tr>';
       end if;
       -- codincom4
-      if rec_tapplcfm.codincom4 is not null then
-        v_desc_tabsal := v_desc_tabsal || '' ||
-                         get_tinexinf_name ( rec_tapplcfm.codincom4, global_v_lang)|| ' ' ||
-                         get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                         to_char(stddec(rec_tapplcfm.amtincom4, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+      if rec_tapplcfm.codincom4 is not null and stddec(rec_tapplcfm.amtincom4, rec_tapplcfm.numappl, v_chken) > 0 then
+        v_desc_tabsal := v_desc_tabsal||'<tr>';
+        v_desc_tabsal := v_desc_tabsal ||
+                         '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom4, global_v_lang)||'</td>'||
+                         '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                         '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom4, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+        v_desc_tabsal := v_desc_tabsal||'</tr>';
       end if;
       -- codincom5
-      if rec_tapplcfm.codincom5 is not null then
-        v_desc_tabsal := v_desc_tabsal || '' ||
-                         get_tinexinf_name ( rec_tapplcfm.codincom5, global_v_lang)|| ' ' ||
-                         get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                         to_char(stddec(rec_tapplcfm.amtincom5, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+      if rec_tapplcfm.codincom5 is not null and stddec(rec_tapplcfm.amtincom5, rec_tapplcfm.numappl, v_chken) > 0 then
+        v_desc_tabsal := v_desc_tabsal||'<tr>';
+        v_desc_tabsal := v_desc_tabsal ||
+                         '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom5, global_v_lang)||'</td>'||
+                         '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                         '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom5, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+        v_desc_tabsal := v_desc_tabsal||'</tr>';
       end if;
       -- codincom6
-      if rec_tapplcfm.codincom6 is not null then
-        v_desc_tabsal := v_desc_tabsal || '' ||
-                         get_tinexinf_name ( rec_tapplcfm.codincom6, global_v_lang)|| ' ' ||
-                         get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                         to_char(stddec(rec_tapplcfm.amtincom6, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+      if rec_tapplcfm.codincom6 is not null and stddec(rec_tapplcfm.amtincom6, rec_tapplcfm.numappl, v_chken) > 0 then
+        v_desc_tabsal := v_desc_tabsal||'<tr>';
+        v_desc_tabsal := v_desc_tabsal ||
+                         '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom6, global_v_lang)||'</td>'||
+                         '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                         '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom6, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+        v_desc_tabsal := v_desc_tabsal||'</tr>';
       end if;
       -- codincom7
-      if rec_tapplcfm.codincom7 is not null then
-        v_desc_tabsal := v_desc_tabsal || '' ||
-                         get_tinexinf_name ( rec_tapplcfm.codincom7, global_v_lang)|| ' ' ||
-                         get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                         to_char(stddec(rec_tapplcfm.amtincom7, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+      if rec_tapplcfm.codincom7 is not null and stddec(rec_tapplcfm.amtincom7, rec_tapplcfm.numappl, v_chken) > 0 then
+        v_desc_tabsal := v_desc_tabsal||'<tr>';
+        v_desc_tabsal := v_desc_tabsal ||
+                         '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom7, global_v_lang)||'</td>'||
+                         '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                         '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom7, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+        v_desc_tabsal := v_desc_tabsal||'</tr>';
       end if;
       -- codincom8
-      if rec_tapplcfm.codincom8 is not null then
-        v_desc_tabsal := v_desc_tabsal || '' ||
-                         get_tinexinf_name ( rec_tapplcfm.codincom8, global_v_lang)|| ' ' ||
-                         get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                         to_char(stddec(rec_tapplcfm.amtincom8, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+      if rec_tapplcfm.codincom8 is not null and stddec(rec_tapplcfm.amtincom8, rec_tapplcfm.numappl, v_chken) > 0 then
+        v_desc_tabsal := v_desc_tabsal||'<tr>';
+        v_desc_tabsal := v_desc_tabsal ||
+                         '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom8, global_v_lang)||'</td>'||
+                         '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                         '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom8, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+        v_desc_tabsal := v_desc_tabsal||'</tr>';
       end if;
       -- codincom9
-      if rec_tapplcfm.codincom9 is not null then
-        v_desc_tabsal := v_desc_tabsal || '' ||
-                         get_tinexinf_name ( rec_tapplcfm.codincom9, global_v_lang)|| ' ' ||
-                         get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                         to_char(stddec(rec_tapplcfm.amtincom9, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+      if rec_tapplcfm.codincom9 is not null and stddec(rec_tapplcfm.amtincom9, rec_tapplcfm.numappl, v_chken) > 0 then
+        v_desc_tabsal := v_desc_tabsal||'<tr>';
+        v_desc_tabsal := v_desc_tabsal ||
+                         '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom9, global_v_lang)||'</td>'||
+                         '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                         '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom9, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+        v_desc_tabsal := v_desc_tabsal||'</tr>';
       end if;
       -- codincom10
-      if rec_tapplcfm.codincom10 is not null then
-        v_desc_tabsal := v_desc_tabsal || '' ||
-                         get_tinexinf_name ( rec_tapplcfm.codincom10, global_v_lang)|| ' ' ||
-                         get_label_name('HRRC35XC1', global_v_lang, 160) || ' ' ||
-                         to_char(stddec(rec_tapplcfm.amtincom10, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
-                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>';
+      if rec_tapplcfm.codincom10 is not null and stddec(rec_tapplcfm.amtincom10, rec_tapplcfm.numappl, v_chken) > 0 then
+        v_desc_tabsal := v_desc_tabsal||'<tr>';
+        v_desc_tabsal := v_desc_tabsal ||
+                         '<td class="border-table" align="left">'||get_tinexinf_name ( rec_tapplcfm.codincom10, global_v_lang)||'</td>'||
+                         '<td class="border-table" align="center">'||get_label_name('HRRC35XC1', global_v_lang, 160) ||'</td>'||
+                         '<td class="border-table" align="right">'||to_char(stddec(rec_tapplcfm.amtincom10, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+        v_desc_tabsal := v_desc_tabsal||'</tr>';
+      end if;
+
+      if v_desc_tabsal is not null then
+        v_sum_amt := stddec(rec_tapplcfm.amtincom1,rec_tapplcfm.numappl,v_chken) +
+                   stddec(rec_tapplcfm.amtincom2,rec_tapplcfm.numappl,v_chken) +
+                   stddec(rec_tapplcfm.amtincom3,rec_tapplcfm.numappl,v_chken) +
+                   stddec(rec_tapplcfm.amtincom4,rec_tapplcfm.numappl,v_chken) +
+                   stddec(rec_tapplcfm.amtincom5,rec_tapplcfm.numappl,v_chken) +
+                   stddec(rec_tapplcfm.amtincom6,rec_tapplcfm.numappl,v_chken) +
+                   stddec(rec_tapplcfm.amtincom7,rec_tapplcfm.numappl,v_chken) +
+                   stddec(rec_tapplcfm.amtincom8,rec_tapplcfm.numappl,v_chken) +
+                   stddec(rec_tapplcfm.amtincom9,rec_tapplcfm.numappl,v_chken) +
+                   stddec(rec_tapplcfm.amtincom10,rec_tapplcfm.numappl,v_chken);
+        v_desc_tabsal := v_desc_tabsal||'<tr>';
+        v_desc_tabsal := v_desc_tabsal ||
+                         '<td class="border-table" align="right" colspan="2">'||get_label_name('HRRC35XC3', global_v_lang, 90) ||'</td>'||
+                         '<td class="border-table" align="right">'||to_char(v_sum_amt,'fm999,999,990.00')|| ' ' ||
+                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'</td>';
+        v_desc_tabsal := v_desc_tabsal||'</tr>';
+        v_desc_tabsal := v_desc_tabsal||'</table>'||'<br><br>';
+      end if;
+
+      if stddec(rec_tapplcfm.amtsalpro, rec_tapplcfm.numappl, v_chken) > 0 then
+        v_desc_tabsal := v_desc_tabsal || get_label_name('HRRC35XC3', global_v_lang, 70) || '<br>';
+        v_desc_tabsal := v_desc_tabsal ||
+                         get_label_name('HRRC35XC3', global_v_lang, 80)|| ': \t\t\t\t' ||
+                         to_char(stddec(rec_tapplcfm.amtsalpro, rec_tapplcfm.numappl, v_chken),'fm999,999,990.00')|| ' ' ||
+                         get_tcodec_name('TCODCURR',rec_tapplcfm.codcurr, global_v_lang)||'<br>'||
+                         rec_tapplcfm.welfare;
       end if;
 
       data_file := replace(data_file,'[PARAM-TABSAL]', v_desc_tabsal);
+      --
+      v_desc_namedoc := null; 
+      v_num_doc := 0;
+      for r2 in c2 loop
+        v_num_doc := v_num_doc + 1;
+        v_desc_namedoc := v_desc_namedoc || to_char(v_num_doc) || '. ' ||r2.descdoc||'<br>';
+      end loop;
+
+      if v_desc_namedoc is not null then
+        data_file := replace(data_file,'[PARAM-NAMDOC]', v_desc_namedoc);
+      end if;
+-- >> apisit ||09/04/2025 || Requirement ???????????????????????? ??? ????????????????????????????????????????
       --
       for j in 0..p_data_fparam.get_size - 1 loop
         obj_fparam      := hcm_util.get_json_t( p_data_fparam,to_char(j));
@@ -1435,6 +1661,7 @@
     for i in c1 loop
       v_codtable := i.codtable;
       v_codcolmn := i.ffield;
+
       /* find description sql */
       begin
         select funcdesc ,flgchksal into v_funcdesc,v_flgchksal
@@ -1448,6 +1675,7 @@
       if nvl(i.flgdesc,'N') = 'N' then
         v_funcdesc := null;
       end if;
+
       if v_flgchksal = 'Y' then
         v_statmt  := 'select to_char(stddec('||i.ffield||','||''''||v_numappl||''''||','||''''||hcm_secur.get_v_chken||'''),''fm999,999,999,990.00'') from '||i.codtable ||' where '||i.fwhere ;  -- softberry || 8/08/2023 || #8739  v_statmt  := 'select to_char(stddec('||i.ffield||','||''''||hcm_util.get_string_t(p_itemson,'codempid')||''''||','||''''||hcm_secur.get_v_chken||'''),''fm999,999,999,990.00'') from '||i.codtable ||' where '||i.fwhere ;
       elsif v_funcdesc is not null then
@@ -1461,6 +1689,7 @@
       else
          v_statmt  := i.stm ;
       end if;
+
       if get_item_property(v_codtable,v_codcolmn) = 'DATE' then
         if nvl(i.flgdesc,'N') = 'N' then
           v_statmt := 'select to_char('||i.ffield||',''dd/mm/yyyy'') from '||i.codtable ||' where '||i.fwhere;
@@ -1493,6 +1722,7 @@
            and numreqrq = v_numreqrq
            and codposrq = v_codposrq;
       end;
+
       insert into tapplcfmd(numappl, numreqrq, codposrq, numseq, fparam, fvalue, codcreate, coduser)
                      values(v_numappl, v_numreqrq, v_codposrq, v_numseq, i.fparam, v_dataexct, global_v_coduser, global_v_coduser);
 

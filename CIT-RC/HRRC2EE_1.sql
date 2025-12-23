@@ -3,7 +3,7 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC2EE" AS
---last update: 28/06/2023 11:12||redmine-8886
+--last update: -- 000569-yoksirianan-dev | 29/05/2024 | 4448#10836
   procedure initial_value(json_str in clob) is
     json_obj        json_object_t;
   begin
@@ -122,7 +122,8 @@
             select count(*) into v_qtypos
         from tjobpost
        where codcomp  like b_index_codcomp||'%'
-         and dtepost  = i.dtepost
+         -- and dtepost = i.dtepost -- STD |000504-Tae-Surachai-Dev | 03/05/2024 | 4448#10633 (bk)
+         and dtepost = i.dtepost -- 000569-yoksirianan-dev | 29/05/2024 | 4448#10836
          and codjobpost = i.codjobpost;
       end;
 -->>user14||28/06/2023 11:12||redmine-8886
@@ -154,11 +155,13 @@
       select numreqst,codpos,codjobpost,dtepost,codcomp,dteclose,welfare,flgtrans,amtpay,remark
         from tjobpost
        where codcomp  like b_index_codcomp||'%'
-         and dtepost  = b_index_dtepost
+         -- and dtepost = b_index_dtepost -- STD |000504-Tae-Surachai-Dev | 03/05/2024 | 4448#10633 (bk)
+         and dtepost = b_index_dtepost -- 000569-yoksirianan-dev | 29/05/2024 | 4448#10836
          and codjobpost = p_codjobpost
       order by dtepost,codcomp,numreqst;
 
   begin
+
     initial_value(json_str_input);
     obj_row := json_object_t();
     for i in c_tjobpost loop
@@ -177,7 +180,7 @@
                 select (amtpay / greatest(qtypos,0,1)) into v_amtpay
                   from tjobposte
                  where codjobpost = i.codjobpost
-                   and dtepost    = i.dtepost
+                   and dtepost = i.dtepost -- 000569-yoksirianan-dev | 29/05/2024 | 4448#10836
                    and codcomp    = i.codcomp;--#7761 Phase2 || 18/03/2022 || USER39
             exception when no_data_found then
                 null;
@@ -241,14 +244,14 @@
                                  remark = p_remark,
                                  amtpay = p_amtpay,
                                  coduser = global_v_coduser
-             where codjobpost = p_codjobpost
-               and dtepost    = p_dtepost
-               and codcomp    = p_codcomp;
+             where codjobpost       = p_codjobpost
+               and dtepost          = p_dtepost -- 000569-yoksirianan-dev | 29/05/2024 | 4448#10836
+               and codcomp          = p_codcomp;
 
             update tjobpost set amtpay = v_amtpay, coduser = global_v_coduser
-             where codjobpost = p_codjobpost
-               and dtepost    = p_dtepost
-               and codcomp    = p_codcomp;
+             where codjobpost       = p_codjobpost
+               and dtepost          = p_dtepost -- 000569-yoksirianan-dev | 29/05/2024 | 4448#10836
+               and codcomp          = p_codcomp;
         else
             json_str_output := get_response_message(null, param_msg_error, global_v_lang);
             rollback;
@@ -286,5 +289,6 @@
   end;
 
 END HRRC2EE;
+
 
 /

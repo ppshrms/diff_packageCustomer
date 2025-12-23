@@ -3,6 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRRC91X" AS
+    -- Site: ST11
+    -- Author: Chinnawat Wiw (000553)
+    -- Date updated: 2024/05/24
+    -- Comment: 4448#10791
     param_msg_error         varchar2(4000 char);
     global_v_coduser        varchar2(100 char);
     global_v_codempid       varchar2(100 char);
@@ -21,5 +25,6 @@
     procedure get_index(json_str_input in clob, json_str_output out clob);
 
 END HRRC91X;
+
 
 /

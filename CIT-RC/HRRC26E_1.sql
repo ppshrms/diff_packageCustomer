@@ -3,6 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC26E" AS
+  -- Site: ST11
+  -- Author: Chinnawat Wiw (000553)
+  -- Date updated: 2024/05/28
+  -- Comment: 4448#10750
 
   procedure initial_current_user_value(json_str_input in clob) as
    json_obj json_object_t;
@@ -499,7 +503,7 @@
               v_rowid := '';
               v_codintview := '';
           end;
-          chk_flowmail.replace_text_frmmail(v_templete_to, 'TREQEST1', v_rowid, v_subject, v_codform, '1', v_func_appr, global_v_coduser, global_v_lang, v_msg_to, p_chkparam => 'N');
+          chk_flowmail.replace_param('TREQEST1',v_rowid,v_codform,'1',global_v_lang,v_msg_to,'N'); -- ST11 | Chinnawat (Wiw) | 28/05/2024
 
           -- replace sender
           begin
@@ -509,8 +513,7 @@
           exception when no_data_found then
               v_rowid := '';
           end;
-          chk_flowmail.replace_text_frmmail(v_templete_to, 'TEMPLOY1', v_rowid, v_subject, v_codform, '1', v_func_appr, global_v_coduser, global_v_lang, v_msg_to, p_chkparam => 'N');
-
+          chk_flowmail.replace_param('TEMPLOY1',v_rowid,v_codform,'1',global_v_lang,v_msg_to,'N'); -- ST11 | Chinnawat (Wiw) | 28/05/2024
 
           begin
               select email into v_email
@@ -550,5 +553,6 @@
     end send_email;
 
 END HRRC26E;
+
 
 /

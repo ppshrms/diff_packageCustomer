@@ -3,6 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC41E" AS
+    -- Site: ST11
+    -- Author: Chinnawat Wiw (000553)
+    -- Date updated: 10/09/2024
+    -- Comment: 4448#10777
 
   procedure initial_current_user_value(json_str_input in clob) as
    json_obj json_object_t;
@@ -488,19 +492,41 @@
     data_obj       json_object_t;
 
     v_codempid      temploy1.codempid%type;
+    v_numappl      tapplinf.numappl%type;
+    v_hasNumAppl   LONG := '';
   begin
     initial_current_user_value(json_str_input);
     json_obj    := json_object_t(json_str_input);
     param_json  := hcm_util.get_json_t(json_obj,'param_json');
+
     for i in 0..param_json.get_size -1 loop
         data_obj := hcm_util.get_json_t(param_json,to_char(i));
         initial_params(data_obj);
         v_codempid := hcm_util.get_string_t(data_obj, 'codempid');
---        if v_codempid is null then
-         gen_id_for_obj;  --03/11/2022
+        v_numappl := hcm_util.get_string_t(data_obj, 'numappl');
 
---        end if;
+        -->> ST11 Chinnawat Wiw (000553) || 31/05/2024
+        if v_codempid is not null then
+            if (i = 0) then
+                v_hasNumAppl := v_numappl;
+            else
+                v_hasNumAppl := v_hasNumAppl || ' ,' || v_numappl;
+            end if;
+        else
+		    gen_id_for_obj;  --03/11/2022
+        end if;
+        --<< ST11 Chinnawat Wiw (000553) || 31/05/2024
+
     end loop;
+
+    -->> ST11 Chinnawat Wiw (000553) || 31/05/2024
+    if v_hasNumAppl is not null then
+        param_msg_error := get_error_msg_php('RC0044', global_v_lang);
+        json_str_output := get_response_message('400', replace(param_msg_error,'[P-NUMAPPL]',v_hasNumAppl), global_v_lang);
+        return;
+    end if;
+    --<< ST11 Chinnawat Wiw (000553) || 31/05/2024
+
     if param_msg_error is null then
         commit;
         param_msg_error := get_error_msg_php('HR2401',global_v_lang);
@@ -509,6 +535,7 @@
         rollback;
         json_str_output := get_response_message('400',param_msg_error,global_v_lang);
     end if;
+
     exception when others then
         rollback;
         param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
@@ -557,7 +584,14 @@
   begin
     v_result := v_param;
     for i in c1 loop
-        v_result := replace(v_result,i.fparam,i.fvalue);
+        -- softberry || 6/06/2023 || #8739 || v_result := replace(v_result,i.fparam,i.fvalue);
+        -- << softberry || 9/06/2023 || #8739
+        if i.fparam = '[PARAM-03]' and i.numseq = 4 then
+            v_result := replace(v_result,i.fparam,stddec(i.fvalue,p_numappl,2017));
+        else
+            v_result := replace(v_result,i.fparam,i.fvalue);
+        end if;
+        -->> softberry || 9/06/2023 || #8739
     end loop;
     return v_result;
   end replace_html_param;
@@ -697,18 +731,73 @@
 
     type html_array   is varray(3) of clob;
     list_msg_html     html_array;
-
+    -->> ST11 FIX || Chinnawat Wiw (000553) || 23/05/2024
+    v_amttotal        tapplcfm.amttotal%type;
+    v_amtincom2       tapplcfm.amtincom2%type;
+    v_amtincom3       tapplcfm.amtincom3%type;
+    v_amtincom4       tapplcfm.amtincom4%type;
+    v_amtincom5       tapplcfm.amtincom5%type;
+    v_amtincom6       tapplcfm.amtincom6%type;
+    v_amtincom7       tapplcfm.amtincom7%type;
+    v_amtincom8       tapplcfm.amtincom8%type;
+    v_amtincom9       tapplcfm.amtincom9%type;
+    v_amtincom10      tapplcfm.amtincom10%type;
+    v_codcomp         tapplcfm.codcomp%type;
+    v_qtyduepr        tapplcfm.qtyduepr%type;
+    v_codtitle        temploy1.codtitle%type;
+    v_name            VARCHAR2(2000);
+    v_dteempmt        temploy1.dteempmt%type;
+    v_dteredue        temploy1.dteredue%type;
+    rec_temploy1      temploy1%rowtype;
+    rec_temploy1      temploy1%rowtype;
+    rec_temploy1      temploy1%rowtype;
     v_sum             varchar2(20 char);
+    v_chken           varchar2(10 char);
+    v_day			  number;
+    v_desc_month      varchar2(50 char);
+    v_year			  varchar2(4 char);
+    v_sysdate         varchar2(1000 char);
+    v_sumamt          number := 0;
+    v_start_work      varchar2(1000 char);
+    --<< ST11 FIX || Chinnawat Wiw (000553) || 23/05/2024
+
   begin
+    -->> ST11 FIX || Chinnawat Wiw (000553) || 23/05/2024
+    -- Select more field
+    v_chken := hcm_secur.get_v_chken;
+
     begin
-        select b.codform,a.codempid,b.codposrq,b.numreqrq into v_codform,v_codempid,v_codpos,v_numreq
+        select 
+            b.codform,a.codempid,b.codposrq,b.numreqrq,b.amttotal,
+            b.amtincom2,b.amtincom3,b.amtincom4,b.amtincom5,b.amtincom6,
+            b.amtincom7,b.amtincom8,b.amtincom9,b.amtincom10,
+            b.codcomp,b.qtyduepr
+        into 
+            v_codform,v_codempid,v_codpos,v_numreq,v_amttotal,
+            v_amtincom2,v_amtincom3,v_amtincom4,v_amtincom5,v_amtincom6,
+            v_amtincom7,v_amtincom8,v_amtincom9,v_amtincom10,
+            v_codcomp,v_qtyduepr
         from tapplinf a, tapplcfm b
         where a.numappl = p_numappl
         and b.numappl = a.numappl
-        and b.numdoc = a.numdoc;
+        and b.numdoc = a.numdoc
+        fetch first 1 row only; -- ST11 FIX || Chinnawat Wiw (000553) || 10/09/2024
     exception when no_data_found then
         v_codform := null;
+        v_amttotal := '';
+        v_amtincom2 := '';
+        v_amtincom3 := '';
+        v_amtincom4 := '';
+        v_amtincom5 := '';
+        v_amtincom6 := '';
+        v_amtincom7 := '';
+        v_amtincom8 := '';
+        v_amtincom9 := '';
+        v_amtincom10 := '';
+        v_codcomp := '';
+        v_qtyduepr := '';
     end;
+    --<< ST11 FIX || Chinnawat Wiw (000553) || 23/05/2024
 
     gen_message(v_codform, o_message1, o_namimglet, o_message2, o_typemsg2, o_message3);
     list_msg_html := html_array(o_message1,o_message2,o_message3);
@@ -717,12 +806,72 @@
         o_namimglet := get_tsetup_value('PATHDOC')||get_tfolderd('HRPMB9E')||'/'||o_namimglet;
     end if;
 
+    -->> ST11 FIX || Chinnawat Wiw (000553) || 23/05/2024
+    v_day         := to_number(to_char(sysdate,'dd'),'99');
+    v_desc_month  := get_nammthful(to_number(to_char(sysdate,'mm')),global_v_lang);
+    v_year        := get_ref_year(global_v_lang,global_v_zyear,to_number(to_char(sysdate,'yyyy')));
+    v_sysdate := v_day ||' '||v_desc_month||' '||v_year;
+
+    v_amttotal  := stddec(v_amttotal,p_numappl,v_chken);
+
+    v_sumamt := stddec(v_amtincom2,p_numappl,v_chken) +
+                      stddec(v_amtincom3,p_numappl,v_chken) +
+                      stddec(v_amtincom4,p_numappl,v_chken) +
+                      stddec(v_amtincom5,p_numappl,v_chken) +
+                      stddec(v_amtincom6,p_numappl,v_chken) +
+                      stddec(v_amtincom7,p_numappl,v_chken) +
+                      stddec(v_amtincom8,p_numappl,v_chken) +
+                      stddec(v_amtincom9,p_numappl,v_chken) +
+                      stddec(v_amtincom10,p_numappl,v_chken);
+
     o_message1 := replace_html_param(o_message1,v_codpos,v_numreq);
     o_message2 := replace(o_message2,'[PARAM-TABSAL]',gen_html_tab_incom(v_codpos,v_numreq,v_sum));
     o_message2 := replace(o_message2,'[PARAM-AMTNET]',v_sum);
+    o_message2 := replace(o_message2,'[PARAM-DOCID]',p_numappl);
+    o_message2 := replace(o_message2,'[PARAM-DATE]',v_sysdate);
+    o_message2 := replace(o_message2,'[PARAM-AMTNET]', to_char(v_amttotal,'fm9,999,990.00'));
+    o_message2 := replace(o_message2,'[PARAM-AMTOTH]', v_sumamt);
+    o_message2 := replace(o_message2,'[PARAM-BAHTNET]', get_amount_name(v_amttotal,global_v_lang));
+    o_message2 := replace(o_message2,'[PARAM-COMPANY]', get_tcenter_name(v_codcomp,global_v_lang));
+    o_message2 := replace(o_message2,'[PARAM-SIGN]', '');
+
+    begin
+        select 
+            codtitle, get_temploy_name(codempid,global_v_lang), dteempmt, dteredue
+        into
+            v_codtitle, v_name, v_dteempmt, v_dteredue
+        from TEMPLOY1
+        where CODEMPID = v_codempid;
+    exception when no_data_found then
+        v_codtitle := '';
+        v_name := '';
+        v_dteempmt := '';
+        v_dteredue := '';
+    end;
+
+    -->> ST11 FIX || Chinnawat Wiw (000553) || 10/09/2024
+    if v_dteempmt is not null then
+        v_day         := to_number(to_char(v_dteempmt,'dd'),'99');
+        v_desc_month  := get_nammthful(to_number(to_char(v_dteempmt,'mm')),global_v_lang);
+        v_year        := get_ref_year(global_v_lang,global_v_zyear,to_number(to_char(v_dteempmt,'yyyy')));
+        v_start_work := v_day ||' '||v_desc_month||' '||v_year;
+    end if;
+    --<< ST11 FIX || Chinnawat Wiw (000553) || 10/09/2024
+
+    o_message2 := replace(o_message2,'[PARAM-01]', get_tlistval_name('CODTITLE',v_codtitle,global_v_lang));
+    o_message2 := replace(o_message2,'[PARAM-02]', v_name);
+    o_message2 := replace(o_message2,'[PARAM-03]', get_tpostn_name(v_codpos, global_v_lang));
+    o_message2 := replace(o_message2,'[PARAM-04]', v_start_work);
+    o_message2 := replace(o_message2,'[PARAM-06]', v_qtyduepr);
+
+    v_day         := to_number(to_char(v_dteredue,'dd'),'99');
+    v_desc_month  := get_nammthful(to_number(to_char(v_dteredue,'mm')),global_v_lang);
+    v_year        := get_ref_year(global_v_lang,global_v_zyear,to_number(to_char(v_dteredue,'yyyy')));
+    v_sysdate := v_day ||' '||v_desc_month||' '||v_year;
+    o_message2 := replace(o_message2,'[PARAM-05]', v_sysdate);
+    --<< ST11 FIX || Chinnawat Wiw (000553) || 23/05/2024
     o_message2 := replace_html_param(o_message2,v_codpos,v_numreq);
     o_message3 := replace_html_param(o_message3,v_codpos,v_numreq);
-
 
     obj_data := json_object_t();
     obj_data.put('coderror', '200');
@@ -832,5 +981,6 @@
     end send_email;
 
 END HRRC41E;
+
 
 /

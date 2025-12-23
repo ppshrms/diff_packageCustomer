@@ -3,6 +3,11 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRRC2PB" is
+  -- Site: ST11
+  -- Author: Chinnwat Wiw (000553)
+  -- Date updated: 2024/06/12
+  -- Comment: 4448#10884
+
   param_msg_error           varchar2(4000 char);
 
   v_chken                   varchar2(10 char);
@@ -50,7 +55,7 @@
 --  p_dteyrbug                tmanpwm.dteyrbug%TYPE;
 --  p_dtemthbugstr            tmanpwm.dtemthbug%TYPE;
 --  p_dtemthbugend            tmanpwm.dtemthbug%TYPE;
---
+--  
   p_numappl                 tapplinf.numappl%type;
   v_count_tapplinf          number;
   global_v_numreqst         treqest1.numreqst%type;
@@ -74,5 +79,6 @@
   procedure check_error(p_item in varchar2, p_line in number, p_numseq in out number,p_num_error_row in out number , p_table in varchar2, p_column in varchar2, p_type in varchar2, obj_response in out json_object_t);
 
 end HRRC2PB;
+
 
 /

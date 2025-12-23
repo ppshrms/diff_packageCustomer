@@ -3,6 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC5GE" AS
+  -- Site: ST11
+  -- Author: Chinnawat Wiw (000553)
+  -- Date updated: 2024/05/28
+  -- Comment: 4448#10730
 
   procedure initial_current_user_value(json_str_input in clob) as
    json_obj json_object_t;
@@ -150,6 +154,7 @@
     v_numreqst      varchar(40 char);
     v_codpos        varchar(40 char);
     v_codcomp       varchar(40 char);
+    v_star_html     varchar(1000 char); -- 000554-bow.sarunya-dev | 10/05/2024 | issue4448#10685: add v_star_html
 
     cursor c1 is
       select numreqst,codpos,codcomp, qtyreq, qtyact
@@ -162,9 +167,9 @@
 
     cursor c2 is
        select a.numreqst,a.codempid, a.codcompe, a.codpose, a.dteappoi, a.codempts,
-              a.numscore, a.perscore, a.codasapl, a.dtestrt, a.dtereq
+              a.numscore, a.perscore, a.codasapl, a.dtestrt, a.dtereq, a.rowid -- 000554-bow.sarunya-dev | 10/05/2024 | issue4448#10685: add a.rowid
          from tappeinf a
-        where a.numreqst = nvl(p_numreqst, a.numreqst)         -- 17/03/2023 14:24 Adisak redmine 4448#8909 : change param prefix from v_ => p_ (this from payload)
+        where a.numreqst = nvl(p_numreqst, a.numreqst) -- 17/03/2023 14:24 Adisak redmine 4448#8909 : change param prefix from v_ => p_ (this from payload)
           and a.codcomp  like p_codcomp||'%'
           and a.codpos   = p_codpos
           and a.status   = 'A'
@@ -226,7 +231,19 @@
             obj_data.put('desc_codpos',i.codpose||' '|| get_tpostn_name(i.codpose, global_v_lang));
             obj_data.put('dteintview', to_char(i.dteappoi, 'dd/mm/yyyy'));
             obj_data.put('intviewby', i.codempts);
-            obj_data.put('grade', '');
+
+            --< [START] 000554-bow.sarunya-dev | 10/05/2024 | issue4448#10685: add html star and can click for choose grade
+            v_star_html := '';
+            for star in 1..5 loop
+              if star <= i.numscore then
+                v_star_html := v_star_html || '<i class="fas fa-star star star-rowid-'||i.rowid||'" data-rowid="'||i.rowid||'" data-star="'||star||'"></i>';
+              else
+                v_star_html := v_star_html || '<i class="far fa-star star star-rowid-'||i.rowid||'" data-rowid="'||i.rowid||'" data-star="'||star||'"></i>';
+              end if;
+            end loop;
+            --> [END] 000554-bow.sarunya-dev | 10/05/2024 | issue4448#10685: add html star and can click for choose grade
+
+            obj_data.put('grade', v_star_html);
             obj_data.put('graded', i.numscore);
             obj_data.put('score', i.perscore);
             obj_data.put('result', i.codasapl);
@@ -416,8 +433,7 @@
             v_rowid := '';
             v_codappchse := '';
         end;
-        chk_flowmail.replace_text_frmmail(v_templete_to, 'TREQEST1', v_rowid, v_subject, v_codform, '1', v_func_appr, global_v_coduser, global_v_lang, v_msg_to, p_chkparam => 'N');
-
+        chk_flowmail.replace_param('TREQEST1',v_rowid,v_codform,'1',global_v_lang,v_msg_to,'N'); -- ST11 | Chinnawat (Wiw) | 28/05/2024
         -- replace sender
         begin
             select rowid into v_rowid
@@ -426,17 +442,17 @@
         exception when no_data_found then
             v_rowid := '';
         end;
-        chk_flowmail.replace_text_frmmail(v_templete_to, 'TEMPLOY1', v_rowid, v_subject, v_codform, '1', v_func_appr, global_v_coduser, global_v_lang, v_msg_to, p_chkparam => 'N');
+        chk_flowmail.replace_param('V_TEMPLOY1',v_rowid,v_codform,'1',global_v_lang,v_msg_to,'N'); -- ST11 | Chinnawat (Wiw) | 28/05/2024
 
         begin
             select email into v_email
             from temploy1
-            where codempid = v_codappchse;
+            where codempid = '0000022006';
         exception when no_data_found then
-            v_codappchse := '';
+            v_email := '';
         end;
 
-        v_error := chk_flowmail.send_mail_to_emp (v_codappchse, global_v_coduser, v_msg_to, NULL, v_subject, 'E', global_v_lang, null,null,null, null);
+        v_error := chk_flowmail.send_mail_to_emp ('0000022006', global_v_coduser, v_msg_to, NULL, v_subject, 'E', global_v_lang, null,null,null, null);
 
     end send_mail_a;
 
@@ -465,5 +481,6 @@
     end send_email;
 
 END HRRC5GE;
+
 
 /

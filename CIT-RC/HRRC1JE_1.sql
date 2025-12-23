@@ -3,6 +3,9 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC1JE" AS
+--Date updated: 24/05/2024
+--Comment: 000554-bow.sarunya-dev | issue4448#10689: mail to dont show
+
   procedure initial_current_user_value(json_str_input in clob) as
    json_obj json_object_t;
     begin
@@ -36,6 +39,7 @@
         p_codcompe          := hcm_util.get_string_t(data_obj,'p_codcompe');
         p_mailto            := hcm_util.get_string_t(data_obj,'p_mailto');
         p_flgduepr          := hcm_util.get_string_t(data_obj,'p_flgduepr');
+        p_codpose           := hcm_util.get_string_t(data_obj,'p_codpose'); -- 000554-bow.sarunya-dev | 10/05/2024 | issue4448#10689: mail to dont show
 --  parameter from drilldown tab2
         p_codjob            := hcm_util.get_string_t(data_obj,'p_codjob');
         p_codempmt          := hcm_util.get_string_t(data_obj,'p_codempmt');
@@ -158,7 +162,7 @@
     v_day           number;
     v_count_trequest2   number := 0;
     cursor c1 is
-        select a.codempid, a.codcompe, a.codpose, b.dteempmt, a.dtestrt,a.numreqst, a.dtereq
+        select a.codempid, a.codcompe, a.codpose, b.dteempmt, a.dtestrt,a.numreqst, a.dtereq, a.codcomp, a.codpos --000554-bow.sarunya-dev | 10/05/2024 | issue4448#10689: mail to dont show
         from tappeinf a, temploy1 b
         where a.codempid = b.codempid
           and a.numreqst = nvl(p_numreqst, a.numreqst)
@@ -208,6 +212,13 @@
             obj_data_rows.put('desc_codempid', get_temploy_name(i.codempid, global_v_lang));
             obj_data_rows.put('desc_codcomp', get_tcenter_name(i.codcompe, global_v_lang));
             obj_data_rows.put('desc_codpos', get_tpostn_name(i.codpose, global_v_lang));
+
+            --< [START] 000554-bow.sarunya-dev | 10/05/2024 | issue4448#10689: mail to dont show
+            obj_data_rows.put('codpose', i.codpose);
+            obj_data_rows.put('codpos', i.codpos);
+            obj_data_rows.put('codcomp', i.codcomp);
+            obj_data_rows.put('codcompe', i.codcompe);
+            --> [END] 000554-bow.sarunya-dev | 10/05/2024 | issue4448#10689: mail to dont show
 
             get_service_year(i.dteempmt, sysdate, 'Y', v_year, v_month, v_day);
 
@@ -638,22 +649,23 @@
         v_codposh       temphead.codposh%type;
         v_codcomph      temphead.codcomph%type;
 
-        v_codempidh      temphead.codempidh%type;
-        v_codemprq      treqest1.codemprq%type;
+        v_codempidh     temphead.codempidh%type;
+        v_codempap      treqest1.codempap%type; -- 000554-bow.sarunya-dev | 24/05/2024 | issue4448#10689: change codemprq to codempap
 
         v_mail_to    varchar2(1000 char);
 
         cursor  c1 is
             select codempidh,codposh,codcomph,rowid
             from TEMPHEAD
-            where codpos = p_codpos
-            and codcomp = p_codcomp;
+            where codpos = nvl(p_codpose, p_codpos) -- 000554-bow.sarunya-dev | 10/05/2024 | issue4448#10689: mail to dont show
+              and codcomp = nvl(p_codcompe, p_codcomp); -- 000554-bow.sarunya-dev | 10/05/2024 | issue4448#10689: mail to dont show
 
         cursor  c2 is
             select codempid
             from TEMPLOY1
             where codpos = v_codposh
-            and codcomp = v_codcomph;
+              and codcomp = v_codcomph
+              and staemp <> 9; -- 000554-bow.sarunya-dev | 10/05/2024 | issue4448#10689: mail to dont show
 
     BEGIN
         json_obj := json(json_str_input);
@@ -665,13 +677,13 @@
         v_mail_to := get_temploy_name(v_codempid, global_v_lang);
 
         for i in c1 loop
-
-            if i.codempidh is not null then
+            if i.codempidh != '%' then -- 000554-bow.sarunya-dev | 10/05/2024 | issue4448#10689: mail to dont show
                 v_codempidh := i.codempidh;
                 v_mail_to := v_mail_to||', '||get_temploy_name(v_codempidh, global_v_lang);
             elsif i.codposh is not null  and i.codcomph is not null  then
                 v_codposh := i.codposh;
                 v_codcomph := i.codcomph;
+
                 for j in c2 loop
                     v_mail_to := v_mail_to||', '||get_temploy_name(j.codempid, global_v_lang);
                 end loop;
@@ -679,15 +691,15 @@
         end loop;
 
         BEGIN
-            select codemprq into v_codemprq
+            select codempap into v_codempap -- 000554-bow.sarunya-dev | 24/05/2024 | issue4448#10689: change codemprq to codempap
             from treqest1
             where numreqst = nvl(p_numreqst,numreqst)
               and   rownum = 1;
         exception when no_data_found then
-            v_codemprq := '';
+            v_codempap := ''; -- 000554-bow.sarunya-dev | 24/05/2024 | issue4448#10689: change codemprq to codempap
         END;
 
-        obj_data.put('mailto', v_mail_to||', '||get_temploy_name(v_codemprq, global_v_lang));
+        obj_data.put('mailto', v_mail_to||', '||get_temploy_name(v_codempap, global_v_lang)); -- 000554-bow.sarunya-dev | 24/05/2024 | issue4448#10689: change codemprq to codempap
         obj_data.put('coderror', 200);
 
         dbms_lob.createtemporary(json_str_output, true);
@@ -944,5 +956,6 @@
   END save_index;
 
 END HRRC1JE;
+
 
 /

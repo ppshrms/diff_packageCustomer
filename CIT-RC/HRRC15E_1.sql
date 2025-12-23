@@ -3,6 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC15E" as
+    -- Site: ST11
+    -- Author: Peerasak-(Dev) (000566)
+    -- Date updated: 29-10-2024
+    -- Comment: Issue 4448 #11102
 
     procedure initial_current_user_value(json_str_input in clob) as
         json_obj        json_object_t;
@@ -272,50 +276,71 @@
         end loop;
     end save_tposcond;
 
-  procedure gen_detail(json_obj json_object_t,json_str_output out clob) as
-    obj_json    json_object_t;
-    p_flgcond   varchar2(1 char);
+  procedure gen_detail(json_obj json_object_t, json_str_output out clob) as
+    obj_json        json_object_t;
+    p_flgcond       varchar2(1 char);
     p_obj_syncond   json_object_t := json_object_t();
-    p_syncond   treqest2.syncond%type;
-    v_flgcond   treqest2.flgcond%type;
-    v_codjob    treqest2.codjob%type;
-    v_flgjob    treqest2.flgjob%type;
-    v_syncond   treqest2.syncond%type;
-    v_syncond2  tjobcode.syncond%type;
+    p_syncond       treqest2.syncond%type;
+    v_flgcond       treqest2.flgcond%type;
+    v_codjob        treqest2.codjob%type;
+    v_flgjob        treqest2.flgjob%type;
+    v_syncond       treqest2.syncond%type;
+    v_syncond2      tjobcode.syncond%type;
     v_statement     long;
     v_count_stmt    number := 0;
-    v_namdoc    tappldoc.namdoc%type;
-    v_filedoc   tappldoc.filedoc%type;
-    obj_score1  json_object_t := json_object_t();
-    obj_score2  json_object_t := json_object_t();
-    obj_score3  json_object_t := json_object_t();
-    obj_score4  json_object_t := json_object_t();
-    obj_score5  json_object_t := json_object_t();
-    v_row1      number :=0;
-    v_row2      number :=0;
-    v_row3      number :=0;
-    v_row4      number :=0;
-    v_row5      number :=0;
-    obj_data    json_object_t;
-    obj_rows    json_object_t := json_object_t();
-    v_codcompl  treqest2.codcomp%type;
-    v_codempts  treqest2.codemprc%type;
-    sv_age      number;
-    v_qtyscore  number;
-    v_data      varchar2(1) := 'N';
-    v_numappl   tapplinf.numappl%type;
+    v_namdoc        tappldoc.namdoc%type;
+    v_filedoc       tappldoc.filedoc%type;
+    obj_score  	    json_object_t := json_object_t(); --> yoksirianan | issue:4448#10739 | 28/05/2024
+    obj_score1      json_object_t := json_object_t();
+    obj_score2      json_object_t := json_object_t();
+    obj_score3      json_object_t := json_object_t();
+    obj_score4      json_object_t := json_object_t();
+    obj_score5      json_object_t := json_object_t();
+    v_row      	    number :=0; --> yoksirianan | issue:4448#10739 | 28/05/2024
+    v_row1          number :=0;
+    v_row2          number :=0;
+    v_row3          number :=0;
+    v_row4          number :=0;
+    v_row5          number :=0;
+    obj_data        json_object_t;
+    obj_rows        json_object_t := json_object_t();
+    v_codcompl      treqest2.codcomp%type;
+    v_codempts      treqest2.codemprc%type;
+    sv_age          number;
+    v_qtyscore      number;
+    v_data          varchar2(1) := 'N';
+    v_numappl       tapplinf.numappl%type;
 
-    cursor c1 is
-      select numappl,decode(global_v_lang,'101',namempe,'102',namempt,'103',namemp3,'104',namemp4,'105',namemp5) namempe,
-             dteappl,codpos1,codpos2,statappl,codempid,dteempdb
-        from tapplinf
-       where nvl(numreql,p_numreqst) = p_numreqst
---         and(codpos1   = p_codpos or (codpos2 is not null and codpos2 = p_codpos))
---         and(codbrlc1  = nvl(p_codbrlc,codbrlc1)
---          or(codbrlc2  is not null and codbrlc2 = p_codbrlc)
---          or(codbrlc3  is not null and codbrlc3 = p_codbrlc))
-         and statappl = '10'
-    order by numappl;
+    -- Dev-Peerasak (000566) || 01/10/2024 || Issue#11102
+    v_cur           SYS_REFCURSOR; 
+    v_rtbs_from     varchar2(4000) := ' from TAPPLINF ';
+    v_rtbs_syncond  ttobfcde.syncond%type;
+
+    TYPE t_tapplinf_record IS RECORD (
+        numappl   tapplinf.numappl%TYPE,
+        namempe   tapplinf.namempe%TYPE,
+        dteappl   tapplinf.dteappl%TYPE,
+        codpos1   tapplinf.codpos1%TYPE,
+        codpos2   tapplinf.codpos2%TYPE,
+        statappl  tapplinf.statappl%TYPE,
+        codempid  tapplinf.codempid%TYPE,
+        dteempdb  tapplinf.dteempdb%TYPE
+    );
+
+    i           t_tapplinf_record; 
+    -- Dev-Peerasak (000566) || 01/10/2024 || Issue#11102
+
+--    cursor c1 is
+--      select numappl,decode(global_v_lang,'101',namempe,'102',namempt,'103',namemp3,'104',namemp4,'105',namemp5) namempe,
+--             dteappl,codpos1,codpos2,statappl,codempid,dteempdb
+--        from tapplinf
+--       where nvl(numreql,p_numreqst) = p_numreqst
+----         and(codpos1   = p_codpos or (codpos2 is not null and codpos2 = p_codpos))
+----         and(codbrlc1  = nvl(p_codbrlc,codbrlc1)
+----          or(codbrlc2  is not null and codbrlc2 = p_codbrlc)
+----          or(codbrlc3  is not null and codbrlc3 = p_codbrlc))
+--         and statappl = '10'
+--    order by numappl;
 
     cursor c2 is
       select syncond,qtyscore
@@ -324,114 +349,116 @@
          and codpos = p_codpos
          and syncond is not null
     order by numseq;
+
   begin
-    for i in c1 loop
-      param_json      := hcm_util.get_json_t(json_obj,'param_json');
-      p_flgcond       := upper(hcm_util.get_string_t(param_json,'flgcond'));
-      p_obj_syncond   := hcm_util.get_json_t(param_json,'syncond');
-      p_syncond       := hcm_util.get_string_t(p_obj_syncond,'code');
-      if p_flgcond = 'N' then
-        v_syncond   := p_syncond;
+     -- Dev-Peerasak (000566) || 01/10/2024 || Issue#11102
+    param_json      := hcm_util.get_json_t(json_obj, 'param_json');
+    p_flgcond       := upper(hcm_util.get_string_t(param_json, 'flgcond'));
+
+    if p_flgcond = 'N' then
+      p_obj_syncond   := hcm_util.get_json_t(param_json, 'syncond');
+      p_syncond       := hcm_util.get_string_t(p_obj_syncond, 'code');
+      v_syncond       := p_syncond;
+
+      if v_syncond is not null then
+        v_syncond := 'and '||v_syncond;
+        sv_age := trunc(( months_between(sysdate, i.dteempdb)/12));
+      end if;
+
+      replace_text_by_syncond(v_syncond, 'V_HRRC26', v_rtbs_from, v_rtbs_syncond);
+    elsif p_flgcond = 'Y' then
+      v_flgjob    := null;
+      v_codjob    := null;
+      v_flgcond   := null;
+      v_syncond   := null;
+
+      begin
+        select flgjob,codjob,flgcond,syncond
+          into v_flgjob, v_codjob, v_flgcond, v_syncond
+          from treqest2
+         where codpos   = p_codpos
+           and numreqst = p_numreqst;
+      exception when no_data_found then null;
+      end;
+      commit;
+
+      if v_flgcond = 'Y' then
         if v_syncond is not null then
           v_syncond := 'and '||v_syncond;
-          sv_age := trunc(( months_between(sysdate,i.dteempdb)/12));
-          v_syncond := replace(v_syncond,'TAPPLINF.SV_AGE',nvl(sv_age,0));
-          v_syncond := replace(v_syncond,'V_HRRC26.CODLANG','TLANGABI.CODLANG');  -- softberry || 20/03/2023 || #8694
-        end if;
-        v_statement := 'select count(tapplinf.numappl) '||
-                       '  from tapplinf, tapplfm, teducatn, tapplref, tapplwex, tcmptncy, V_HRRC26, tlangabi '|| -- softberry || 20/03/2023 || #8694 || '  from tapplinf, tapplfm, teducatn, tapplref, tapplwex, tcmptncy,V_HRRC26 '||
-                       ' where tapplinf.numappl = '||''''||i.numappl||''''||' '||
-                       '   and tapplinf.numappl = tapplfm.numappl(+) '||
-                       '   and tapplinf.numappl = teducatn.numappl(+) '||
-                       '   and tapplinf.numappl = tapplref.numappl(+) '||
-                       '   and tapplinf.numappl = tapplwex.numappl(+) '||
-                       '   and tapplinf.numappl = tlangabi.numappl(+) '|| -- softberry || 20/03/2023 || #8694
-                       '   and tapplinf.numappl = tcmptncy.numappl(+) '||v_syncond;
-        execute immediate v_statement into v_count_stmt;
-      elsif p_flgcond = 'Y' then
-        v_flgjob    := null;
-        v_codjob    := null;
-        v_flgcond   := null;
-        v_syncond   := null;
-        begin
-          select flgjob,codjob,flgcond,syncond
-            into v_flgjob,v_codjob,v_flgcond,v_syncond
-            from treqest2
-           where codpos   = p_codpos
-             and numreqst = p_numreqst;
-        exception when no_data_found then null;
-        end;
-        if v_flgcond = 'Y' then
-          if v_syncond is not null then
-            v_syncond := 'and '||v_syncond;
-          end if;
-          v_statement := 'select count(v_hrrc26.numappl) '||
-                         '  from v_hrrc26 '||
-                         ' where v_hrrc26.numappl = '||''''||i.numappl||''''||' '||v_syncond;
-          execute immediate v_statement into v_count_stmt;
-        end if;
-        if v_flgjob = 'Y' then
-          begin
-            select syncond
-              into v_syncond
-              from tjobcode
-             where codjob = v_codjob;
-          exception when no_data_found then
-            v_syncond := null;
-          end;
-          if v_syncond is not null then
-            v_syncond := 'and '||v_syncond;
-            v_syncond := replace(v_syncond,'V_HRCO21','V_HRCO21_TAPPLINF');
-            /*v_syncond := replace(v_syncond,'V_HRCO21.NUMAPPL','V_HRCO21_TAPPLINF.NUMAPPL');
-            v_syncond := replace(v_syncond,'V_HRCO21.CODCOMP','V_HRCO21_TAPPLINF.CODCOMP');
-            v_syncond := replace(v_syncond,'V_HRCO21.CODPOS','V_HRCO21_TAPPLINF.CODPOS');
-            v_syncond := replace(v_syncond,'V_HRCO21.CODBRLC','V_HRCO21_TAPPLINF.CODBRLC');
-            v_syncond := replace(v_syncond,'V_HRCO21.CODSEX','V_HRCO21_TAPPLINF.CODSEX');
-            v_syncond := replace(v_syncond,'V_HRCO21.AGEEMP','V_HRCO21_TAPPLINF.AGEEMP');
-            v_syncond := replace(v_syncond,'V_HRCO21.SV_EXP','V_HRCO21_TAPPLINF.SV_EXP');
-            v_syncond := replace(v_syncond,'V_HRCO21.CODEDLV','V_HRCO21_TAPPLINF.CODEDLV');
-            v_syncond := replace(v_syncond,'V_HRCO21.CODDGLV','V_HRCO21_TAPPLINF.CODDGLV');
-            v_syncond := replace(v_syncond,'V_HRCO21.CODMAJSB','V_HRCO21_TAPPLINF.CODMAJSB');
-            v_syncond := replace(v_syncond,'V_HRCO21.CODINST','V_HRCO21_TAPPLINF.CODINST');
-            v_syncond := replace(v_syncond,'V_HRCO21.CODCNTY','V_HRCO21_TAPPLINF.CODCNTY');
-            v_syncond := replace(v_syncond,'V_HRCO21.CODMINSB','V_HRCO21_TAPPLINF.CODMINSB');
-            v_syncond := replace(v_syncond,'V_HRCO21.NUMGPA','V_HRCO21_TAPPLINF.NUMGPA');*/
-          end if;
-          v_statement := 'select count(v_hrco21_tapplinf.numappl) '||
-                         '  from v_hrco21_tapplinf '||
-                         ' where v_hrco21_tapplinf.numappl = '||''''||i.numappl||''''||' '||v_syncond;
-          execute immediate v_statement into v_count_stmt;
+
+          replace_text_by_syncond(v_syncond, 'V_HRRC26', v_rtbs_from, v_rtbs_syncond);
         end if;
       end if;
-      if v_count_stmt > 0 then
+
+      if v_flgjob = 'Y' then
+        begin
+          select syncond
+            into v_syncond
+            from tjobcode
+           where codjob = v_codjob;
+        exception when no_data_found then
+          v_syncond := null;
+        end;
+
+        if v_syncond is not null then
+          v_syncond := ' and '||v_syncond;
+        end if;
+
+        replace_text_by_syncond(v_syncond, 'V_HRCO21', v_rtbs_from, v_rtbs_syncond);
+      end if;
+    end if;
+
+    v_statement := 'SELECT TAPPLINF.numappl,' ||
+                   'decode(' || global_v_lang || ', 101, namempe, 102, namempt, 103, namemp3, 104, namemp4, 105, namemp5) namempe, ' ||
+                   'TAPPLINF.dteappl, TAPPLINF.codpos1, TAPPLINF.codpos2, TAPPLINF.statappl, TAPPLINF.codempid, TAPPLINF.dteempdb ' ||
+                    v_rtbs_from || 
+                    ' WHERE TAPPLINF.STATAPPL = ''10'' ' || 
+                    ' AND  NVL(TAPPLINF.NUMREQL, ''' || p_numreqst || ''') = ''' || p_numreqst || ''' ' ||
+                    v_rtbs_syncond ||
+                    ' ORDER BY TAPPLINF.NUMAPPL';
+
+
+    OPEN v_cur FOR v_statement;
+    LOOP
+        FETCH v_cur INTO i;  -- Fetch directly into the row
+        EXIT WHEN v_cur%NOTFOUND;
+
         v_data       := 'Y';
         v_count_stmt := 0;
         v_syncond    := null;
         v_qtyscore   := 0;
+
         for i2 in c2 loop
           if i2.syncond is not null then
             v_syncond := 'and '||i2.syncond;
-            v_syncond := replace(v_syncond,'V_HRRC15E','v_hrrc26');-- boy 02/04/2022 : delete this line when fix error
           end if;
-          v_statement := 'select count(v_hrrc26.numappl) '||
-                         '  from v_hrrc26 '||
-                         ' where v_hrrc26.numappl = '||''''||i.numappl||''''||' '||v_syncond;
+
+          replace_text_by_syncond(v_syncond, 'V_HRRC26', v_rtbs_from, v_rtbs_syncond);
+          v_statement := 'SELECT COUNT(TAPPLINF.NUMAPPL) '||
+                          v_rtbs_from || 
+                          ' WHERE TAPPLINF.STATAPPL = ''10'' ' || 
+                          ' AND  NVL(TAPPLINF.NUMAPPL, ''' || i.numappl || ''') = ''' || i.numappl || ''' ' ||
+                          v_rtbs_syncond ||
+                          ' ORDER BY TAPPLINF.NUMAPPL';
+
           execute immediate v_statement into v_count_stmt;
           if v_count_stmt > 0 then
             v_qtyscore := i2.qtyscore;
             exit;
           end if;
         end loop; -- c2
+
         obj_data := json_object_t();
-        obj_data.put('numappl',i.numappl);
-        obj_data.put('namempe',i.namempe);
-        obj_data.put('codpos1',i.codpos1);
-        obj_data.put('desc_codpos1',get_tpostn_name(i.codpos1,global_v_lang));
-        obj_data.put('codpos2',i.codpos2);
-        obj_data.put('desc_codpos2',get_tpostn_name(i.codpos2,global_v_lang));
-        obj_data.put('statappl',i.statappl);
-        obj_data.put('qtyscore',v_qtyscore);
-        obj_data.put('dteappl',to_char(i.dteappl,'dd/mm/yyyy'));
+        obj_data.put('numappl', i.numappl);
+        obj_data.put('namempe', i.namempe);
+        obj_data.put('codpos1', i.codpos1);
+        obj_data.put('desc_codpos1', get_tpostn_name(i.codpos1,global_v_lang));
+        obj_data.put('codpos2', i.codpos2);
+        obj_data.put('desc_codpos2', get_tpostn_name(i.codpos2,global_v_lang));
+        obj_data.put('statappl', i.statappl);
+        obj_data.put('desc_statappl', get_tlistval_name('STATAPPL', i.statappl, global_v_lang)); -- << STD-ST11 | 000537-Boy-Apisit-Dev | 24/05/2024 | Fix issue 4448: #10753
+        obj_data.put('qtyscore', v_qtyscore);
+        obj_data.put('dteappl', to_char(i.dteappl,'dd/mm/yyyy'));
 
         begin
           select namdoc, filedoc
@@ -444,8 +471,9 @@
           v_filedoc := null;
         end;
 
-        obj_data.put('resume',v_namdoc);
+        obj_data.put('resume', v_namdoc);
 --        obj_data.put('path_filename',v_filedoc);
+
         obj_data.put('path_filename',get_tsetup_value('PATHWORKPHP') || get_tfolderd('HRPMC2E') || '/' || v_filedoc); -- Adisak 24/03/202317:43 redmine 4448#9226
         if v_qtyscore = '1' then
           v_row1 := v_row1+1;
@@ -462,9 +490,13 @@
         elsif v_qtyscore = '5' then
           v_row5 := v_row5+1;
           obj_score5.put(to_char(v_row5-1),obj_data);
+        elsif v_qtyscore = '0' then --> yoksirianan | issue:4448#10739 | 28/05/2024
+          v_row := v_row + 1;
+          obj_score.put(to_char(v_row-1), obj_data);
         end if;
-      end if; -- v_count_stmt > 0
-    end loop; -- c1
+    END LOOP;
+    CLOSE v_cur;
+
     v_row1 := 0;
     for i in 0..obj_score5.get_size-1 loop
         v_row1 := v_row1+1;
@@ -485,6 +517,10 @@
     for i in 0..obj_score1.get_size-1 loop
         v_row1 := v_row1+1;
         obj_rows.put(to_char(v_row1-1),obj_score1.get(to_char(i)));
+    end loop;
+    for i in 0..obj_score.get_size-1 loop --> yoksirianan | issue:4448#10739 | 28/05/2024
+        v_row1 := v_row1 + 1;
+        obj_rows.put(to_char(v_row1-1), obj_score.get(to_char(i)));
     end loop;
 
     if v_data = 'N' then -- if obj_rows.get_size = 0 then
@@ -528,7 +564,7 @@
     obj_rows.to_clob(json_str_output);
     return;
   end gen_detail;
-
+  --
     procedure check_get_detail(json_obj json_object_t) as
         obj_data        json_object_t;
         obj_table       json_object_t;
@@ -697,7 +733,7 @@
             v_rowid := '';
             v_codintview := '';
         end;
-        chk_flowmail.replace_text_frmmail(v_templete_to, 'TREQEST1', v_rowid, v_subject, v_codform, '1', v_func_appr, global_v_coduser, global_v_lang, v_msg_to, p_chkparam => 'N');
+        chk_flowmail.replace_param('TREQEST1',v_rowid,v_codform,'1',global_v_lang,v_msg_to,'N'); -- ST11 | Chinnawat (Wiw) | 28/05/2024
 
         -- replace sender
         begin
@@ -707,7 +743,8 @@
         exception when no_data_found then
             v_rowid := '';
         end;
-        chk_flowmail.replace_text_frmmail(v_templete_to, 'TEMPLOY1', v_rowid, v_subject, v_codform, '1', v_func_appr, global_v_coduser, global_v_lang, v_msg_to, p_chkparam => 'N');
+        chk_flowmail.replace_param('TEMPLOY1',v_rowid,v_codform,'1',global_v_lang,v_msg_to,'N'); -- ST11 | Chinnawat (Wiw) | 28/05/2024
+
         begin
             select email into v_email
             from temploy1
@@ -720,7 +757,7 @@
 
     end send_mail_a;
 
-  procedure send_email(json_str_input in clob, json_str_output out clob) AS
+    procedure send_email(json_str_input in clob, json_str_output out clob) AS
         json_obj        json_object_t;
         data_obj        json_object_t;
     begin
@@ -743,7 +780,119 @@
         param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
         json_str_output := get_response_message('400',param_msg_error,global_v_lang);
     end send_email;
+    --
+    -- Dev-Peerasak (000566) || 01/10/2024 || Issue#11102
+    PROCEDURE replace_text_by_syncond(
+        in_syncond in clob, 
+        in_table in varchar2, 
+        v_rtbs_from out clob, 
+        v_rtbs_syncond out clob
+    ) AS
 
+      v_tobfcde_typrelate   varchar2(10 char);
+
+    BEGIN
+      v_rtbs_from := ' from TAPPLINF ';
+      v_rtbs_syncond := in_syncond;
+
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.AGE', 'TRUNC(TRUNC(MONTHS_BETWEEN(SYSDATE, NVL(TAPPLINF.DTEEMPDB, SYSDATE))) / 12)');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODSEX', 'TAPPLINF.CODSEX');    
+
+      -- TAPPLINF
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.DTEAPPL', 'TAPPLINF.XDTEAPPL');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.NUMAPPL', 'TAPPLINF.NUMAPPL');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.STATAPPL', 'TAPPLINF.STATAPPL');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.NAMEMP', 'TAPPLINF.NAMEMPT');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODPOS1', 'TAPPLINF.CODPOS1');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODPOS2', 'TAPPLINF.CODPOS2');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODMEDIA', 'TAPPLINF.CODMEDIA');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.DTEEMPDB', 'TAPPLINF.DTEEMPDB');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.SV_AGE', 'NVL(ROUND(MONTHS_BETWEEN(SYSDATE, TAPPLINF.DTEEMPDB)), 0)');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODSEX', 'TAPPLINF.CODSEX');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODBLOOD', 'TAPPLINF.CODBLOOD');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODDOMCL', 'TAPPLINF.CODDOMCL');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODNATNL', 'TAPPLINF.CODNATNL');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODORGIN', 'TAPPLINF.CODORGIN');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODRELGN', 'TAPPLINF.CODRELGN');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.NUMOFFID', 'TAPPLINF.NUMOFFID');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.NUMTELEM', 'TAPPLINF.NUMTELEM');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.STAMARRY', 'TAPPLINF.STAMARRY');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.STAMILIT', 'TAPPLINF.STAMILIT');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.ADRCONTT', 'TAPPLINF.ADRCONTT');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.ADRREGT', 'TAPPLINF.ADRREGT');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODBRLC1', 'TAPPLINF.CODBRLC1');
+
+      -- TAPPLFM
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.NAMCONT', 'TAPPLFM.NAMCONT');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.ADRCONT1', 'TAPPLFM.ADRCONT1');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODPOST', 'TAPPLFM.CODPOST');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.NUMTELE', 'TAPPLFM.NUMTELE');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.DESRELAT', 'TAPPLFM.DESRELAT');
+
+      -- TEDUCATN
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODEDLV', 'TEDUCATN.CODEDLV');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODDGLV', 'TEDUCATN.CODDGLV');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODMAJSB', 'TEDUCATN.CODMAJSB');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODMINSB', 'TEDUCATN.CODMINSB');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODINST', 'TEDUCATN.CODINST');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODCOUNT', 'TEDUCATN.CODCOUNT');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.NUMGPA', 'TEDUCATN.NUMGPA');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.STAYEAR', 'TEDUCATN.STAYEAR ');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.DTEGYEAR', 'TEDUCATN.DTEGYEAR');
+
+      -- TAPPLREF
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.NAMREFT', 'TAPPLREF.NAMREFT');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.FLGREF', 'TAPPLREF.FLGREF');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.DESPOS', 'TAPPLREF.DESPOS');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.ADRCONT1', 'TAPPLREF.ADRCONT1');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.DESNOFFI', 'TAPPLREF.DESNOFFI');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.NUMTELE', 'TAPPLREF.NUMTELE');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.EMAIL', 'TAPPLREF.EMAIL');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODOCCUP', 'TAPPLREF.CODOCCUP');
+
+      -- TAPPLWEX
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.SV_EXP', 'TRUNC(TRUNC(MONTHS_BETWEEN(SYSDATE, NVL(TAPPLWEX.DTESTART, SYSDATE))) / 12)');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.DESNOFFI', 'TAPPLWEX.DESNOFFI');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.DESLSTJOB1', 'TAPPLWEX.DESLSTJOB1');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.DESLSTPOS', 'TAPPLWEX.DESLSTPOS');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.DESOFFI1', 'TAPPLWEX.DESOFFI1');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.NUMTELEO', 'TAPPLWEX.NUMTELEO');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.NAMBOSS', 'TAPPLWEX.NAMBOSS');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.DESRES', 'TAPPLWEX.DESRES');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.AMTINCOM', 'TAPPLWEX.AMTINCOM');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.DTESTART', 'TAPPLWEX.DTESTART');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.DTEEND', 'TAPPLWEX.DTEEND');
+
+      -- TLANGABI
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.CODLANG', 'TLANGABI.CODLANG');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.FLGLIST', 'TLANGABI.FLGLIST');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.FLGSPEAK', 'TLANGABI.FLGSPEAK');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.FLGREAD', 'TLANGABI.FLGREAD');
+      v_rtbs_syncond := replace(v_rtbs_syncond, in_table || '.FLGWRITE', 'TLANGABI.FLGWRITE');
+
+      -- Session Join Table
+      if INSTR(v_rtbs_syncond, 'TAPPLFM') > 0 then
+          v_rtbs_from := v_rtbs_from || ' LEFT JOIN TAPPLFM ON TAPPLINF.NUMAPPL = TAPPLFM.NUMAPPL ';
+      end if;
+
+      if INSTR(v_rtbs_syncond, 'TEDUCATN') > 0 then
+          v_rtbs_from := v_rtbs_from || ' LEFT JOIN TEDUCATN ON TAPPLINF.NUMAPPL = TEDUCATN.NUMAPPL ';
+      end if;
+
+      if INSTR(v_rtbs_syncond, 'TAPPLREF') > 0 then
+          v_rtbs_from := v_rtbs_from || ' LEFT JOIN TAPPLREF ON TAPPLINF.NUMAPPL = TAPPLREF.NUMAPPL ';
+      end if;
+
+      if INSTR(v_rtbs_syncond, 'TAPPLWEX') > 0 then
+          v_rtbs_from := v_rtbs_from || ' LEFT JOIN TAPPLWEX ON TAPPLINF.NUMAPPL = TAPPLWEX.NUMAPPL ';
+      end if;
+
+      if INSTR(v_rtbs_syncond, 'TLANGABI') > 0 then
+          v_rtbs_from := v_rtbs_from || ' LEFT JOIN TLANGABI ON TAPPLINF.NUMAPPL = TLANGABI.NUMAPPL ';
+      end if;
+    END replace_text_by_syncond;
+    -- Dev-Peerasak (000566) || 01/10/2024 || Issue#11102
 end HRRC15E;
+
 
 /

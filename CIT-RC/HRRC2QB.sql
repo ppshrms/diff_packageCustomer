@@ -20,7 +20,7 @@
 
   global_v_codapp           varchar2(100 char)  := 'HRRC2QB';
 
-  
+
   procedure initial_value (json_str in clob);
   procedure check_index;
   procedure get_index (json_str_input in clob, json_str_output out clob);
@@ -29,5 +29,6 @@
   procedure gen_export_excel_data (json_str_input in clob,json_str_output out clob);
 
 end HRRC2QB;
+
 
 /

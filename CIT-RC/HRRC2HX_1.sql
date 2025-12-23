@@ -167,4 +167,5 @@ procedure get_detail(json_str_input in clob, json_str_output out clob) as
 
 end HRRC2HX;
 
+
 /

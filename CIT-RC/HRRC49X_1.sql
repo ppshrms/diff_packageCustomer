@@ -3,7 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC49X" AS
-
+  -- Site: ST11
+  -- Author: Apisit Boy (000537)
+  -- Date updated: 14/06/2024 10:52
+  -- Comment: 4448#10780
   procedure initial_current_user_value(json_str_input in clob) as
    json_obj json_object_t;
     begin
@@ -290,11 +293,14 @@
       exit when v_item is null;
 --        param_msg_error := param_msg_error||v_statmt;
      -- v_value value in selected object with same name as field
-      v_value := name_in(v_itemson , lower(v_item));
+     v_value := name_in(v_itemson , lower(v_item));
       if get_item_property(v_codtable,v_item) = 'DATE' then
         v_value   := 'to_date('''||to_char(to_date(v_value),'dd/mm/yyyy')||''',''dd/mm/yyyy'')' ;
         v_statmt  := replace(v_statmt,'['||v_item_field_original||']',v_value) ;
       else
+--        if (v_value is null or v_value = '') and upper(v_item) = 'CODCOMPY' then
+--            
+--        end;
         v_statmt  := replace(v_statmt,'['||v_item_field_original||']',v_value) ;
 --                param_msg_error := param_msg_error||v_statmt;
 
@@ -387,9 +393,11 @@
           v_funcdesc := null;
           v_flgchksal:= 'N' ;
       end;
+
       if nvl(i.flgdesc,'N') = 'N' then
         v_funcdesc := null;
       end if;
+
       if v_flgchksal = 'Y' then
          v_statmt  := 'select to_char(stddec('||i.ffield||','||''''||hcm_util.get_string_t(p_itemson,'codempid')||''''||','||''''||hcm_secur.get_v_chken||'''),''fm999,999,999,990.00'') from '||i.codtable ||' where '||i.fwhere ;
       elsif v_funcdesc is not null then
@@ -403,10 +411,13 @@
       else
          v_statmt  := i.stm ;
       end if;
+
       if get_item_property(v_codtable,v_codcolmn) = 'DATE' then
-        if nvl(i.flgdesc,'N') = 'N' then
-          v_statmt := 'select to_char('||i.ffield||',''dd/mm/yyyy'') from '||i.codtable ||' where '||i.fwhere;
-        else
+--<< ST11 | Apisit Boy (000537) | 11-06-2024 | Fix issue 4448: #10780
+--        if nvl(i.flgdesc,'N') = 'N' then
+--          v_statmt := 'select to_char('||i.ffield||',''dd/mm/yyyy'') from '||i.codtable ||' where '||i.fwhere;
+--        else
+-->> ST11 | Apisit Boy (000537) | 11-06-2024 | Fix issue 4448: #10780
           v_statmt := 'select to_char('||i.ffield||',''dd/mm/yyyy'') from '||i.codtable ||' where '||i.fwhere;
           v_statmt := std_get_value_replace(v_statmt, p_itemson, v_codtable);
           v_dataexct := execute_desc(v_statmt);
@@ -420,10 +431,16 @@
           v_dataexct := to_number(v_day) ||' '||
                         get_label_name('HRPM33R1',global_v_lang,30) || ' ' ||get_tlistval_name('NAMMTHFUL',to_number(v_month),global_v_lang) || ' ' ||
                         get_label_name('HRPM33R1',global_v_lang,220) || ' ' ||hcm_util.get_year_buddhist_era(v_year);
-        end if;
+--        end if;   --<< ST11 | Apisit Boy (000537) | 11-06-2024 | Fix issue 4448: #10780
       else
         v_statmt := std_get_value_replace(v_statmt, p_itemson, v_codtable);
         v_dataexct := execute_desc(v_statmt);
+--<< ST11 | Apisit Boy (000537) | 11-06-2024 | Fix issue 4448: #10780        
+        if (v_dataexct is null or v_dataexct = '') and upper(v_codtable) = 'TCOMPNY' then
+            v_statmt := 'select '||v_codcolmn||' from '||v_codtable||' where codcompy = '''||p_codcomp||'''';
+            v_dataexct := execute_desc(v_statmt);
+        end if;
+-->> ST11 | Apisit Boy (000537) | 11-06-2024 | Fix issue 4448: #10780
       end if;
       v_message := replace(v_message,i.fparam,v_dataexct);
     end loop; -- loop main
@@ -547,7 +564,7 @@
         v_namcom       tcompny.namcome%type;
         v_adremp        temploy2.adrconte%type;
         v_section       number;
-      
+
       cursor c_paraminput is ----
         select fparam,descript
         from tfmparam
@@ -556,7 +573,7 @@
           and flginput = 'Y'
           and flgstd <> 'Y'
         order by numseq;
-        
+
     begin
 
     begin
@@ -644,47 +661,58 @@
 
             -- Read Document HTML
             gen_message(p_codform, o_message1, o_namimglet, o_message2, o_typemsg2, o_message3);
-                    list_msg_html := html_array(o_message1,o_message2,o_message3);
+            list_msg_html := html_array(o_message1,o_message2,o_message3);
 
             for i in 1..3 loop
                 data_file := list_msg_html(i);
                 data_file := std_replace(data_file,p_codform,i,itemSelected );
-                data_file := replace(data_file,'[PARAM-DOCID]',v_numdoc);
-                data_file := replace(data_file,'[PARAM-DATE]',TO_CHAR(sysdate,'fmdd MONTH yyyy','nls_calendar=''Thai Buddha'' nls_date_language = Thai'));
-                data_file := replace(data_file,'[PARAM-ADRCOM]',v_adrcom);
-                data_file := replace(data_file,'[param_01]',v_namcom);
-                data_file := replace(data_file,'[param_03]',v_namcom);
+--<< ST11 | Apisit Boy (000537) | 11-06-2024 | Fix issue 4448: #10780
+--                data_file := replace(data_file,'[PARAM-DOCID]',v_numdoc);
+--                data_file := replace(data_file,'[PARAM-DATE]',TO_CHAR(sysdate,'fmdd MONTH yyyy','nls_calendar=''Thai Buddha'' nls_date_language = Thai'));
+--                data_file := replace(data_file,'[PARAM-DATE]',nvl(TO_CHAR(p_dateprint_date,'fmdd MONTH yyyy','nls_calendar=''Thai Buddha'' nls_date_language = Thai'),TO_CHAR(sysdate,'fmdd MONTH yyyy','nls_calendar=''Thai Buddha'' nls_date_language = Thai')));
+--                data_file := replace(data_file,'[PARAM-ADRCOM]',v_adrcom);
+--                data_file := replace(data_file,'[param_01]',v_namcom);
+--                data_file := replace(data_file,'[param_03]',v_namcom);
+--
+--                data_file := replace(data_file,'[param_07]',v_namemp);
+--                data_file := replace(data_file,'[param_08]',v_adremp);
+--                data_file := replace(data_file,'[param_09]',get_tcodec_name('TCODEMPL', v_codempmt , global_v_lang));
+--
+--                data_file := replace(data_file,'[param_12]',get_tpostn_name(v_codpos,global_v_lang)  );
+--
+--                data_file := replace(data_file,'[param_10]',TO_CHAR(v_dteempmt,'fmdd MONTH yyyy','nls_calendar=''Thai Buddha'' nls_date_language = Thai'));
+--                data_file := replace(data_file,'[param_11]',v_codempid);
+--                data_file := replace(data_file,'[param_13]',get_tcenter_name(v_codcomp,global_v_lang));
+--
+--                v_param_14 := '';
+--                for j in 1..10 loop
+--                    if v_codincom1_arr(j) is not null then
+--                        v_param_14 := v_param_14||'<p>'||get_tinexinf_name(v_codincom1_arr(j),global_v_lang)||' '
+--                                                ||get_tlistval_name('NAMEUNIT',v_unitcal1_arr(j),global_v_lang)||' '
+--                                                ||stddec(v_amtincom1_arr(j),v_numappl,hcm_secur.get_v_chken)||'</p>';
+--                    end if;
+--                end loop;
 
-                data_file := replace(data_file,'[param_07]',v_namemp);
-                data_file := replace(data_file,'[param_08]',v_adremp);
-                data_file := replace(data_file,'[param_09]',get_tcodec_name('TCODEMPL', v_codempmt , global_v_lang));
-
-                data_file := replace(data_file,'[param_12]',get_tpostn_name(v_codpos,global_v_lang)  );
-
-                data_file := replace(data_file,'[param_10]',TO_CHAR(v_dteempmt,'fmdd MONTH yyyy','nls_calendar=''Thai Buddha'' nls_date_language = Thai'));
-                data_file := replace(data_file,'[param_11]',v_codempid);
-                data_file := replace(data_file,'[param_13]',get_tcenter_name(v_codcomp,global_v_lang));
-
-                v_param_14 := '';
-                for j in 1..10 loop
-                    if v_codincom1_arr(j) is not null then
-                        v_param_14 := v_param_14||'<p>'||get_tinexinf_name(v_codincom1_arr(j),global_v_lang)||' '
-                                                ||get_tlistval_name('NAMEUNIT',v_unitcal1_arr(j),global_v_lang)||' '
-                                                ||stddec(v_amtincom1_arr(j),v_numappl,hcm_secur.get_v_chken)||'</p>';
-                    end if;
-                end loop;
-
-                data_file := replace(data_file,'[PARAM-TABSAL]',v_param_14);
-                --
-                data_file := replace(data_file,'[PARAM-AMTNET]',to_char(stddec(v_amttotal,v_numappl,hcm_secur.get_v_chken),'fm999,999,999,990.00')||' '||get_amount_name(stddec(v_amttotal,v_numappl,hcm_secur.get_v_chken),global_v_lang));
-                data_file := replace(data_file,'[param_16]',v_qtyduepr);
-
+--                data_file := replace(data_file,'[PARAM-TABSAL]',v_param_14);
+--                --
+--                data_file := replace(data_file,'[PARAM-AMTNET]',to_char(stddec(v_amttotal,v_numappl,hcm_secur.get_v_chken),'fm999,999,999,990.00')||' '||get_amount_name(stddec(v_amttotal,v_numappl,hcm_secur.get_v_chken),global_v_lang));
+--                data_file := replace(data_file,'[param_16]',v_qtyduepr);
+-->> ST11 | Apisit Boy (000537) | 11-06-2024 | Fix issue 4448: #10780
                 for j in 0..p_resultfparam.get_size - 1 loop
                     obj_fparam      := hcm_util.get_json_t( p_resultfparam,to_char(j));
                     fparam_fparam   := hcm_util.get_string_t(obj_fparam,'fparam');
                     fparam_numseq   := hcm_util.get_string_t(obj_fparam,'numseq');
                     fparam_section  := hcm_util.get_string_t(obj_fparam,'section');
                     fparam_value    := hcm_util.get_string_t(obj_fparam,'value');
+-- << ST11 | Apisit Boy (000537) | 11-06-2024 | Fix issue 4448: #10780
+                    if fparam_fparam = '[PARAM-DATE]' then
+                        if upper(global_v_lang) in ('102','TH')THEN
+                            fparam_value := TO_CHAR(p_dateprint_date,'fmdd MONTH yyyy','nls_calendar=''Thai Buddha'' nls_date_language = Thai');
+                        else
+                            fparam_value := TO_CHAR(p_dateprint_date,'fmdd MONTH yyyy','nls_calendar=''Gregorian'' nls_date_language = English');
+                        end if;
+                    end if;
+-- >> ST11 | Apisit Boy (000537) | 11-06-2024 | Fix issue 4448: #10780
                     if fparam_fparam = '[PARAM-SIGNID]' then
                       begin
                         select get_temploy_name(codempid,global_v_lang) into v_namesign
@@ -785,10 +813,10 @@
     global_v_codpswd  := hcm_util.get_string_t(json_obj,'p_codpswd');
     global_v_lang     := hcm_util.get_string_t(json_obj,'p_lang');
 
-        global_v_zyear := hcm_appsettings.get_additional_year() ;
+    global_v_zyear    := hcm_appsettings.get_additional_year() ;
     -- index
     p_codcomp         := hcm_util.get_string_t(json_obj,'p_codcomp');
-        p_detail_obj      := hcm_util.get_json_t(json_object_t(json_obj),'details');
+    p_detail_obj      := hcm_util.get_json_t(json_object_t(json_obj),'details');
     p_url             := hcm_util.get_string_t(json_object_t(p_detail_obj),'url');
     p_codform         := hcm_util.get_string_t(p_detail_obj,'codform');
     p_dateprint_date  := to_date(trim(hcm_util.get_string_t(p_detail_obj,'dateprint')),'dd/mm/yyyy');
@@ -949,5 +977,6 @@
   end;
 
 END HRRC49X;
+
 
 /

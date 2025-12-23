@@ -3,6 +3,11 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC2PB" is
+  -- Site: ST11
+  -- Author: Chinnwat Wiw (000553)
+  -- Date updated: 2024/06/12
+  -- Comment: 4448#10884
+
   procedure initial_value(json_str in clob) is
     json_obj        json_object_t;
   begin
@@ -106,8 +111,8 @@
     ttrainbf_error_all              number := 0;
 
     tapploth_response               json_object_t;
-    tapploth_complete_all           number;
-    tapploth_error_all              number;
+    tapploth_complete_all           number := 0; -- ST11|Chinnawat Wiw (000553)|13-06-2024|4448#10884
+    tapploth_error_all              number := 0; -- ST11|Chinnawat Wiw (000553)|13-06-2024|4448#10884
 
     tapplfm_response                json_object_t;
     tapplfm_complete_all            number := 0;
@@ -137,6 +142,8 @@
     v_msg                           clob;
     v_error                         varchar2(4000 char);
 
+    json_string long;
+
     cursor c_treqest1 is
         select codemprc
           from treqest1
@@ -157,208 +164,243 @@
     addinfo_response            := json_object_t();
     tappldoc_response           := json_object_t();
     if param_msg_error is null then
-    --<< softberry || 28/08/2023
-        for i in 0..p_data_import.get_size-1 loop
-            p_data_each := hcm_util.get_json_t(p_data_import,to_char(i));
-            p_data_sheet := hcm_util.get_json_t(p_data_each, 'dataSheet');
-    -->> softberry || 28/08/2023
-            p_addinfo                 := hcm_util.get_json_t(p_data_sheet, 'p_addinfo');
-            p_doc                     := hcm_util.get_json_t(p_data_sheet, 'p_doc');
-            p_edu                     := hcm_util.get_json_t(p_data_sheet, 'p_edu');
-            p_emppref                 := hcm_util.get_json_t(p_data_sheet, 'p_emppref');
-            p_exp                     := hcm_util.get_json_t(p_data_sheet, 'p_exp');
-            p_info                    := hcm_util.get_json_t(p_data_sheet, 'p_info');
-            p_lng                     := hcm_util.get_json_t(p_data_sheet, 'p_lng');
-            p_ref                     := hcm_util.get_json_t(p_data_sheet, 'p_ref');
-            p_rel                     := hcm_util.get_json_t(p_data_sheet, 'p_rel');
-            p_spouse                  := hcm_util.get_json_t(p_data_sheet, 'p_spouse');
-            p_train                   := hcm_util.get_json_t(p_data_sheet, 'p_train');
+        obj_row         := json_object_t();
+        -->> ST11|Chinnawat Wiw (000553)|13-06-2024|4448#10884
+        --1.tapplinf
+        p_data_each := hcm_util.get_json_t(p_data_import,to_char(0));
+        p_data_sheet := hcm_util.get_json_t(p_data_each, 'dataSheet');
+        p_info := hcm_util.get_json_t(p_data_sheet, 'p_info');
 
-            obj_row         := json_object_t();
+        insert_tapplinf(tapplinf_response, tapplinf_complete_all, tapplinf_error_all);
 
-            --1.tapplinf
-            insert_tapplinf(tapplinf_response, tapplinf_complete_all, tapplinf_error_all);
+        obj_data        := json_object_t();
+        obj_data.put('coderror', '200');
+        obj_data.put('numseq', '1');
+        obj_data.put('iconimage', 'fas fa-user');
+        obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'90'));
+        obj_data.put('complete', tapplinf_complete_all);
+        obj_data.put('error', tapplinf_error_all);
+        obj_data.put('table', tapplinf_response);
+        obj_row.put(to_char(0), obj_data);
+
+        -->> -- softberry || 28/08/2023 || #9223
+
+        --2.teducatn
+        p_data_each := hcm_util.get_json_t(p_data_import,to_char(1));
+        p_data_sheet := hcm_util.get_json_t(p_data_each, 'dataSheet');
+        p_edu := hcm_util.get_json_t(p_data_sheet, 'p_edu');
+
+        insert_teducatn(teducatn_response, teducatn_complete_all ,teducatn_error_all);
+
+        obj_data        := json_object_t();
+        obj_data.put('coderror', '200');
+        obj_data.put('numseq', '2');
+        obj_data.put('iconimage', 'fas fa-graduation-cap');
+        obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'100'));
+        obj_data.put('complete', teducatn_complete_all);
+        obj_data.put('error', teducatn_error_all);
+        obj_data.put('table', teducatn_response);
+        obj_row.put(to_char(1), obj_data);
+
+        --3.tapplwex
+        p_data_each := hcm_util.get_json_t(p_data_import,to_char(2));
+        p_data_sheet := hcm_util.get_json_t(p_data_each, 'dataSheet');
+        p_exp := hcm_util.get_json_t(p_data_sheet, 'p_exp');
+
+        insert_tapplwex(tapplwex_response, tapplwex_complete_all ,tapplwex_error_all);
+
+        obj_data        := json_object_t();
+        obj_data.put('coderror', '200');
+        obj_data.put('numseq', '3');
+        obj_data.put('iconimage', 'fas fa-briefcase');
+        obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'100'));
+        obj_data.put('complete', tapplwex_complete_all);
+        obj_data.put('error', tapplwex_error_all);
+        obj_data.put('table', tapplwex_response);
+        obj_row.put(to_char(2), obj_data);
+
+        --4.ttrainbf
+        p_data_each := hcm_util.get_json_t(p_data_import,to_char(3));
+        p_data_sheet := hcm_util.get_json_t(p_data_each, 'dataSheet');
+        p_train := hcm_util.get_json_t(p_data_sheet, 'p_train');
+
+        insert_ttrainbf(ttrainbf_response, ttrainbf_complete_all ,ttrainbf_error_all);
+
+        obj_data        := json_object_t();
+        obj_data.put('coderror', '200');
+        obj_data.put('numseq', '4');
+        obj_data.put('iconimage', 'fas fa-chalkboard-teacher');
+        obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'120'));
+        obj_data.put('complete', ttrainbf_complete_all);
+        obj_data.put('error', ttrainbf_error_all);
+        obj_data.put('table', ttrainbf_response);
+        obj_row.put(to_char(3), obj_data);
+
+        --5.tapploth
+        p_data_each := hcm_util.get_json_t(p_data_import,to_char(4));
+        p_data_sheet := hcm_util.get_json_t(p_data_each, 'dataSheet');
+        p_emppref := hcm_util.get_json_t(p_data_sheet, 'p_emppref');
+
+        insert_tapploth(tapploth_response, tapploth_complete_all ,tapploth_error_all);
+
+        obj_data        := json_object_t();
+        obj_data.put('coderror', '200');
+        obj_data.put('numseq', '5');
+        obj_data.put('iconimage', 'fas fa-flag');
+        obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'130'));
+        obj_data.put('complete', tapploth_complete_all);
+        obj_data.put('error', tapploth_error_all);
+        obj_data.put('table', tapploth_response);
+        obj_row.put(to_char(4), obj_data);
+
+        --6.tapplfm
+        p_data_each := hcm_util.get_json_t(p_data_import,to_char(5));
+        p_data_sheet := hcm_util.get_json_t(p_data_each, 'dataSheet');
+        p_spouse := hcm_util.get_json_t(p_data_sheet, 'p_spouse');
+
+        insert_tapplfm(tapplfm_response, tapplfm_complete_all ,tapplfm_error_all);
+
+        obj_data        := json_object_t();
+        obj_data.put('coderror', '200');
+        obj_data.put('numseq', '6');
+        obj_data.put('iconimage', 'fas fa-heart');
+        obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'140'));
+        obj_data.put('complete', tapplfm_complete_all);
+        obj_data.put('error', tapplfm_error_all);
+        obj_data.put('table', tapplfm_response);
+        obj_row.put(to_char(5), obj_data);
+
+        --7.tapplrel
+        p_data_each := hcm_util.get_json_t(p_data_import,to_char(6));
+        p_data_sheet := hcm_util.get_json_t(p_data_each, 'dataSheet');
+        p_rel := hcm_util.get_json_t(p_data_sheet, 'p_rel');
+
+        insert_tapplrel(tapplrel_response, tapplrel_complete_all ,tapplrel_error_all);
+
+        obj_data        := json_object_t();
+        obj_data.put('coderror', '200');
+        obj_data.put('numseq', '7');
+        obj_data.put('iconimage', 'fas fa-users');
+        obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'150'));
+        obj_data.put('complete', tapplrel_complete_all);
+        obj_data.put('error', tapplrel_error_all);
+        obj_data.put('table', tapplrel_response);
+        obj_row.put(to_char(6), obj_data);
+
+        --8.tapplref
+        p_data_each := hcm_util.get_json_t(p_data_import,to_char(7));
+        p_data_sheet := hcm_util.get_json_t(p_data_each, 'dataSheet');
+        p_ref := hcm_util.get_json_t(p_data_sheet, 'p_ref');
+
+        insert_tapplref(tapplref_response, tapplref_complete_all ,tapplref_error_all);
+
+        obj_data        := json_object_t();
+        obj_data.put('coderror', '200');
+        obj_data.put('numseq', '8');
+        obj_data.put('iconimage', 'fas fa-user-friends');
+        obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'160'));
+        obj_data.put('complete', tapplref_complete_all);
+        obj_data.put('error', tapplref_error_all);
+        obj_data.put('table', tapplref_response);
+        obj_row.put(to_char(7), obj_data);
+
+        --9.tlangabi
+        p_data_each := hcm_util.get_json_t(p_data_import,to_char(8));
+        p_data_sheet := hcm_util.get_json_t(p_data_each, 'dataSheet');
+        p_lng := hcm_util.get_json_t(p_data_sheet, 'p_lng');
+
+        insert_tlangabi(tlangabi_response, tlangabi_complete_all ,tlangabi_error_all);
+
+        obj_data        := json_object_t();
+        obj_data.put('coderror', '200');
+        obj_data.put('numseq', '9');
+        obj_data.put('iconimage', 'fas fa-language');
+        obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'170'));
+        obj_data.put('complete', tlangabi_complete_all);
+        obj_data.put('error', tlangabi_error_all);
+        obj_data.put('table', tlangabi_response);
+        obj_row.put(to_char(8), obj_data);
+
+        --10.addinfo
+        p_data_each := hcm_util.get_json_t(p_data_import,to_char(9));
+        p_data_sheet := hcm_util.get_json_t(p_data_each, 'dataSheet');
+        p_addinfo := hcm_util.get_json_t(p_data_sheet, 'p_addinfo');
+
+        insert_addinfo(addinfo_response, addinfo_complete_all ,addinfo_error_all);
+
+        obj_data        := json_object_t();
+        obj_data.put('coderror', '200');
+        obj_data.put('numseq', '10');
+        obj_data.put('iconimage', 'fas fa-comment-dots');
+        obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'180'));
+        obj_data.put('complete', addinfo_complete_all);
+        obj_data.put('error', addinfo_error_all);
+        obj_data.put('table', addinfo_response);
+        obj_row.put(to_char(9), obj_data);
+
+        --11.tappldoc
+        p_data_each := hcm_util.get_json_t(p_data_import,to_char(10));
+        p_data_sheet := hcm_util.get_json_t(p_data_each, 'dataSheet');
+        p_lng := hcm_util.get_json_t(p_data_sheet, 'p_doc');
+
+        insert_tappldoc(tappldoc_response, tappldoc_complete_all ,tappldoc_error_all);
+
+        obj_data        := json_object_t();
+        obj_data.put('coderror', '200');
+        obj_data.put('numseq', '11');
+        obj_data.put('iconimage', 'fas fa-file-alt');
+        obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'190'));
+        obj_data.put('complete', tappldoc_complete_all);
+        obj_data.put('error', tappldoc_error_all);
+        obj_data.put('table', tappldoc_response);
+        obj_row.put(to_char(10), obj_data);
+        --<< ST11|Chinnawat Wiw (000553)|13-06-2024|4448#10884
             --<< softberry || 28/08/2023 || #9223
+            /*
+            if (tapplinf_error_all + teducatn_error_all + tapplwex_error_all + ttrainbf_error_all +
+                tapploth_error_all + tapplfm_error_all + tapplrel_error_all + tapplref_error_all +
+                tlangabi_error_all + addinfo_error_all + tappldoc_error_all = 0) then
 
-            obj_data        := json_object_t();
-            obj_data.put('coderror', '200');
-            obj_data.put('numseq', '1');
-            obj_data.put('iconimage', 'fas fa-user');
-            obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'90'));
-            obj_data.put('complete', tapplinf_complete_all);
-            obj_data.put('error', tapplinf_error_all);
-            obj_data.put('table', tapplinf_response);
-            obj_row.put(to_char(0), obj_data);
+                  begin
+                      select decode(global_v_lang,'101',messagee,
+                                            '102',messaget,
+                                            '103',message3,
+                                            '104',message4,
+                                            '105',message5,
+                                            '101',messagee) msg
+                      into  v_msg
+                      from  tfrmmail
+                      where codform = 'HRRC2PB' ;
+                exception when others then
+                  v_msg := null ;
+                end ;
 
-            -->> -- softberry || 28/08/2023 || #9223
+                for r1 in c_treqest1 loop
+                    begin
+                        select email
+                          into v_email
+                          from temploy1
+                          where codempid = r1.codemprc;
+                    exception when no_data_found then
+                        v_email := null;
+                    end;
 
-            --2.teducatn
-            insert_teducatn(teducatn_response, teducatn_complete_all ,teducatn_error_all);
-            obj_data        := json_object_t();
-            obj_data.put('coderror', '200');
-            obj_data.put('numseq', '2');
-            obj_data.put('iconimage', 'fas fa-graduation-cap');
-            obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'100'));
-            obj_data.put('complete', teducatn_complete_all);
-            obj_data.put('error', teducatn_error_all);
-            obj_data.put('table', teducatn_response);
-            obj_row.put(to_char(1), obj_data);
-
-            --3.tapplwex
-            insert_tapplwex(tapplwex_response, tapplwex_complete_all ,tapplwex_error_all);
-            obj_data        := json_object_t();
-            obj_data.put('coderror', '200');
-            obj_data.put('numseq', '3');
-            obj_data.put('iconimage', 'fas fa-briefcase');
-            obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'100'));
-            obj_data.put('complete', tapplwex_complete_all);
-            obj_data.put('error', tapplwex_error_all);
-            obj_data.put('table', tapplwex_response);
-            obj_row.put(to_char(2), obj_data);
-
-            --4.ttrainbf
-            insert_ttrainbf(ttrainbf_response, ttrainbf_complete_all ,ttrainbf_error_all);
-            obj_data        := json_object_t();
-            obj_data.put('coderror', '200');
-            obj_data.put('numseq', '4');
-            obj_data.put('iconimage', 'fas fa-chalkboard-teacher');
-            obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'120'));
-            obj_data.put('complete', ttrainbf_complete_all);
-            obj_data.put('error', ttrainbf_error_all);
-            obj_data.put('table', ttrainbf_response);
-            obj_row.put(to_char(3), obj_data);
-
-            --5.tapploth
-            insert_tapploth(tapploth_response, tapploth_complete_all ,tapploth_error_all);
-            obj_data        := json_object_t();
-            obj_data.put('coderror', '200');
-            obj_data.put('numseq', '5');
-            obj_data.put('iconimage', 'fas fa-flag');
-            obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'130'));
-            obj_data.put('complete', tapploth_complete_all);
-            obj_data.put('error', tapploth_error_all);
-            obj_data.put('table', tapploth_response);
-            obj_row.put(to_char(4), obj_data);
-
-            --6.tapplfm
-            insert_tapplfm(tapplfm_response, tapplfm_complete_all ,tapplfm_error_all);
-            obj_data        := json_object_t();
-            obj_data.put('coderror', '200');
-            obj_data.put('numseq', '6');
-            obj_data.put('iconimage', 'fas fa-heart');
-            obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'140'));
-            obj_data.put('complete', tapplfm_complete_all);
-            obj_data.put('error', tapplfm_error_all);
-            obj_data.put('table', tapplfm_response);
-            obj_row.put(to_char(5), obj_data);
-
-            --7.tapplrel
-            insert_tapplrel(tapplrel_response, tapplrel_complete_all ,tapplrel_error_all);
-            obj_data        := json_object_t();
-            obj_data.put('coderror', '200');
-            obj_data.put('numseq', '7');
-            obj_data.put('iconimage', 'fas fa-users');
-            obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'150'));
-            obj_data.put('complete', tapplrel_complete_all);
-            obj_data.put('error', tapplrel_error_all);
-            obj_data.put('table', tapplrel_response);
-            obj_row.put(to_char(6), obj_data);
-
-            --8.tapplref
-            insert_tapplref(tapplref_response, tapplref_complete_all ,tapplref_error_all);
-            obj_data        := json_object_t();
-            obj_data.put('coderror', '200');
-            obj_data.put('numseq', '8');
-            obj_data.put('iconimage', 'fas fa-user-friends');
-            obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'160'));
-            obj_data.put('complete', tapplref_complete_all);
-            obj_data.put('error', tapplref_error_all);
-            obj_data.put('table', tapplref_response);
-            obj_row.put(to_char(7), obj_data);
-
-            --9.tlangabi
-            insert_tlangabi(tlangabi_response, tlangabi_complete_all ,tlangabi_error_all);
-            obj_data        := json_object_t();
-            obj_data.put('coderror', '200');
-            obj_data.put('numseq', '9');
-            obj_data.put('iconimage', 'fas fa-language');
-            obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'170'));
-            obj_data.put('complete', tlangabi_complete_all);
-            obj_data.put('error', tlangabi_error_all);
-            obj_data.put('table', tlangabi_response);
-            obj_row.put(to_char(8), obj_data);
-
-            --10.addinfo
-            insert_addinfo(addinfo_response, addinfo_complete_all ,addinfo_error_all);
-            obj_data        := json_object_t();
-            obj_data.put('coderror', '200');
-            obj_data.put('numseq', '10');
-            obj_data.put('iconimage', 'fas fa-comment-dots');
-            obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'180'));
-            obj_data.put('complete', addinfo_complete_all);
-            obj_data.put('error', addinfo_error_all);
-            obj_data.put('table', addinfo_response);
-            obj_row.put(to_char(9), obj_data);
-
-            --11.tappldoc
-            insert_tappldoc(tappldoc_response, tappldoc_complete_all ,tappldoc_error_all);
-            obj_data        := json_object_t();
-            obj_data.put('coderror', '200');
-            obj_data.put('numseq', '11');
-            obj_data.put('iconimage', 'fas fa-file-alt');
-            obj_data.put('detail', get_label_name('HRRC2PB1',global_v_lang,'190'));
-            obj_data.put('complete', tappldoc_complete_all);
-            obj_data.put('error', tappldoc_error_all);
-            obj_data.put('table', tappldoc_response);
-            obj_row.put(to_char(10), obj_data);
-
-                --<< softberry || 28/08/2023 || #9223
-                /*
-                if (tapplinf_error_all + teducatn_error_all + tapplwex_error_all + ttrainbf_error_all +
-                    tapploth_error_all + tapplfm_error_all + tapplrel_error_all + tapplref_error_all +
-                    tlangabi_error_all + addinfo_error_all + tappldoc_error_all = 0) then
-
-                      begin
-                          select decode(global_v_lang,'101',messagee,
-                                               '102',messaget,
-                                               '103',message3,
-                                               '104',message4,
-                                               '105',message5,
-                                               '101',messagee) msg
-                          into  v_msg
-                          from  tfrmmail
-                          where codform = 'HRRC2PB' ;
-                    exception when others then
-                      v_msg := null ;
-                    end ;
-
-                    for r1 in c_treqest1 loop
-                        begin
-                            select email
-                              into v_email
-                              from temploy1
-                             where codempid = r1.codemprc;
-                        exception when no_data_found then
-                            v_email := null;
-                        end;
-
-                        if v_email is not null then
-                            v_error := send_mail(v_email,v_msg);
-                        end if;
-                    end loop;
-                end if;
-
-                obj_main        := json_object_t();
-                obj_main.put('coderror', '200');
-                obj_main.put('response', hcm_util.get_string_t(json_object_t(get_response_message(null,get_error_msg_php('HR2715',global_v_lang),global_v_lang)),'response'));
-                obj_main.put('table', obj_row);
-                json_str_output := obj_main.to_clob;
-            else
-                json_str_output := get_response_message(null,param_msg_error,global_v_lang);
+                    if v_email is not null then
+                        v_error := send_mail(v_email,v_msg);
+                    end if;
+                end loop;
             end if;
-            */
-            -->> softberry || 28/08/2023 || #9223
-         end loop;  -- softberry || 28/08/2023 || #9223
+
+            obj_main        := json_object_t();
+            obj_main.put('coderror', '200');
+            obj_main.put('response', hcm_util.get_string_t(json_object_t(get_response_message(null,get_error_msg_php('HR2715',global_v_lang),global_v_lang)),'response'));
+            obj_main.put('table', obj_row);
+            json_str_output := obj_main.to_clob;
+        else
+            json_str_output := get_response_message(null,param_msg_error,global_v_lang);
+        end if;
+        */
+        -->> softberry || 28/08/2023 || #9223
 
     --<< softberry || 28/08/2023 || #9223
         if (tapplinf_error_all + teducatn_error_all + tapplwex_error_all + ttrainbf_error_all +
@@ -754,8 +796,9 @@
                  and dteappl = (select max(dteappl)
                                   from tapplinf
                                  where numoffid = v_tapplinf.numoffid);
-            exception when others then null; end;
-
+            exception when others then
+              null;
+            end;
             v_num_complete_all                  := v_num_complete_all + 1;
         end if;
     else
@@ -1064,19 +1107,22 @@
                     values ( p_numappl,v_tapploth.reason,v_tapploth.jobdesc,v_tapploth.codlocat,v_tapploth.flgprov,
                              v_tapploth.flgoversea,v_tapploth.flgstrwk,v_tapploth.dtewkst,v_tapploth.qtydayst,
                              sysdate,global_v_coduser,sysdate,global_v_coduser);
+                    v_num_complete_all := v_num_complete_all + 1; -- ST11|Chinnawat Wiw (000553)|13-06-2024|4448#10884
                 exception when dup_val_on_index then
                     update tapploth
-                       set reason = v_tapploth.reason,
-                           jobdesc = v_tapploth.jobdesc,
-                           codlocat = v_tapploth.codlocat,
-                           flgprov = v_tapploth.flgprov,
-                           flgoversea = v_tapploth.flgoversea,
-                           flgstrwk = v_tapploth.flgstrwk,
-                           dtewkst = v_tapploth.dtewkst,
-                           qtydayst = v_tapploth.qtydayst,
-                           coduser = global_v_coduser,
-                           dteupd = sysdate
-                     where numappl = p_numappl;
+                        set reason = v_tapploth.reason,
+                            jobdesc = v_tapploth.jobdesc,
+                            codlocat = v_tapploth.codlocat,
+                            flgprov = v_tapploth.flgprov,
+                            flgoversea = v_tapploth.flgoversea,
+                            flgstrwk = v_tapploth.flgstrwk,
+                            dtewkst = v_tapploth.dtewkst,
+                            qtydayst = v_tapploth.qtydayst,
+                            coduser = global_v_coduser,
+                            dteupd = sysdate
+                      where numappl = p_numappl;
+
+                    v_num_complete_all := v_num_complete_all + 1; -- ST11|Chinnawat Wiw (000553)|13-06-2024|4448#10884
                 when others then
                     v_num_error_all := v_num_error_all + 1;
                 end;
@@ -1306,6 +1352,8 @@
                              v_tapplref.namrefe,v_tapplref.namreft,v_tapplref.namref3,v_tapplref.namref4,v_tapplref.namref5,
                              v_tapplref.flgref,v_tapplref.despos,v_tapplref.adrcont1,v_tapplref.desnoffi,v_tapplref.numtele,v_tapplref.email,
                              sysdate,global_v_coduser,sysdate,global_v_coduser);
+
+                    v_num_complete_all := v_num_complete_all + 1; -- ST11|Chinnawat Wiw (000553)|13-06-2024|4448#10884
                 exception when others then
                     v_num_error_all := v_num_error_all + 1;
                 end;
@@ -1777,5 +1825,6 @@
     param_msg_error     := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
   end check_error;
 end HRRC2PB;
+
 
 /
