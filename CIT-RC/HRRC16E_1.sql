@@ -100,6 +100,9 @@
     v_typelogical   varchar2(1 char) := p_typelogical;
     v_flgjob        treqest2.flgjob%type;
     v_flgcond       treqest2.flgcond%type;
+    v_from          varchar2(100 char);
+    v_where         varchar2(100 char);
+    v_join          varchar2(100 char);
 
     cursor c1 is
       select a.numreqst, a.codempid, b.codcomp, b.codpos, b.dteempmt, b.numlvl,
@@ -146,6 +149,8 @@
           v_statement := 'select count(v_hrpma1.codempid) '||
                          '  from v_hrpma1 '||
                          ' where v_hrpma1.codempid = '||''''||i.codempid||''''||' '||v_syncond;
+
+
         elsif v_typelogical = '2' then
           if v_syncond is not null then
             v_syncond := replace(v_syncond,'V_HRCO21.AGEEMP','V_HRPMA1.AGE');
@@ -156,11 +161,13 @@
           v_statement := 'select count(v_hrpma1.codempid) '||
                          '  from v_hrpma1 '||
                          ' where v_hrpma1.codempid = '||''''||i.codempid||''''||' '||v_syncond;
+
         elsif v_typelogical = '3' then
           v_statement := 'select count(v_hrpma1.codempid) '||
                          '  from v_hrpma1 '||
                          ' where v_hrpma1.codempid = '||''''||i.codempid||''''||' '||v_syncond;
         end if;
+        commit;
         execute immediate v_statement into v_check_logical;
 
         if v_check_logical > 0 then
@@ -524,6 +531,7 @@
         exception when no_data_found then
             v_codbrlc := '';
         end;
+
         obj_data := json_object_t();
         obj_data.put('codbrlc',v_codbrlc);
         obj_rows := json_object_t();
@@ -543,5 +551,6 @@
     end get_index_codbrlc;
 
 END HRRC16E;
+
 
 /

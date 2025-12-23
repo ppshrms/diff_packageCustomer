@@ -3,6 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRRC46X" AS
+  -- Site: ST11
+  -- Author: Chinanwat Wiw (000553)
+  -- Date updated: 2024/05/09
+  -- Comment: 4448#10781 reset back
   param_msg_error           varchar2(4000 char);
 
   v_chken                   varchar2(10 char);
@@ -23,5 +27,7 @@
   procedure get_index (json_str_input in clob, json_str_output out clob);
   procedure gen_index (json_str_output out clob);
 END HRRC46X;
+
+
 
 /

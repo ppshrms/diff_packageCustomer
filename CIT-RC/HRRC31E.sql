@@ -3,6 +3,9 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRRC31E" AS
+-- Date updated: 27/05/2024
+-- Comment: 000554-bow.sarunya-dev | issue4448#10768: fix body msg email replace wrong
+
     param_msg_error         varchar2(4000 char);
     global_v_coduser        varchar2(100 char);
     global_v_codempid       varchar2(100 char);
@@ -83,5 +86,7 @@
     procedure sendemail(json_str_input in clob, json_str_output out clob);
 
 END HRRC31E;
+
+
 
 /

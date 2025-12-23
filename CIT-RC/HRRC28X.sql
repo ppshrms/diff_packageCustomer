@@ -3,6 +3,8 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRRC28X" AS
+-- last update: 05/06/2024
+-- comment: 000554-bow.sarunya-dev | issue4448#10767
   param_msg_error           varchar2(4000 char);
 
   v_chken                   varchar2(10 char);
@@ -35,5 +37,7 @@
   procedure get_qtyappl_reject (json_str_input in clob, json_str_output out clob);
   procedure gen_qtyappl_reject (json_str_output out clob);
 END HRRC28X;
+
+
 
 /

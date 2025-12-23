@@ -56,4 +56,5 @@
   procedure get_msg_warning(json_str_input in clob, json_str_output out clob);
 end;
 
+
 /

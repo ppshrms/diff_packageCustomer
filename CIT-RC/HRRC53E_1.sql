@@ -199,22 +199,23 @@
     v_amtguarntr        number;
     n_amtguarntr        number;
   begin
---    if p_codempid is not null then
---      begin
---        select codcomp,codjob
---          into v_codcomp,v_codjob
---          from temploy1
---        where codempid = p_codempid;
---      exception when no_data_found then
---        param_msg_error := get_error_msg_php('HR2010', global_v_lang, 'temploy1');
---        return;
---      end;
---      if not secur_main.secur2(p_codempid, global_v_coduser, global_v_zminlvl, global_v_zwrklvl, p_zupdsal) then
---        param_msg_error := get_error_msg_php('HR3007', global_v_lang);
---        return;
---      end if;
---    end if;
-    --
+  --<< Site: STD Author: Nuii Kowit (000551) Date updated: 17 May 2024 17:22 Comment: fix issue 4448#10668
+    if p_codempid is not null then
+      begin
+        select codcomp,codjob
+          into v_codcomp,v_codjob
+          from temploy1
+        where codempid = p_codempid;
+      exception when no_data_found then
+        param_msg_error := get_error_msg_php('HR2010', global_v_lang, 'temploy1');
+        return;
+      end;
+      if not secur_main.secur2(p_codempid, global_v_coduser, global_v_zminlvl, global_v_zwrklvl, p_zupdsal) then
+        param_msg_error := get_error_msg_php('HR3007', global_v_lang);
+        return;
+      end if;
+    end if;
+  -->> Site: STD Author: Nuii Kowit (000551) Date updated: 17 May 2024 17:22 Comment: fix issue 4448#10668
     begin
       select amtguarntr
         into b_amtguarntr
@@ -235,6 +236,7 @@
       n_amtguarntr := hcm_util.get_string_t(json_params, 'amtguarntr');
       v_amtguarntr := nvl(v_amtguarntr,0) + nvl(n_amtguarntr,0);
       --
+
       if b_amtguarntr > v_amtguarntr and (param_flgwarn != 'Y' or param_flgwarn is null) then -- softberry || 20/03/2023 || #8764 || if b_amtguarntr > v_amtguarntr then
         param_msg_error := replace(get_error_msg_php('RC0043', global_v_lang),'[P-AMTCOLLA]',to_char(b_amtguarntr - v_amtguarntr, 'fm9,999,990.90'));
       end if;
@@ -618,5 +620,6 @@
     json_str_output   := get_response_message('400',param_msg_error,global_v_lang);
   end;
 end HRRC53E;
+
 
 /

@@ -5,7 +5,7 @@
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC2QB" is
   procedure initial_value(json_str in clob) is
     json_obj        json_object_t;
-    
+
   begin
     v_chken             := hcm_secur.get_v_chken;
     json_obj            := json_object_t(json_str);
@@ -37,7 +37,7 @@
     param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
     json_str_output := get_response_message('400',param_msg_error,global_v_lang);
   end;
-  
+
   procedure get_export_excel_data(json_str_input in clob,json_str_output out clob) is
   begin
     gen_export_excel_data(json_str_input,json_str_output);
@@ -45,11 +45,11 @@
     param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
     json_str_output := get_response_message('400',param_msg_error,global_v_lang);
   end;
-  
+
   procedure gen_index(json_str_output out clob) as
     obj_data            json_object_t;
     obj_row             json_object_t;
-    
+
     v_rcnt              number := 0;
     v_flgdata           boolean;
 
@@ -61,35 +61,36 @@
                                    '105', nambrow5,
                                    '') nambrow
           from treport2
-         where codapp = global_v_codapp;
-        
+         where codapp = global_v_codapp
+         order by numseq;
+
   begin
     obj_row := json_object_t();
-    
+
     for i in c_index_report loop
       v_flgdata := true;
-      
+
       v_rcnt  := v_rcnt + 1;
       obj_data := json_object_t();
       obj_data.put('coderror','200');
       obj_data.put('nambrow',i.nambrow);
       obj_data.put('namfld',i.namfld);
       obj_data.put('tablename',i.tablename);
-      
+
       obj_row.put(to_char(v_rcnt - 1),obj_data);
     end loop;
-    
+
     if v_flgdata then
         json_str_output   := obj_row.to_clob;
     else
         param_msg_error := get_error_msg_php('HR2055',global_v_lang,'TAPPFM');
     end if;
-    
+
   exception when others then
     param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
     json_str_output := get_response_message('400',param_msg_error,global_v_lang);
   end;
-  
+
   function get_commoncode_stmt(p_ms_table varchar2) return varchar2 is
     v_stmt    varchar2(4000 char);
   begin
@@ -269,28 +270,28 @@
     end if;
     return v_stmt;
   end;
-  
+
   procedure gen_export_excel_data(json_str_input in clob,json_str_output out clob) as
     json_obj        json_object_t;
     json_obj_list   json_object_t;
     array_list      json_array_t;
-    
+
     obj_data        json_object_t;
     obj_data_row    json_object_t;
     obj_row         json_object_t;
     obj_row_table   json_object_t;
     obj_table       json_object_t;
-    
+
     v_rcnt          number := 0;  -- total record of all common code
     v_numseq        number := 0;  -- total record of each common code
     v_numrow        number := 0;
-    
+
     v_param         json_object_t;
     v_stmt          varchar2(4000 char);
     v_namfld        varchar2(4000 char);
     v_flgdata       boolean;
     v_flgdata_user  boolean;
-    
+
     v_cursor        number;
     v_dummy         integer;
     v_code          varchar2(1000 char);
@@ -301,7 +302,7 @@
     v_code3         varchar2(1000 char);
     v_code4         varchar2(1000 char);
     v_code5         varchar2(1000 char);
-    
+
     p_filename      varchar2(4000 char);
     v_table         clob;
 
@@ -309,14 +310,14 @@
     json_obj     := json_object_t(json_str_input);
     v_param      := json_object_t(json_obj).get_object('p_data_import');
     v_numrow     := 0;
-    
+
     obj_table    := json_object_t();
     if v_param is not null then
       for i in 0..v_param.get_size - 1 loop
        json_obj_list    := hcm_util.get_json_t(v_param,to_char(i));
        v_namfld         := hcm_util.get_string_t(json_obj_list,'namfld');
        obj_row          := json_object_t();
-       
+
        v_flgdata        := false;
        v_flgdata_user   := false;
 
@@ -335,7 +336,7 @@
         v_dummy := dbms_sql.execute(v_cursor);
         v_numseq  := 0;
         v_rcnt    := 0;
-        
+
         while dbms_sql.fetch_rows(v_cursor) > 0 loop
           v_flgdata := true;
           v_code := null;  v_labe := null;  v_labt := null;  v_code1 := null;  v_code2 := null;  v_code3 := null;  v_code4 := null;  v_code5 := null;
@@ -348,7 +349,7 @@
           dbms_sql.column_value(v_cursor,6,v_code3);
           dbms_sql.column_value(v_cursor,7,v_code4);
           dbms_sql.column_value(v_cursor,8,v_code5);
-          
+
           v_rcnt := v_rcnt + 1;
           v_numseq := v_numseq + 1;
           obj_data := json_object_t();
@@ -366,30 +367,31 @@
 
           obj_row.put(to_char(v_rcnt), obj_data);
         end loop;   -- end while dbms_sql.fetch_rows(v_cursor) > 0 loop
-        
+
         if v_flgdata then
             obj_table.put(to_char(v_namfld), obj_row);
         end if; -- end if not empty obj_row
-        
+
        exception when others then null;
        end;
       end loop;     -- end for i in 0..v_param.get_size - 1 loop
-      
+
       obj_data_row    := json_object_t();
-      
+
       obj_data_row.put('coderror','200');
       obj_data_row.put('table',obj_table);
-      
-      
+
+
     end if;         -- if v_param <> 'null'
 
     json_str_output   := obj_data_row.to_clob;
-    
+
   exception when others then
     param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
     json_str_output := get_response_message('400',param_msg_error,global_v_lang);
   end;
-  
+
 end HRRC2QB;
+
 
 /

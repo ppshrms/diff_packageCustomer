@@ -163,6 +163,7 @@
         obj_data.put('codcomp', i.codcomp);
         obj_data.put('desc_codcomp', get_tcenter_name(i.codcomp, global_v_lang));
         obj_data.put('codpos', i.codpos);
+        obj_data.put('desc_codpos', get_tpostn_name(i.codpos, global_v_lang)); -- OSS0009 | DEV - Ping | issue4448#10617 | 03/05/2024 14.40
         obj_data.put('scorfull', i.scorfull);
         obj_data.put('qtyscore', i.qtyscore);
         obj_data.put('isDelete', check_delete(i.codcomp, i.codform, i.codpos));
@@ -467,5 +468,6 @@
     json_str_output := obj_rows.to_clob;
   end gen_tintvews;
 end HRRC3FE;
+
 
 /

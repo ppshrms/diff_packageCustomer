@@ -3,6 +3,7 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC58X" AS
+    -- last updated: 31/05/2024
   procedure initial_value (json_str in clob) AS
     json_obj            json_object_t;
   begin
@@ -109,8 +110,12 @@
               into v2_codempid, v2_dteyrepay, v2_dtemthpay, v2_numperiod, v2_numprdded
               from tguardet t1
              where codempid = i.codempid
-               and numprdded = (select min(numprdded) from tguardet
-                             where codempid = t1.codempid);
+            --<< Site: STD Author: Nuii Kowit (000551) Date updated: 31 May 2024 12:15 Comment: issue 4448#10790
+                  and dteyrepay || lpad(dtemthpay, 2, '0')||lpad(numprdded, 2, '0') =
+                    (select min(dteyrepay||lpad(dtemthpay, 2, '0')||lpad(numprdded, 2, '0'))
+                    from tguardet
+                    where codempid = t1.codempid);
+            -->> Site: STD Author: Nuii Kowit (000551) Date updated: 31 May 2024 12:15 Comment: issue 4448#10790
               v2_con := 'Y';
          exception when no_data_found then
               v2_con := 'N';
@@ -308,7 +313,7 @@
       select codempid, dteyrepay, dtemthpay, numperiod, numprdded, amtded
         from tguardet
        where codempid = p_codempid
-       order by numprdded;
+       order by dteyrepay,dtemthpay,numprdded;
 
   begin
     obj_rows            := json_object_t();
@@ -544,5 +549,6 @@
     json_str_output := obj_data.to_clob;
   end gen_tcolltrl_detail;
 end HRRC58X;
+
 
 /

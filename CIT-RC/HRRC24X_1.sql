@@ -3,7 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC24X" is
--- last update: 24/11/2020 18:30
+  -- Site: ST11
+  -- Author: Taweechok (000565)
+  -- Date updated: 2024/06/10
+  -- Comment: 4448#10679
  procedure initial_value(json_str_input in clob) as
     json_obj          json_object_t;
   begin
@@ -42,11 +45,21 @@
     obj_row     := json_object_t();
     obj_row.put('coderror', '200');
     obj_row.put('codrep', p_codrep);
+    --<< st-11 | 000565-taweechok-dev | 2024/06/10 | add obj_row.put 4448#10679
+    obj_row.put('condition', p_codrep);
+    -->>
     for trep in c_trepdsph loop
       obj_row.put('code', trep.syncond);
       obj_row.put('description', get_logical_name('HRRC24X',trep.syncond,global_v_lang));
       obj_row.put('statement', trep.statement);
-      obj_row.put('condition', p_codrep);
+      --<< st-11 | 000565-taweechok-dev | 2024/06/04 | add obj_row.put 4448#10679
+      obj_row.put('namrep', trep.namrep);
+      obj_row.put('namrepe', trep.namrepe);
+      obj_row.put('namrept', trep.namrept);
+      obj_row.put('namrep3', trep.namrep3);
+      obj_row.put('namrep4', trep.namrep4);
+      obj_row.put('namrep5', trep.namrep5);
+      -->> 
     end loop;
 
     json_str_output := obj_row.to_clob;
@@ -68,17 +81,29 @@
   procedure insert_trepdsph(p_r_trepdsph trepdsph%rowtype) is
   begin
     begin
+      --<< st-11 | 000565-taweechok-dev | 2024/06/04 | edit sql insert 4448#10679 
       insert into trepdsph (codapp,codrep,
+                            namrepe,namrept,namrep3,namrep4,namrep5,
                             syncond,codcreate,coduser,statement)
              values  (p_codapp,p_r_trepdsph.codrep,
+                      p_r_trepdsph.namrepe,p_r_trepdsph.namrept,p_r_trepdsph.namrep3,p_r_trepdsph.namrep4,p_r_trepdsph.namrep5,                      
                       p_r_trepdsph.syncond,global_v_coduser,global_v_coduser,p_r_trepdsph.statement);
+      -->>        
     exception when dup_val_on_index then
+      --<< st-11 | 000565-taweechok-dev | 2024/06/04 | edit sql update 4448#10679 
       update  trepdsph
-      set     syncond     = p_r_trepdsph.syncond,
+      set     
+              namrepe     = p_r_trepdsph.namrepe,
+              namrept     = p_r_trepdsph.namrept,
+              namrep3     = p_r_trepdsph.namrep3,
+              namrep4     = p_r_trepdsph.namrep4,
+              namrep5     = p_r_trepdsph.namrep5,      
+              syncond     = p_r_trepdsph.syncond,
               statement   = p_r_trepdsph.statement,
               coduser     = global_v_coduser
       where   codapp      = p_codapp
       and     codrep      = p_r_trepdsph.codrep;
+      -->> 
     end;
   end;
   --
@@ -145,6 +170,13 @@
     v_obj_detail_style_row  := json_object_t();
     json_str             := json_object_t(json_str_input);
     r_trepdsph.codrep    := hcm_util.get_string_t(json_str, 'p_codrep');
+    --<< st-11 | 000565-taweechok-dev | 2024/06/05 | add r_trepdsph.namrepe-namrep5 4448#10679 
+    r_trepdsph.namrepe   := hcm_util.get_string_t(json_str, 'p_namrepe');
+    r_trepdsph.namrept   := hcm_util.get_string_t(json_str, 'p_namrept');
+    r_trepdsph.namrep3   := hcm_util.get_string_t(json_str, 'p_namrep3');
+    r_trepdsph.namrep4   := hcm_util.get_string_t(json_str, 'p_namrep4');
+    r_trepdsph.namrep5   := hcm_util.get_string_t(json_str, 'p_namrep5');
+    -->>    
     json_syncond         := hcm_util.get_json_t(json_str,'p_syncond');
     r_trepdsph.syncond   := hcm_util.get_string_t(json_syncond, 'code');
     r_trepdsph.statement := hcm_util.get_string_t(json_syncond, 'statement');
@@ -324,7 +356,7 @@
             v_stmt_query  := ' select '||v_alias_column||
                              ' from '||v_treport(i).codtable||' '||
                              ' where numappl = '''||v_numappl||''' ';
-          end if;
+          end if;     
           dbms_sql.parse(v_cursor_query,v_stmt_query,dbms_sql.native);
           dbms_sql.define_column(v_cursor_query,1,v_data_exec,2000);
           v_dummy     := dbms_sql.execute(v_cursor_query);
@@ -542,7 +574,7 @@ procedure gen_list_fields(json_str_output out clob) as
     end if;
   end get_item_property;
 ----------------------------------------------------------------------------------
-
 end HRRC24X;
+
 
 /

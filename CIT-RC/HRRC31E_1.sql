@@ -3,6 +3,8 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC31E" AS
+-- Date updated: 27/05/2024
+-- Comment: 000554-bow.sarunya-dev | issue4448#10768: fix body msg email replace wrong
 
   procedure initial_current_user_value(json_str_input in clob) as
    json_obj json_object_t;
@@ -334,7 +336,7 @@
     v_total_qtyscoreavg     number := 0;
     v_total_codasapl        number := 0;
     v_total_result          tappoinf.codasapl%type := 'P';
-    v2_scorfull      number := 0;
+    v2_scorfull      number := 0;  
 
     cursor c1 is
         select a.numapseq, a.dteappoi, a.typappty, a.descnote, a.stapphinv,
@@ -358,23 +360,24 @@
         obj_data.put('desc_oth', i.descnote);
         obj_data.put('status', i.stapphinv);
         obj_data.put('desc_status', get_tlistval_name('STAPPHINV', i.stapphinv, global_v_lang));
--- #7855 || 13/07/2022
+-- #7855 || 13/07/2022        
         if i.typappty = '1' then
             begin
-                select scorfull into v2_scorfull
+                select scorfull into v2_scorfull 
                 from texampos
                 where codcomp like p_codcomp||'%'
                 and codexam = i.codexam
                 and codpos = i.codposrq;
             exception when others then
-                v2_scorfull := 0;
+                v2_scorfull := 0;            
             end;
         else
             v2_scorfull := i.qtyfscore;
         end if;
         obj_data.put('scorfull', v2_scorfull);
-        --obj_data.put('scorfull', i.qtyfscore);
--- #7855 || 13/07/2022
+        obj_data.put('codexam', i.codexam); -- 000554-bow.sarunya-dev | issue4448#10770 | response node codexam | 20/05/2024
+        --obj_data.put('scorfull', i.qtyfscore); 
+-- #7855 || 13/07/2022        
         obj_data.put('qtyscore', i.qtyscoreavg);
         obj_data.put('result', get_tlistval_name('CODASAPL', i.codasapl, global_v_lang));
         obj_rows.put(to_char(v_row-1),obj_data);
@@ -1523,18 +1526,16 @@
       v_item_field_original := v_item;
       v_item     :=   substr(v_item, instr(v_item,'.')+1);
       exit when v_item is null;
-        param_msg_error := param_msg_error||v_statmt;
-      v_value := name_in(v_itemson , lower(v_item));
+        v_value := name_in(v_itemson , lower(v_item));
+
       if get_item_property(v_codtable,v_item) = 'DATE' then
-        v_value   := 'to_date('''||to_char(to_date(v_value),'dd/mm/yyyy')||''',''dd/mm/yyyy'')' ;
-        v_statmt  := replace(v_statmt,'['||v_item_field_original||']',v_value) ;
+        v_value   := 'to_date('''||to_char(to_date(v_value),'dd/mm/yyyy')||''',''dd/mm/yyyy'')';
+        v_statmt  := replace(v_statmt,'['||v_item_field_original||']',v_value);
       else
-        v_statmt  := replace(v_statmt,'['||v_item_field_original||']',v_value) ;
-                param_msg_error := param_msg_error||v_statmt;
-
+        v_statmt  := replace(v_statmt,'['||v_item_field_original||']',v_value);
       end if;
-
      end loop;
+
     return v_statmt;
   end std_get_value_replace;
 
@@ -1622,9 +1623,16 @@
             v_month := arr_result(2);
             v_year := arr_result(3);
           end if;
-          v_dataexct := to_number(v_day) ||' '||
-                        get_label_name('HRPM33R1',global_v_lang,30) || ' ' ||get_tlistval_name('NAMMTHFUL',to_number(v_month),global_v_lang) || ' ' ||
-                        get_label_name('HRPM33R1',global_v_lang,220) || ' ' ||hcm_util.get_year_buddhist_era(v_year);
+
+		  --< [START] 000554-bow.sarunya-dev | issue4448#10768: fix email lang | 27/05/2024
+		  if v_codlang = '102' then
+			v_dataexct := to_number(v_day) ||' '||
+							get_label_name('HRPM33R1',v_codlang,30) || ' ' ||get_tlistval_name('NAMMTHFUL',to_number(v_month),v_codlang) || ' ' ||
+							get_label_name('HRPM33R1',v_codlang,220) || ' ' ||hcm_util.get_year_buddhist_era(v_year);
+		  else
+			v_dataexct := to_number(v_day) || ' ' || get_tlistval_name('NAMMTHFUL',to_number(v_month),v_codlang) || ' ' || v_year;
+		  end if;
+		  --> [END] 000554-bow.sarunya-dev | issue4448#10768: fix email lang | 27/05/2024
         end if;
       else
         v_statmt := std_get_value_replace(v_statmt, p_itemson, v_codtable);
@@ -1713,6 +1721,7 @@
         v_templete_to       clob;
         v_func_appr           varchar2(500 char);
         v_rowid         varchar(20);
+        v_applicant_codcomp   tcenter.codcomp%type;
 
         cursor c_interviewer is
             select a.codempts, b.email
@@ -1739,7 +1748,7 @@
                 v_folder := '';
         end;
         v_codlang := nvl(v_codlang,global_v_lang);
-        v_subject  := get_label_name('HRRC31EC1', global_v_lang, 310);
+        v_subject  := get_label_name('HRRC31EC1', v_codlang, 310); --> 000554-bow.sarunya-dev | issue4448#10768: lang subject change global_v_lang to v_codlang | 27/05/2024
 
         -- dateprint
         v_day           := to_number(to_char(p_dateprint_date,'dd'),'99');
@@ -1754,33 +1763,39 @@
 
             -- Read Document HTML
             gen_message(p_codform, o_message1, o_namimglet, o_message2, o_typemsg2, o_message3);
-                    list_msg_html := html_array(o_message1,o_message2,o_message3);
+            list_msg_html := html_array(o_message1,o_message2,o_message3);
 
             for i in 1..3 loop
                 data_file := list_msg_html(i);
-                data_file := std_replace(data_file,p_codform,i,itemSelected );
-                for j in 0..p_resultfparam.get_size - 1 loop
-                    obj_fparam      := hcm_util.get_json_t( p_resultfparam,to_char(j));
-                    fparam_fparam   := hcm_util.get_string_t(obj_fparam,'fparam');
-                    fparam_numseq   := hcm_util.get_string_t(obj_fparam,'numseq');
-                    fparam_section  := hcm_util.get_string_t(obj_fparam,'section');
-                    fparam_value    := hcm_util.get_string_t(obj_fparam,'value');
-                    if fparam_fparam = '[PARAM-SIGNID]' then
-                      begin
-                        select get_temploy_name(codempid,global_v_lang) into v_namesign
-                          from temploy1
-                         where codempid = fparam_value;
-                        fparam_value := v_namesign;
-                      exception when no_data_found then
-                        null;
-                      end;
-                    end if;
 
-                    data_file := replace(data_file, fparam_fparam, fparam_value);
-                end loop;
-                data_file := replace(data_file, '\t', '&nbsp;&nbsp;&nbsp;');
-                data_file := replace(data_file, chr(9), '&nbsp;');
-                list_msg_html(i) := data_file;
+                if trim(dbms_lob.substr(data_file, 1, 1)) is not null then --> 000554-bow.sarunya-dev | issue4448#10768: add if check data_file | 20/05/2024
+                  data_file := std_replace(data_file,p_codform,i,itemSelected );
+
+                  for j in 0..p_resultfparam.get_size - 1 loop
+                      obj_fparam      := hcm_util.get_json_t( p_resultfparam,to_char(j));
+                      fparam_fparam   := hcm_util.get_string_t(obj_fparam,'fparam');
+                      fparam_numseq   := hcm_util.get_string_t(obj_fparam,'numseq');
+                      fparam_section  := hcm_util.get_string_t(obj_fparam,'section');
+                      fparam_value    := hcm_util.get_string_t(obj_fparam,'fvalue'); --> 000554-bow.sarunya-dev | issue4448#10768: change value to fvalue for replace params | 27/05/2024
+
+                      if fparam_fparam = '[PARAM-SIGNID]' then
+                        begin
+                          select get_temploy_name(codempid,global_v_lang) into v_namesign
+                            from temploy1
+                           where codempid = fparam_value;
+                          fparam_value := v_namesign;
+                        exception when no_data_found then
+                          null;
+                        end;
+                      end if;
+
+                      data_file := replace(data_file, fparam_fparam, fparam_value);
+                  end loop;
+
+                  data_file := replace(data_file, '\t', '&nbsp;&nbsp;&nbsp;');
+                  data_file := replace(data_file, chr(9), '&nbsp;');
+                  list_msg_html(i) := data_file;
+                end if; --> 000554-bow.sarunya-dev | issue4448#10768: add if check data_file | 20/05/2024
             end loop;
 
             v_resultcol   := json_object_t ();
@@ -1820,23 +1835,26 @@
             -- send mail applicant '1'
             if p_flgappr_mail = '1' or p_flgappr_mail = '3' then
                 begin
-                    select email into v_email
+                    select email, codcomp
+                    into v_email, v_applicant_codcomp
                     from tapplinf
                     where numappl = v_numappl;
                 exception when no_data_found then
                     v_email := '';
                 end;
 
-                v_msg_to   := replace(v_msg_to ,'[PARA_DATE]'  ,to_char(sysdate,'dd/mm/yyyy'));
-                v_msg_to   := replace(v_msg_to ,'[P_CODUSER]'  ,v_coduser);
-                v_msg_to   := replace(v_msg_to ,'[P_LANG]'        ,global_v_lang);
-                v_msg_to   := replace(v_msg_to ,'[PARAM1]'       ,get_temploy_name(global_v_coduser, global_v_lang));
-                v_msg_to   := replace(v_msg_to ,'[PARAM2]'       ,v_subject);
-                v_msg_to   := replace(v_msg_to ,'[P_EMAIL]'      ,v_email);
-               v_error := send_mail(p_email    => v_email,
-                                     p_msg     => v_msg_to,
-                                     p_codappr  => null,
-                                     p_codapp  => null,
+                v_msg_to   := replace(v_msg_to, '[PARA_DATE]', to_char(sysdate,'dd/mm/yyyy'));
+                v_msg_to   := replace(v_msg_to, '[P_CODUSER]', v_coduser);
+                v_msg_to   := replace(v_msg_to, '[P_LANG]', global_v_lang);
+                v_msg_to   := replace(v_msg_to, '[PARAM1]' ,get_temploy_name(global_v_coduser, global_v_lang));
+                v_msg_to   := replace(v_msg_to, '[PARAM2]' ,v_subject);
+                v_msg_to   := replace(v_msg_to, '[P_EMAIL]', v_email);
+                v_msg_to   := replace(v_msg_to, '[PARAM-COMPANY]', get_tcenter_name(v_applicant_codcomp, v_codlang)); --> 000554-bow.sarunya-dev | issue4448#10768: add replace PARAM-COMPANY | 27/05/2024
+
+                v_error := send_mail(p_email => v_email,
+                                     p_msg => v_msg_to,
+                                     p_codappr => null,
+                                     p_codapp => null,
                                      p_filename1 => p_refdoc,
                                      p_filename2 => null,
                                      p_filename3 => null,
@@ -1920,5 +1938,6 @@
     end sendemail;
 
 END HRRC31E;
+
 
 /

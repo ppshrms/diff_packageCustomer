@@ -78,6 +78,7 @@
        order by codempid;
   begin
     obj_rows    := json_object_t();
+
     for i in c1 loop
       if param_msg_error is null then
         v_found     := true;
@@ -115,6 +116,7 @@
 
           obj_rows.put(to_char(v_rcnt - 1), obj_data);
         else
+
           if v_check = 'HR2010' then
             param_msg_error := get_error_msg_php(v_check, global_v_lang, 'tfwmailc');
             exit;
@@ -125,12 +127,14 @@
 
     if v_found then
       if param_msg_error is null then
---        if obj_rows.get_size > 0 then
+      -->> Site: mo-kohu-ss2301 Author: Nuii Kowit (000551) Date updated: 31 May 2024 13:51 Comment: 4448#10727
+        if obj_rows.get_size > 0 then
           json_str_output := obj_rows.to_clob;
---        else
---          param_msg_error := get_error_msg_php('HR3008', global_v_lang);
---          json_str_output := get_response_message(null, param_msg_error, global_v_lang);
---        end if;
+        else
+          param_msg_error := get_error_msg_php('HR3008', global_v_lang);
+          json_str_output := get_response_message(null, param_msg_error, global_v_lang);
+        end if;
+    --<< Site: mo-kohu-ss2301 Author: Nuii Kowit (000551) Date updated: 31 May 2024 13:51 Comment: 4448#10727
       else
         json_str_output := get_response_message(null, param_msg_error, global_v_lang);
       end if;
@@ -673,5 +677,6 @@
     json_str_output := get_response_message('400', param_msg_error, global_v_lang);
   end save_detail;
 end HRRC43U;
+
 
 /

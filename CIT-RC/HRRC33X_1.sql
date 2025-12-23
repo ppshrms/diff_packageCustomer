@@ -465,7 +465,9 @@
         and codexam = p_codexam
         and typtest = p_typtest
         and typetest = p_typetest
-        and dtetest = p_dtetest;
+        and dtetest = p_dtetest
+        ;
+
 --        where codempid = 'K000053002'
 --        and codexam = 'KAI2'
 --        and typtest = 1
@@ -483,21 +485,31 @@
         for r1 in c1 loop
             v_rcnt := v_rcnt + 1;
             json_obj_data       := json_object_t();
-            select count(codempid), nvl(sum(score), 0)
+
+            --> Peerasak || 12/05/2024 || Issue#10873
+            begin
+              select count(codempid), nvl(sum(score), 0)
                 into v_qtydone, v_score
                 from ttestempd
-                where codempid    = p_codempid
-                and codexam       = p_codexam
-                and dtetest       = p_dtetest
-                and typtest       = p_typtest
-                and typetest      = p_typetest
-                and codquest      = r1.codquest
-                and(answer is not null or numans is not null);
+               where codempid     = p_codempid
+                 and codexam      = p_codexam
+                 and dtetest      = p_dtetest
+                 and typtest      = p_typtest
+                 and typetest     = p_typetest
+                 and codquest     = r1.codquest
+                 and(answer is not null or numans is not null);
+            exception when no_data_found then
+              v_qtydone   := 0;
+              v_score     := 0;
+            end;
+            --> Peerasak || 12/05/2024 || Issue#10873
+
             json_obj_data.put('numsubj', r1.numsubj);
             json_obj_data.put('qtyexam', r1.qtyexam);
             json_obj_data.put('qtydone', v_qtydone);
             json_obj_data.put('score', v_score);
-            json_obj_row.put('coderror', 200);
+            json_obj_data.put('scorfull', nvl(r1.qtyscore, 0));                 --> Peerasak || 12/05/2024 || Issue#10873
+--            json_obj_row.put('coderror', 200);
 
             json_obj_row.put(to_char(v_rcnt - 1), json_obj_data);
         end loop;
@@ -512,5 +524,6 @@
   end gen_index_popup;
   --
 end hrrc33x;
+
 
 /

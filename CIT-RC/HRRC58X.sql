@@ -3,6 +3,7 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRRC58X" AS
+  -- last updated: 31/05/2024
   param_msg_error           varchar2(4000 char);
 
   v_chken                   varchar2(10 char);
@@ -36,5 +37,6 @@
   procedure get_tguardet (json_str_input in clob, json_str_output out clob);
   procedure gen_tguardet (json_str_output out clob);
 END HRRC58X;
+
 
 /

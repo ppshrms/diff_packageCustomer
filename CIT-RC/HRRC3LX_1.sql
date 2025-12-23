@@ -88,6 +88,7 @@
         order by codemprc;
   begin
     obj_rows := json_object_t();
+
     for i in c1 loop
     --    v_count := v_count + 1;--<<user25 Date:14/10/2021 #4252
         c1_numreqst := i.numreqst;
@@ -114,6 +115,38 @@
             end loop;
         end loop;
     end loop;
+
+    --> Peerasak || 27-05-2024 || Issue#10659
+    if v_count = 0 then
+      for i in c1 loop
+
+        c1_numreqst := i.numreqst;
+        c1_codpos := i.codpos;
+
+        v_count := v_count + 1;--<<user25 Date:14/10/2021 #4252
+        v_row := v_row+1;
+        obj_data := json_object_t();
+        obj_data.put('coderror', '200'); --<<user25 Date:14/10/2021 #4252
+        obj_data.put('codjobpost',i.codjobpost);
+        obj_data.put('desc_codjobpost',get_tcodec_name('TCODJOBPOST',i.codjobpost,global_v_lang));
+        obj_data.put('dtepost',to_char(i.dtepost,'dd/mm/yyyy'));
+        obj_data.put('dteclose',to_char(i.dteclose,'dd/mm/yyyy'));
+        obj_data.put('numreqst', i.numreqst);
+        obj_data.put('codpos', i.codpos);
+        obj_data.put('desc_codpos', get_tpostn_name(i.codpos, global_v_lang));
+        obj_data.put('codemprc', '');
+        obj_data.put('desc_codemprc', '');
+        obj_data.put('cs_emp', 0);
+
+        for i2 in c2 loop
+          obj_data.put('qtyreq',i2.qtyreq);
+          obj_data.put('qtyact',i2.qtyact);
+        end loop;
+
+        obj_rows.put(to_char(v_row-1),obj_data);
+      end loop;
+    end if;
+    --> Peerasak || 27-05-2024 || Issue#10659
 
     if v_count = 0 then
         param_msg_error := get_error_msg_php('HR2055',global_v_lang,'TJOBPOST');
@@ -142,5 +175,6 @@
   END get_index;
 
 END HRRC3LX;
+
 
 /

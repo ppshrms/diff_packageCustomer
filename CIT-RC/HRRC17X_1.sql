@@ -3,7 +3,8 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC17X" AS
-
+--Date updated: 03/05/2024
+--Comment: 000554-bow.sarunya-dev | 4448#10635 and refactor code
   procedure initial_value(json_str in clob) is
     json_obj        json_object_t;
   begin
@@ -157,6 +158,10 @@
     v_dtechoose     date;
     v_dteintview    date;
     v_dteappchse    date;
+    v_qtypsot       number; -- 000554-bow.sarunya-dev | 4448#10635 and refactor code | 03/05/2024
+    v_qtychoose     number; -- 000554-bow.sarunya-dev | 4448#10635 and refactor code | 03/05/2024
+    v_qtyintview    number; -- 000554-bow.sarunya-dev | 4448#10635 and refactor code | 03/05/2024
+    v_qtyappchse    number; -- 000554-bow.sarunya-dev | 4448#10635 and refactor code | 03/05/2024
 
   begin
     initial_value(json_str_input);
@@ -178,14 +183,50 @@
     obj_data.put('desc_codpos', get_tpostn_name(v_codpos,global_v_lang) );
     obj_data.put('dtereq', to_char(v_dtereq,'dd/mm/yyyy'));
     obj_data.put('dtepost', to_char(v_dtepost,'dd/mm/yyyy'));
-    obj_data.put('qtypsot', round((v_dtepost - v_dtereq) + 1) );
     obj_data.put('dtechoose', to_char(v_dtechoose,'dd/mm/yyyy'));
-    obj_data.put('qtychoose', round((v_dtechoose - v_dtepost) + 1) );
     obj_data.put('dteintview', to_char(v_dteintview,'dd/mm/yyyy'));
-    obj_data.put('qtyintview', round((v_dteintview - v_dtechoose) + 1) );
     obj_data.put('dteappchse', to_char(v_dteappchse,'dd/mm/yyyy'));
-    obj_data.put('qtyappchse', round((v_dteappchse - v_dteintview) + 1) );
-    obj_data.put('qtyall', (round((v_dtepost - v_dtereq) + 1) + round((v_dtechoose - v_dtepost) + 1) + round((v_dteintview - v_dtechoose) + 1)) );
+
+    --< [START] 000554-bow.sarunya-dev | 4448#10635 and refactor code | 03/05/2024
+    -- obj_data.put('qtypsot', round((v_dtepost - v_dtereq) + 1));
+    -- obj_data.put('qtychoose', round((v_dtechoose - v_dtepost) + 1) );
+    -- obj_data.put('qtyintview', round((v_dtechoose - v_dtepost) + 1) );
+    -- obj_data.put('qtyappchse', round((v_dteappchse - v_dteintview) + 1) );
+    -- obj_data.put('qtyall', (round((v_dtepost - v_dtereq) + 1) + round((v_dtechoose - v_dtepost) + 1) + round((v_dteintview - v_dtechoose) + 1)) );
+    if v_dtepost > v_dtereq then
+        v_qtypsot := round((v_dtepost - v_dtereq) + 1);
+    else
+        v_qtypsot := round((v_dtereq - v_dtepost) + 1);
+    end if;
+
+    obj_data.put('qtypsot', v_qtypsot);
+
+    if v_dtechoose > v_dtepost then
+        v_qtychoose := round((v_dtechoose - v_dtepost) + 1);
+    else
+        v_qtychoose := round((v_dtepost - v_dtechoose) + 1);
+    end if;
+
+    obj_data.put('qtychoose', round((v_dtechoose - v_dtepost) + 1));
+
+    if v_dteintview > v_dtechoose then
+        v_qtyintview := round((v_dteintview - v_dtechoose) + 1);
+    else
+        v_qtyintview := round((v_dtechoose - v_dteintview) + 1);
+    end if;
+
+    obj_data.put('qtyintview', v_qtyintview);
+
+    if v_dteappchse > v_dteintview then
+        v_qtyappchse := round((v_dteappchse - v_dteintview) + 1);
+    else
+        v_qtyappchse := round((v_dteintview - v_dteappchse) + 1);
+    end if;
+
+    obj_data.put('qtyappchse', v_qtyappchse);
+
+    obj_data.put('qtyall', nvl(v_qtypsot, 0) + nvl(v_qtychoose, 0) + nvl(v_qtyintview, 0) +  nvl(v_qtyappchse, 0));
+    --> [END] 000554-bow.sarunya-dev | 4448#10635 and refactor code | 03/05/2024
 
     obj_row.put(to_char(0), obj_data);
     if param_msg_error is null then
@@ -200,5 +241,6 @@
   end get_detail_statusreq;
 
 END HRRC17X;
+
 
 /

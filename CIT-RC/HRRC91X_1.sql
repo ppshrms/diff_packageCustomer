@@ -3,6 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC91X" AS
+  -- Site: ST11
+  -- Author: Chinnawat Wiw (000553)
+  -- Date updated: 2024/05/24
+  -- Comment: 4448#10791
 
   procedure initial_current_user_value(json_str_input in clob) as
    json_obj json_object_t;
@@ -91,7 +95,7 @@
     v_row       number;
     v_sum       number;
     cursor c1 is
-        select codcomp
+        select codcomp, sum(amtpay) as amtpay
           from tjobpost
          where codcomp like p_codcomp || '%'
            and dtepost between p_dtestr and p_dteend
@@ -104,29 +108,30 @@
         if secur_main.secur7(i.codcomp, global_v_coduser) then
             v_item5 := get_tcenter_name(i.codcomp, global_v_lang);
             v_row := get_max_numseq;
+            v_sum := i.amtpay;
             -- Adisak redmine#8809 -- 28/03/2023 14:18
-            begin
-              select sum(a.amtpay)
-                into v_sum
-                from tjobpost a
-                join treqest2 b
-                  on b.numreqst in (
-                    select distinct(c.numreqst)
-                      from tjobpost c
-                     where c.codcomp = a.codcomp
-                       and c.codpos = a.codpos
-                       and c.dtepost between p_dtestr and p_dteend
-                  )
-                  and b.codpos = a.codpos
-                where a.codcomp = b.codcomp
-                  and a.codcomp = i.codcomp
-                  and a.dtepost between p_dtestr and p_dteend
-                  and nvl(b.qtyact, 0) > 0
-                group by a.codcomp
-                order by a.codcomp;
-            exception when no_data_found then
-              v_sum := 0;
-            end;
+--            begin
+--              select sum(a.amtpay)
+--                into v_sum
+--                from tjobpost a
+--                join treqest2 b
+--                  on b.numreqst in (
+--                    select distinct(c.numreqst)
+--                      from tjobpost c
+--                     where c.codcomp = a.codcomp
+--                       and c.codpos = a.codpos
+--                       and c.dtepost between p_dtestr and p_dteend
+--                  )
+--                  and b.codpos = a.codpos
+--                where a.codcomp = b.codcomp
+--                  and a.codcomp = i.codcomp
+--                  and a.dtepost between p_dtestr and p_dteend
+--                  and nvl(b.qtyact, 0) > 0
+--                group by a.codcomp
+--                order by a.codcomp;
+--            exception when no_data_found then
+--              v_sum := 0;
+--            end;
             -- Adisak redmine#8809 -- 28/03/2023 14:18
             insert into ttemprpt
                 (
@@ -238,12 +243,12 @@
               on b.numreqst in (
               select distinct(c.numreqst)
                 from tjobpost c
-               where c.codcomp = a.codcomp
+               where hcm_util.get_codcomp_level(c.codcomp, 1) = hcm_util.get_codcomp_level(a.codcomp, 1) -- ST11 || Chinnawat Wiw (000553) || 24/05/2024
                  and c.codpos = a.codpos
                  and c.dtepost between p_dtestr and p_dteend
               )
             and b.codpos = a.codpos
-          where a.codcomp = b.codcomp
+          where hcm_util.get_codcomp_level(b.codcomp, 1) = hcm_util.get_codcomp_level(b.codcomp, 1) -- ST11 || Chinnawat Wiw (000553) || 24/05/2024
             and a.codpos = i.codpos
             and v_codcomps like '%|' || a.codcomp || '|%'
             and a.dtepost between p_dtestr and p_dteend
@@ -293,6 +298,7 @@
       order by numreqst;
 
   begin
+
     obj_rows := json_object_t();
     for i in c1 loop
         v_count     := v_count + 1;
@@ -431,5 +437,6 @@
   END get_index;
 
 END HRRC91X;
+
 
 /

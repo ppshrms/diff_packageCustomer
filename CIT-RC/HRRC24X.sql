@@ -3,7 +3,10 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRRC24X" is
-
+  -- Site: ST11
+  -- Author: Taweechok (000565)
+  -- Date updated: 2024/06/10
+  -- Comment: 4448#10679
   param_msg_error         varchar2(4000 char);
   global_v_coduser        varchar2(100 char);
   global_v_codempid       varchar2(100 char);
@@ -37,5 +40,6 @@
   function  get_item_property (p_table in varchar2,p_field  in varchar2) return varchar2;
 
 end HRRC24X;
+
 
 /

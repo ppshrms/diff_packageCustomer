@@ -66,7 +66,7 @@ procedure initial_value (json_str in clob) is
           and b.numreqst  = c.numreqst
           and a.codcomp  like (p_codcomp ||'%')
           and a.codpos    = p_codpos
-          and a.dteeffex between  p_dtestrt and  p_dteend
+          and b.dtereqm between  p_dtestrt and  p_dteend    -- issue4448#10782 | Ping Phisit | edit query | -- old code, and a.dteeffex 
           and exists( select e.numreqst
                         from treqest2 e
                        where b.rowid         = e.rowid
@@ -85,7 +85,7 @@ procedure initial_value (json_str in clob) is
             and a.codcomp   like (b.codcomp ||'%')
             and a.codpos    = b.codpos
             and a.codempid  = b.codempr
-            and a.dteeffex between  p_dtestrt and  p_dteend
+            and a.dteeffex between p_dtestrt and  p_dteend
             and not exists( select numreqst
                 from treqest2 c
                where c.codcomp   like (p_codcomp ||'%')
@@ -142,5 +142,6 @@ procedure initial_value (json_str in clob) is
 ----------------------------------------------------------------------------------
 
 end HRRC71X;
+
 
 /

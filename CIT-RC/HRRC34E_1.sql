@@ -3,6 +3,8 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC34E" AS
+-- Date updated: 31/05/2024
+-- Comment: 000554-bow.sarunya-dev | issue4448#10772
 
   procedure initial_current_user_value(json_str_input in clob) as
    json_obj json_object_t;
@@ -585,7 +587,7 @@
     exception when no_data_found then
       v_codform := '';
     end;
-        
+
     --<< 22/12/2023 || #7997
     /*select qtyscore into v_qtyscore
       from tintvewp
@@ -839,8 +841,10 @@
     v_sum_act   number :=0;
     v_sum_req   number :=0;
     v_status    varchar2(1 char) := 'P';
+    v_stasign   tapphinv.stasign%type;
+
     cursor c1 is
-        select numapseq,dteappoi,typappty,descnote,stapphinv,qtyfscore,qtyscoreavg,codasapl
+        select numapseq,dteappoi,typappty,descnote,stapphinv,qtyfscore,qtyscoreavg,codasapl, codexam -- 000554-bow.sarunya-dev | issue4448#10773: add codexam | 30/05/2024
           from tappoinf
          where numappl = p_numappl
            and numreqrq = p_numreqrq
@@ -849,16 +853,33 @@
   begin
     initial_current_user_value(json_str_input);
     initial_params(json_object_t(json_str_input));
+
+    --< [START] 000554-bow.sarunya-dev | issue4448#10773: add this query | 30/05/2024
+    begin
+        select stasign
+        into v_stasign
+        from tapphinv
+        where numappl = p_numappl
+          and numreqrq = p_numreqrq
+          and codposrq = p_codpos;
+    exception when no_data_found then
+        v_stasign := '';
+    end;
+    --> [END] 000554-bow.sarunya-dev | issue4448#10773: add this query | 30/05/2024
+
     for i in c1 loop
         v_row := v_row+1;
         obj_data := json_object_t();
         obj_data.put('numapseq',i.numapseq);
         obj_data.put('dteappoi',to_char(i.dteappoi,'dd/mm/yyyy'));
-        obj_data.put('typappty',get_tlistval_name('TYPAPPOINT',i.numapseq,global_v_lang));
+        obj_data.put('desc_typappty',get_tlistval_name('TYPAPPOINT',i.typappty,global_v_lang)); -- 000554-bow.sarunya-dev | issue4448#10772: change typappty to desc_typappty | 31/05/2024
         obj_data.put('descnote',i.descnote);
         obj_data.put('stapphinv',get_tlistval_name('STAPPHINV',i.stapphinv,global_v_lang));
         obj_data.put('qtyfscore',i.qtyfscore);
         obj_data.put('qtyscore',i.qtyscoreavg);
+        obj_data.put('codexam', i.codexam); -- 000554-bow.sarunya-dev | issue4448#10773: add this line | 30/05/2024
+        obj_data.put('stasign', v_stasign); -- 000554-bow.sarunya-dev | issue4448#10773: add this line | 30/05/2024
+        obj_data.put('typappty', i.typappty); -- 000554-bow.sarunya-dev | issue4448#10772: add this line | 31/05/2024
         v_sum_act :=v_sum_act + i.qtyscoreavg;
         v_sum_req :=v_sum_req + i.qtyfscore;
         if i.codasapl = 'F' then
@@ -892,10 +913,12 @@
     obj_rows    json_object_t := json_object_t();
     v_row       number :=0;
     v_stapphinv tappoinf.stapphinv%type;
-    v_codasapl  tappoinf.codasapl%type;
+    v_desc_codasapl  varchar2(100 char); -- 000554-bow.sarunya-dev | issue4448#10772: add v_codasapl to v_desc_codasapl | 31/05/2024
     v_sum_score number :=0;
     v_count_pass    number :=0;
     v_count_fail    number :=0;
+    v_stasign       tapphinv.stasign%type; -- 000554-bow.sarunya-dev | issue4448#10772: add this line | 31/05/2024
+
     cursor c1 is
         select a.codempts,b.codpos,a.qtyscore,a.codasapl,a.descnote
         from tappoinfint a, temploy1 b
@@ -917,30 +940,45 @@
     exception when no_data_found then
         v_stapphinv := null;
     end;
+
+    --< [START] 000554-bow.sarunya-dev | issue4448#10772: add this query for get stasign to show on dilldown interview | 31/05/2024
+    begin
+        select stasign into v_stasign
+        from tapphinv
+        where numappl = p_numappl
+          and numreqrq = p_numreqrq
+          and codposrq = p_codpos;
+    exception when no_data_found then
+        v_stasign := '';
+    end;
+    --< [END] 000554-bow.sarunya-dev | issue4448#10772: add this query for get stasign to show on dilldown interview | 31/05/2024
+
     for i in c1 loop
         v_row := v_row+1;
+        v_desc_codasapl := get_tlistval_name('CODASAPL', i.codasapl, global_v_lang); -- 000554-bow.sarunya-dev | issue4448#10772: add this line | 31/05/2024
         obj_data := json_object_t();
         obj_data.put('desc_codempts',get_temploy_name(i.codempts,global_v_lang));
         obj_data.put('desc_codpos',get_tpostn_name(i.codpos,global_v_lang));
         obj_data.put('qtyscore',i.qtyscore);
-        obj_data.put('desc_codasapl',get_tlistval_name('CODASAPL',i.codasapl, global_v_lang));
+        obj_data.put('desc_codasapl', v_desc_codasapl);
         obj_data.put('descnote',i.descnote);
         obj_rows.put(to_char(v_row-1),obj_data);
-        v_sum_score := v_sum_score + i.qtyscore;
+        v_sum_score := v_sum_score + nvl(i.qtyscore, 0); -- 000554-bow.sarunya-dev | issue4448#10772: add nvl | 31/05/2024
         if  i.codasapl = 'P' then
             v_count_pass := v_count_pass+1;
         else
             v_count_fail := v_count_fail+1;
         end if;
+
     end loop;
     if v_row > 0 then
         v_row := v_row+1;
         obj_data := json_object_t();
-        obj_data.put('desc_codempts',get_label_name('HRRC34EC2',global_v_lang,110));
-        obj_data.put('desc_codpos','');
-        obj_data.put('qtyscore',v_sum_score/v_row);
+        obj_data.put('desc_codempts', get_label_name('HRRC34EC2',global_v_lang,270)); -- 000554-bow.sarunya-dev | issue4448#10772: change 110 to 270 | 31/05/2024
+        obj_data.put('desc_codpos', '');
+        obj_data.put('qtyscore', v_sum_score/v_row);
         if v_stapphinv = 'C' then
-            obj_data.put('desc_codasapl',get_tlistval_name('TCODASAPL',v_codasapl,global_v_lang));
+            obj_data.put('desc_codasapl', v_desc_codasapl);
         else
             if v_count_pass >= v_count_fail then
                 obj_data.put('desc_codasapl',get_tlistval_name('TCODASAPL','P',global_v_lang));
@@ -951,12 +989,18 @@
         obj_data.put('descnote','');
         obj_rows.put(to_char(v_row-1),obj_data);
     end if;
-    json_str_output := obj_rows.to_clob;
+    obj_data.put('desc_codpos', get_tpostn_name(p_codpos, global_v_lang)); -- 000554-bow.sarunya-dev | issue4448#10772: add this line | 31/05/2024
+    obj_data.put('stasign', v_stasign); -- 000554-bow.sarunya-dev | issue4448#10772: add this line | 31/05/2024
+    obj_data.put('table', obj_rows);
+    obj_data.put('coderror', 200);
+
+    json_str_output := obj_data.to_clob;
   exception when others then
     param_msg_error := dbms_utility.format_error_stack||' '||dbms_utility.format_error_backtrace;
     json_str_output := get_response_message('400',param_msg_error,global_v_lang);
   end get_drilldown_interview;
 
 END HRRC34E;
+
 
 /

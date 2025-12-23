@@ -3,6 +3,8 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE "HRRC17X" AS
+--Date updated: 03/05/2024
+--Comment: 000554-bow.sarunya-dev | 4448#10635 and refactor code
 
   param_msg_error           varchar2(4000 char);
   global_v_zminlvl  		number;
@@ -33,5 +35,6 @@
   procedure get_detail_statusreq(json_str_input in clob, json_str_output out clob) ;
 
 END HRRC17X;
+
 
 /

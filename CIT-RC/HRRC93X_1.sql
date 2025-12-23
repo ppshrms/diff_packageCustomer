@@ -208,6 +208,7 @@
 
   procedure get_index(json_str_input in clob, json_str_output out clob) AS
   BEGIN
+
     initial_current_user_value(json_str_input);
     initial_params(json_object_t(json_str_input));
     if check_index then
@@ -322,5 +323,6 @@
         json_str_output := get_response_message('400',param_msg_error,global_v_lang);
   END get_report;
 END HRRC93X;
+
 
 /

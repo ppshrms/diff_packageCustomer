@@ -192,4 +192,5 @@ procedure delete_newemp (json_str_input in clob, json_str_output out clob) is
 
 end HRRC42D;
 
+
 /

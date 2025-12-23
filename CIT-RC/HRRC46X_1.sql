@@ -3,6 +3,11 @@
 --------------------------------------------------------
 
   CREATE OR REPLACE EDITIONABLE PACKAGE BODY "HRRC46X" AS
+-- Site: ST11
+-- Author: Chinanwat Wiw (000553)
+-- Date updated: 2024/05/09
+-- Comment: 4448#10781 reset back
+
   procedure initial_value (json_str in clob) AS
     json_obj            json_object_t;
   begin
@@ -63,7 +68,7 @@
     v_found             boolean := false;
 
     cursor c1 is
-      select a.codempid, a.codcomp, a.codpos, a.dteempmt, b.numappl, a.numlvl
+      select a.codempid, a.codcomp, a.codpos, a.dteempmt, b.numappl, a.numlvl -- 29/05/2024 || 4448#10781 || reset to the same as before
         from temploy1 a, tapplinf b
        where a.codempid = b.codempid
          and a.codcomp  like p_codcomp || '%'
@@ -88,7 +93,7 @@
         obj_data.put('codpos', i.codpos);
         obj_data.put('desc_codpos', get_tpostn_name(i.codpos, global_v_lang));
         obj_data.put('dteempmt', to_char(i.dteempmt, 'DD/MM/YYYY'));
-        obj_data.put('numappl', i.numappl);
+        obj_data.put('numappl', ''); -- 21/05/2024 || 4448#10781 ||  obj_data.put('numappl', i.numappl);
 
         obj_rows.put(to_char(v_rcnt - 1), obj_data);
       end if;
@@ -105,5 +110,6 @@
     end if;
   end gen_index;
 end HRRC46X;
+
 
 /
